@@ -24,9 +24,15 @@ const TaskList: React.FC = () => {
       <h1>Список задач</h1>
       <ul>
         {tasks.map((task) => (
-          <li key={task.id}>
+          <li key={task.id} className={task.completed ? 'completed' : ''}>
             <h2>{task.title}</h2>
             <p>{task.description}</p>
+            <p>
+              <strong>Статус:</strong> {task.completed ? 'Выполнено' : 'В процессе'}
+            </p>
+            <p>
+              <strong>Создано:</strong> {new Date(task.created_at).toLocaleString()}
+            </p>
           </li>
         ))}
       </ul>
