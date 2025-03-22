@@ -1,23 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { Task } from '../../types/Task';
-import { fetchTasks } from '../../api/tasks';
+import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { AppDispatch, RootState } from '../../redux/store';  // Импортируем типизированные Dispatch и RootState
+import { fetchTasks } from '../../redux/tasksSlice';
 import './TaskList.css';
 
 const TaskList: React.FC = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const dispatch = useDispatch<AppDispatch>();  // Используем типизированный Dispatch
+  const tasks = useSelector((state: RootState) => state.tasks.tasks);
+  const status = useSelector((state: RootState) => state.tasks.status);
+  const error = useSelector((state: RootState) => state.tasks.error);
 
   useEffect(() => {
-    const loadTasks = async () => {
-      try {
-        const data = await fetchTasks();
-        setTasks(data);
-      } catch (error) {
-        console.error('Ошибка при загрузке задач:', error);
-      }
-    };
+    if (status === 'idle') {
+      dispatch(fetchTasks());  // Теперь TypeScript знает тип действия
+    }
+  }, [status, dispatch]);
 
-    loadTasks();
-  }, []);
+  if (status === 'loading') {
+    return <div>Loading...</div>;
+  }
+
+  if (status === 'failed') {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="task-list">
