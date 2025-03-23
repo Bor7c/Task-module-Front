@@ -1,44 +1,30 @@
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
-import { AppDispatch, RootState } from '../../redux/store';  // Импортируем типизированные Dispatch и RootState
-import { fetchTasks } from '../../redux/tasksSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { loadTasks } from '../../redux/tasksSlice';
+import { Task } from '../../types/Task';
+import { AppDispatch, RootState } from '../../redux/store'; // Импортируем типы
 import './TaskList.css';
 
 const TaskList: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();  // Используем типизированный Dispatch
-  const tasks = useSelector((state: RootState) => state.tasks.tasks);
-  const status = useSelector((state: RootState) => state.tasks.status);
-  const error = useSelector((state: RootState) => state.tasks.error);
+  const dispatch = useDispatch<AppDispatch>(); // Типизируем dispatch
+  const { tasks, loading, error } = useSelector((state: RootState) => state.tasks); // Типизируем state
 
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchTasks());  // Теперь TypeScript знает тип действия
-    }
-  }, [status, dispatch]);
+    dispatch(loadTasks());
+  }, [dispatch]);
 
-  if (status === 'loading') {
-    return <div>Loading...</div>;
-  }
-
-  if (status === 'failed') {
-    return <div>Error: {error}</div>;
-  }
+  if (loading) return <div>Загрузка...</div>;
+  if (error) return <div>Ошибка: {error}</div>;
 
   return (
     <div className="task-list">
       <h1>Список задач</h1>
       <ul>
-        {tasks.map((task) => (
-          <li key={task.id} className={task.completed ? 'completed' : ''}>
-            <h2>{task.title}</h2>
-            <p>{task.description}</p>
-            <p>
-              <strong>Статус:</strong> {task.completed ? 'Выполнено' : 'В процессе'}
-            </p>
-            <p>
-              <strong>Создано:</strong> {new Date(task.created_at).toLocaleString()}
-            </p>
+        {tasks.map((task: Task) => (
+          <li key={task.id}>
+            <Link to={`/tasks/${task.id}`}>{task.title}</Link>
+            <span> ({task.status})</span>
           </li>
         ))}
       </ul>

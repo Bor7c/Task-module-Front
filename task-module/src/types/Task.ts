@@ -2,6 +2,12 @@ export interface Task {
   id: number;
   title: string;
   description: string;
-  completed: boolean;
-  created_at: string;  // Дата в формате строки (ISO)
+  status: string; // Добавляем статус
+  comments?: Comment[]; // Добавляем комментарии
+}
+
+export interface Comment {
+  id: number;
+  text: string;
+  created_at: string;
 }

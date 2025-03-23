@@ -19,6 +19,7 @@ const store = configureStore({
     }).concat(loggerMiddleware),
 });
 
+// Типизация для RootState и AppDispatch
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 

@@ -1,23 +1,28 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Task } from '../types/Task';
-import { fetchTasks as fetchTasksApi } from '../api/tasks';
-
-export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
-  const response = await fetchTasksApi();
-  return response;
-});
+import { fetchTasks, fetchTaskById } from '../api/tasks';
 
 interface TasksState {
   tasks: Task[];
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  currentTask: Task | null;
+  loading: boolean;
   error: string | null;
 }
 
 const initialState: TasksState = {
   tasks: [],
-  status: 'idle',
+  currentTask: null,
+  loading: false,
   error: null,
 };
+
+export const loadTasks = createAsyncThunk('tasks/loadTasks', async () => {
+  return await fetchTasks();
+});
+
+export const loadTaskById = createAsyncThunk('tasks/loadTaskById', async (id: number) => {
+  return await fetchTaskById(id);
+});
 
 const tasksSlice = createSlice({
   name: 'tasks',
@@ -25,16 +30,29 @@ const tasksSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchTasks.pending, (state) => {
-        state.status = 'loading';
+      .addCase(loadTasks.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
-      .addCase(fetchTasks.fulfilled, (state, action) => {
-        state.status = 'succeeded';
+      .addCase(loadTasks.fulfilled, (state, action) => {
         state.tasks = action.payload;
+        state.loading = false;
       })
-      .addCase(fetchTasks.rejected, (state, action) => {
-        state.status = 'failed';
+      .addCase(loadTasks.rejected, (state, action) => {
+        state.loading = false;
         state.error = action.error.message || 'Ошибка при загрузке задач';
+      })
+      .addCase(loadTaskById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loadTaskById.fulfilled, (state, action) => {
+        state.currentTask = action.payload;
+        state.loading = false;
+      })
+      .addCase(loadTaskById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Ошибка при загрузке задачи';
       });
   },
 });

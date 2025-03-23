@@ -1,0 +1,23 @@
+.task-detail {
+  padding: 20px;
+}
+
+.task-detail h1 {
+  margin-bottom: 10px;
+}
+
+.task-detail p {
+  margin-bottom: 20px;
+}
+
+.task-detail ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.task-detail ul li {
+  background: #f9f9f9;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
