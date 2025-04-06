@@ -1,23 +1,58 @@
 .task-detail {
+  max-width: 800px;
+  margin: 0 auto;
   padding: 20px;
 }
 
-.task-detail h1 {
-  margin-bottom: 10px;
-}
-
-.task-detail p {
+.task-header {
   margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
 }
 
-.task-detail ul {
-  list-style-type: none;
+.task-meta {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+  color: #666;
+}
+
+.comments-section {
+  margin-top: 30px;
+}
+
+.comments-list {
+  list-style: none;
   padding: 0;
 }
 
-.task-detail ul li {
+.comment-item {
   background: #f9f9f9;
-  padding: 10px;
-  margin-bottom: 10px;
   border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.comment-author {
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.comment-date {
+  color: #666;
+  font-weight: normal;
+  font-size: 0.9em;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+}
+
+.error {
+  color: #d32f2f;
+  padding: 20px;
+  text-align: center;
 }

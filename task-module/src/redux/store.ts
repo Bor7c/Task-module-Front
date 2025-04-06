@@ -1,26 +1,22 @@
-import { configureStore, Middleware } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
+import { useDispatch, useSelector } from 'react-redux';
+import type { TypedUseSelectorHook } from 'react-redux';
 import tasksReducer from './tasksSlice';
-
-// Логирующий middleware
-const loggerMiddleware: Middleware = (store) => (next) => (action) => {
-  console.log('Dispatching action:', action);
-  const result = next(action);
-  console.log('Next state:', store.getState());
-  return result;
-};
+import authReducer from './authSlice';
 
 const store = configureStore({
   reducer: {
     tasks: tasksReducer,
+    auth: authReducer,
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: false,  // Отключаем проверку на сериализуемость для логов
-    }).concat(loggerMiddleware),
 });
 
 // Типизация для RootState и AppDispatch
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+
+// Создаем типизированные хуки
+export const useAppDispatch: () => AppDispatch = useDispatch;
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 export default store;

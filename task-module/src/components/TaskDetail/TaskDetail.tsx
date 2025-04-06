@@ -6,6 +6,7 @@ import { Task, Comment } from '../../types/Task';
 import { AppDispatch, RootState } from '../../redux/store'; // Импортируем типы
 import './TaskDetail.css';
 
+
 const TaskDetail: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>(); // Типизируем dispatch
   const { id } = useParams<{ id: string }>();

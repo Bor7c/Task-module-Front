@@ -1,4 +1,5 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+// src/redux/tasksSlice.ts
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Task } from '../types/Task';
 import { fetchTasks, fetchTaskById } from '../api/tasks';
 
@@ -27,7 +28,18 @@ export const loadTaskById = createAsyncThunk('tasks/loadTaskById', async (id: nu
 const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
-  reducers: {},
+  reducers: {
+    // Добавляем ручные редьюсеры для управления состоянием
+    setTasks: (state, action: PayloadAction<Task[]>) => {
+      state.tasks = action.payload;
+    },
+    clearTasks: (state) => {
+      state.tasks = [];
+    },
+    setCurrentTask: (state, action: PayloadAction<Task | null>) => {
+      state.currentTask = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(loadTasks.pending, (state) => {
@@ -56,5 +68,8 @@ const tasksSlice = createSlice({
       });
   },
 });
+
+// Экспортируем actions
+export const { setTasks, clearTasks, setCurrentTask } = tasksSlice.actions;
 
 export default tasksSlice.reducer;
