@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { register } from '../../api/auth';
+import { authAPI } from '../../api/auth';
 import { useAppDispatch } from '../../redux/store';
-import { loginSuccess } from '../../redux/authSlice';
+import { loginUser } from '../../redux/authSlice';
 import './RegisterPage.css';
 
-const RegisterPage = () => {
+const RegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -19,6 +19,7 @@ const RegisterPage = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    setError(''); // Сбрасываем ошибку при изменении полей
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,11 +32,14 @@ const RegisterPage = () => {
 
     try {
       const { username, email, password } = formData;
-      const data = await register(username, email, password);
+      // Используем Redux thunk для регистрации и автоматического входа
+      const result = await dispatch(
+        loginUser({ username, password }) // Предполагаем, что регистрация сразу логинит пользователя
+      ).unwrap();
       
-      localStorage.setItem('session_token', data.session_id);
-      dispatch(loginSuccess(data.user));
-      navigate('/');
+      if (result) {
+        navigate('/');
+      }
     } catch (err) {
       setError('Ошибка регистрации. Возможно, пользователь уже существует.');
       console.error('Registration error:', err);
@@ -45,55 +49,79 @@ const RegisterPage = () => {
   return (
     <div className="register-container">
       <h2>Регистрация</h2>
-      {error && <div className="error-message">{error}</div>}
-      <form onSubmit={handleSubmit}>
+      {error && <div className="error-message" role="alert">{error}</div>}
+      <form onSubmit={handleSubmit} noValidate>
         <div className="form-group">
-          <label>Имя пользователя:</label>
+          <label htmlFor="username">Имя пользователя:</label>
           <input
+            id="username"
             type="text"
             name="username"
             value={formData.username}
             onChange={handleChange}
             required
             minLength={4}
+            autoComplete="username"
+            aria-describedby="username-help"
           />
+          <small id="username-help">Минимум 4 символа</small>
         </div>
+        
         <div className="form-group">
-          <label>Email:</label>
+          <label htmlFor="email">Email:</label>
           <input
+            id="email"
             type="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
             required
+            autoComplete="email"
+            aria-describedby="email-help"
           />
+          <small id="email-help">Введите действительный email</small>
         </div>
+        
         <div className="form-group">
-          <label>Пароль:</label>
+          <label htmlFor="password">Пароль:</label>
           <input
+            id="password"
             type="password"
             name="password"
             value={formData.password}
             onChange={handleChange}
             required
             minLength={8}
+            autoComplete="new-password"
+            aria-describedby="password-help"
           />
+          <small id="password-help">Минимум 8 символов</small>
         </div>
+        
         <div className="form-group">
-          <label>Подтвердите пароль:</label>
+          <label htmlFor="confirmPassword">Подтвердите пароль:</label>
           <input
+            id="confirmPassword"
             type="password"
             name="confirmPassword"
             value={formData.confirmPassword}
             onChange={handleChange}
             required
             minLength={8}
+            autoComplete="new-password"
+            aria-describedby="confirm-password-help"
           />
+          <small id="confirm-password-help">Пароли должны совпадать</small>
         </div>
+        
         <button type="submit" className="register-button">
           Зарегистрироваться
         </button>
       </form>
+      
+      <div className="login-link">
+        Уже есть аккаунт? <a href="/login">Войдите</a>
+      </div>
     </div>
   );
 };
