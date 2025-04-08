@@ -18,37 +18,17 @@ interface ErrorResponse {
   non_field_errors?: string[];
 }
 
-const getCookie = (name: string): string | null => {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-  return null;
-};
-
-const clearAuthData = (): void => {
-  // Очистка кук
-  const cookies = ['sessionid', 'csrftoken', 'session_id'];
-  cookies.forEach(cookie => {
-    document.cookie = `${cookie}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
-  });
-
-  // Очистка хранилищ
-  ['session_token', 'user_data'].forEach(key => {
-    localStorage.removeItem(key);
-    sessionStorage.removeItem(key);
-  });
-};
-
 export const authAPI = {
-  login: async (credentials: { username: string; password: string }): Promise<AuthResponse> => {
+  login: async (credentials: { username: string; password: string }): Promise<{ user: UserData }> => {
     try {
       const response = await api.post('/auth/login/', credentials, {
         withCredentials: true,
-        headers: {
-          'X-CSRFToken': getCookie('csrftoken') || '',
-        }
       });
-      return response.data;
+      
+      // Возвращаем объект с user для совместимости со слайсом
+      return {
+        user: response.data.user
+      };
     } catch (error) {
       const axiosError = error as AxiosError<ErrorResponse>;
       throw new Error(
@@ -59,15 +39,15 @@ export const authAPI = {
     }
   },
 
-  register: async (data: { username: string; email: string; password: string }): Promise<AuthResponse> => {
+  register: async (data: { username: string; email: string; password: string }): Promise<{ user: UserData }> => {
     try {
       const response = await api.post('/auth/register/', data, {
         withCredentials: true,
-        headers: {
-          'X-CSRFToken': getCookie('csrftoken') || '',
-        }
       });
-      return response.data;
+      
+      return {
+        user: response.data.user
+      };
     } catch (error) {
       const axiosError = error as AxiosError<ErrorResponse>;
       throw new Error(
@@ -82,26 +62,25 @@ export const authAPI = {
     try {
       await api.post('/auth/logout/', {}, {
         withCredentials: true,
-        headers: {
-          'X-CSRFToken': getCookie('csrftoken') || '',
-        }
       });
-      clearAuthData();
+      
+      document.cookie = 'sessionid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     } catch (error) {
       console.error('Logout error:', error);
-      clearAuthData(); // Все равно очищаем данные даже при ошибке
       throw error;
     }
   },
 
-  checkSession: async (): Promise<AuthResponse | null> => {
+  checkSession: async (): Promise<{ user: UserData } | null> => {
     try {
       const response = await api.get('/auth/session-check/', {
-        withCredentials: true
+        withCredentials: true,
       });
-      return response.data;
+      
+      return {
+        user: response.data.user
+      };
     } catch (error) {
-      clearAuthData();
       return null;
     }
   }

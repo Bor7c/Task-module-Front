@@ -2,16 +2,13 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: 'http://localhost:8000/api',
-  withCredentials: true,  // Важно для отправки кук сессии
-});
-
-// Интерсептор для автоматической подстановки CSRF токена
-api.interceptors.request.use(config => {
-  const csrfToken = getCookie('csrftoken');
-  if (csrfToken) {
-    config.headers['X-CSRFToken'] = csrfToken;
+  withCredentials: true,
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    // Добавляем session token в заголовки, если нужно
+    'Authorization': `Session ${getCookie('session_token') || ''}`
   }
-  return config;
 });
 
 // Интерсептор для обработки ошибок
@@ -26,7 +23,7 @@ api.interceptors.response.use(
   }
 );
 
-
+// Функция для получения куки
 function getCookie(name: string): string | null {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
