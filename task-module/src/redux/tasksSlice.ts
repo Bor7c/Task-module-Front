@@ -1,7 +1,6 @@
-// src/redux/tasksSlice.ts
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Task } from '../types/Task';
-import { fetchTasks, fetchTaskById } from '../api/tasks';
+import { Task, Comment } from '../types/Task';
+import { fetchTasks, fetchTaskById, fetchComments, addComment, deleteComment } from '../api/tasks';
 
 interface TasksState {
   tasks: Task[];
@@ -17,19 +16,51 @@ const initialState: TasksState = {
   error: null,
 };
 
-export const loadTasks = createAsyncThunk('tasks/loadTasks', async () => {
-  return await fetchTasks();
+export const loadTasks = createAsyncThunk('tasks/loadTasks', async (_, { rejectWithValue }) => {
+  try {
+    return await fetchTasks();
+  } catch (error: any) {
+    return rejectWithValue(error.message);
+  }
 });
 
-export const loadTaskById = createAsyncThunk('tasks/loadTaskById', async (id: number) => {
-  return await fetchTaskById(id);
+export const loadTaskById = createAsyncThunk('tasks/loadTaskById', async (id: number, { rejectWithValue }) => {
+  try {
+    const task = await fetchTaskById(id);
+    const comments = await fetchComments(id);
+    return { ...task, comments };
+  } catch (error: any) {
+    return rejectWithValue(error.message);
+  }
 });
+
+export const addNewComment = createAsyncThunk(
+  'tasks/addComment',
+  async ({ taskId, text }: { taskId: number; text: string }, { rejectWithValue }) => {
+    try {
+      return await addComment(taskId, text);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const removeComment = createAsyncThunk(
+  'tasks/removeComment',
+  async (commentId: number, { rejectWithValue }) => {
+    try {
+      await deleteComment(commentId);
+      return commentId;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
   reducers: {
-    // Добавляем ручные редьюсеры для управления состоянием
     setTasks: (state, action: PayloadAction<Task[]>) => {
       state.tasks = action.payload;
     },
@@ -52,7 +83,7 @@ const tasksSlice = createSlice({
       })
       .addCase(loadTasks.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Ошибка при загрузке задач';
+        state.error = action.payload as string;
       })
       .addCase(loadTaskById.pending, (state) => {
         state.loading = true;
@@ -64,12 +95,23 @@ const tasksSlice = createSlice({
       })
       .addCase(loadTaskById.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Ошибка при загрузке задачи';
+        state.error = action.payload as string;
+      })
+      .addCase(addNewComment.fulfilled, (state, action) => {
+        if (state.currentTask) {
+          state.currentTask.comments = state.currentTask.comments || [];
+          state.currentTask.comments.push(action.payload);
+        }
+      })
+      .addCase(removeComment.fulfilled, (state, action) => {
+        if (state.currentTask?.comments) {
+          state.currentTask.comments = state.currentTask.comments.filter(
+            comment => comment.id !== action.payload
+          );
+        }
       });
   },
 });
 
-// Экспортируем actions
 export const { setTasks, clearTasks, setCurrentTask } = tasksSlice.actions;
-
 export default tasksSlice.reducer;
