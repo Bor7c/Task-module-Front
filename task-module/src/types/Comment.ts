@@ -1,28 +1,20 @@
 import { User } from "./User";
 
-export interface CommentBase {
+export interface Comment {
   id: number;
   text: string;
   created_at: string;
-  updated_at?: string;
+  is_system: boolean;
+  author: {
+    id: number;
+    username: string;
+    role?: string;
+  };
+  task?: number; // Опционально, если не всегда нужно
 }
 
-export interface UserComment extends CommentBase {
-  author: User;
-  is_system: false;
-  task: number; // ID задачи
-}
-
-export interface SystemComment extends CommentBase {
-  author: { id: 0, username: 'system' };
-  is_system: true;
-  task: number; // ID задачи
-}
-
-export type Comment = UserComment | SystemComment;
-
-// Для создания нового комментария
+// Для создания комментария
 export interface CommentCreateData {
   text: string;
-  task_id: number;
+  task_id?: number; // Опционально, если передается через URL
 }

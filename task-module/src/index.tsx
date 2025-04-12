@@ -9,12 +9,28 @@ import './index.css';
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
-root.render(
-  <React.StrictMode>
+
+// Определяем, находимся ли мы в development-режиме
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+const AppWrapper = isDevelopment 
+  ? (
+    // В development-режиме рендерим без StrictMode
     <BrowserRouter>
       <Provider store={store}>
         <App />
       </Provider>
     </BrowserRouter>
-  </React.StrictMode>
-);
+  ) 
+  : (
+    // В production-режиме можно оставить StrictMode
+    <React.StrictMode>
+      <BrowserRouter>
+        <Provider store={store}>
+          <App />
+        </Provider>
+      </BrowserRouter>
+    </React.StrictMode>
+  );
+
+root.render(AppWrapper);

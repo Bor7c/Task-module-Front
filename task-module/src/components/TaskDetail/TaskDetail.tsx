@@ -77,6 +77,10 @@ const TaskDetail: React.FC = () => {
   if (error) return <div className="error-message">{error}</div>;
   if (!currentTask) return <div className="not-found">Задача не найдена</div>;
 
+  // Безопасное получение информации о создателе задачи
+  const taskAuthorName = currentTask.created_by?.username || 'Неизвестный автор';
+  const taskResponsibleName = currentTask.responsible?.username || 'Не назначен';
+
   return (
     <div className="task-detail-page">
       <div className="task-container">
@@ -89,15 +93,15 @@ const TaskDetail: React.FC = () => {
           <div className="task-meta">
             <span 
               className="priority-badge"
-              style={{ backgroundColor: getPriorityColor(currentTask.priority) }}
+              style={{ backgroundColor: getPriorityColor(currentTask.priority || 'medium') }}
             >
-              {currentTask.priority_display}
+              {currentTask.priority_display || 'Средний'}
             </span>
             <span 
               className="status-badge"
-              style={{ backgroundColor: getStatusColor(currentTask.status) }}
+              style={{ backgroundColor: getStatusColor(currentTask.status || 'unassigned') }}
             >
-              {currentTask.status_display}
+              {currentTask.status_display || 'Не назначен'}
             </span>
           </div>
         </div>
@@ -111,18 +115,16 @@ const TaskDetail: React.FC = () => {
           <div className="task-info-grid">
             <div className="info-item">
               <span className="info-label">Создана:</span>
-              <span>{new Date(currentTask.created_at).toLocaleString()}</span>
+              <span>{currentTask.created_at ? new Date(currentTask.created_at).toLocaleString() : 'Нет данных'}</span>
             </div>
             <div className="info-item">
               <span className="info-label">Автор:</span>
-              <span>{currentTask.created_by.username}</span>
+              <span>{taskAuthorName}</span>
             </div>
-            {currentTask.responsible && (
-              <div className="info-item">
-                <span className="info-label">Ответственный:</span>
-                <span>{currentTask.responsible.username}</span>
-              </div>
-            )}
+            <div className="info-item">
+              <span className="info-label">Ответственный:</span>
+              <span>{taskResponsibleName}</span>
+            </div>
             {currentTask.deadline && (
               <div className="info-item">
                 <span className="info-label">Дедлайн:</span>
@@ -164,37 +166,47 @@ const TaskDetail: React.FC = () => {
 
         <div className="comments-list">
           {currentTask.comments?.length ? (
-            currentTask.comments.map((comment) => (
-              <div 
-                key={comment.id} 
-                className={`comment ${comment.is_system ? 'system' : ''}`}
-              >
-                <div className="comment-header">
-                  <div className="comment-author">
-                    <span className="author-avatar">
-                      {comment.author.username.charAt(0).toUpperCase()}
-                    </span>
-                    <div>
-                      <span className="author-name">{comment.author.username}</span>
-                      {comment.is_system && <span className="system-tag">Системное</span>}
-                      <span className="comment-date">
-                        {new Date(comment.created_at).toLocaleString()}
+            currentTask.comments.map((comment) => {
+              // Безопасное получение информации об авторе комментария
+              const isSystemComment = comment.is_system || false;
+              const authorName = isSystemComment 
+                ? 'Система' 
+                : comment.author?.username || 'Удалённый пользователь';
+              const authorInitial = authorName.charAt(0).toUpperCase();
+              const canDelete = !isSystemComment && user?.id === comment.author?.id;
+
+              return (
+                <div 
+                  key={comment.id} 
+                  className={`comment ${isSystemComment ? 'system' : ''}`}
+                >
+                  <div className="comment-header">
+                    <div className="comment-author">
+                      <span className="author-avatar">
+                        {authorInitial}
                       </span>
+                      <div>
+                        <span className="author-name">{authorName}</span>
+                        {isSystemComment && <span className="system-tag">Системное</span>}
+                        <span className="comment-date">
+                          {comment.created_at ? new Date(comment.created_at).toLocaleString() : 'Нет данных'}
+                        </span>
+                      </div>
                     </div>
+                    {canDelete && (
+                      <button 
+                        onClick={() => handleDeleteComment(comment.id)}
+                        className="delete-comment"
+                        title="Удалить комментарий"
+                      >
+                        <i className="icon-trash"></i>
+                      </button>
+                    )}
                   </div>
-                  {!comment.is_system && user?.id === comment.author.id && (
-                    <button 
-                      onClick={() => handleDeleteComment(comment.id)}
-                      className="delete-comment"
-                      title="Удалить комментарий"
-                    >
-                      <i className="icon-trash"></i>
-                    </button>
-                  )}
+                  <div className="comment-text">{comment.text || ''}</div>
                 </div>
-                <div className="comment-text">{comment.text}</div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <div className="no-comments">
               <i className="icon-comment"></i>

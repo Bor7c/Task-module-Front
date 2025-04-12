@@ -80,16 +80,48 @@ export const fetchComments = async (taskId: number): Promise<Comment[]> => {
 };
 
 export const addComment = async (taskId: number, text: string): Promise<Comment> => {
+  // Логирование отправляемых данных
+  console.log('Sending comment:', { taskId, text });
+  
   const response = await fetch(`${API_URL}/tasks/${taskId}/comments/`, {
     method: 'POST',
     headers: getAuthHeaders(),
     credentials: 'include',
-    body: JSON.stringify({ text }),
+    body: JSON.stringify({ text: text.trim() }), // Очищаем текст перед отправкой
   });
 
+  // Логирование статуса ответа
+  console.log('Response status:', response.status);
+  
   await checkResponse(response, 'Ошибка при добавлении комментария');
-  return response.json();
+  
+  const responseData = await response.json();
+  // Логирование полученных данных
+  console.log('Response data:', responseData);
+
+  // Приводим данные к типу Comment
+  const comment: Comment = {
+    id: responseData.id,
+    text: responseData.text,
+    created_at: responseData.created_at,
+    is_system: responseData.is_system || false,
+    author: {
+      id: responseData.author?.id || 0,
+      username: responseData.author?.username || 'Unknown',
+      ...(responseData.author?.role && { role: responseData.author.role })
+    },
+    ...(responseData.task && { task: responseData.task })
+  };
+
+  // Проверка обязательных полей
+  if (!comment.text) {
+    console.error('Received empty text in comment:', comment);
+    throw new Error('Сервер вернул комментарий с пустым текстом');
+  }
+
+  return comment;
 };
+
 
 export const deleteComment = async (commentId: number): Promise<void> => {
   const response = await fetch(`${API_URL}/comments/${commentId}/`, {
