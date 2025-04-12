@@ -18,6 +18,23 @@ const initialState: AuthState = {
   sessionChecked: false,
 };
 
+
+export const registerUser = createAsyncThunk(
+  'auth/registerUser',
+  async (userData: { username: string; email: string; password: string }, { rejectWithValue }) => {
+    try {
+      const response = await authAPI.register(userData);
+      if (response.session_id) {
+        localStorage.setItem('session_id', response.session_id);
+      }
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Registration failed');
+    }
+  }
+);
+
+
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (credentials: { username: string; password: string }, { rejectWithValue }) => {
@@ -75,6 +92,23 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+
+      .addCase(registerUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.isAuthenticated = true;
+        state.sessionChecked = true;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+        state.sessionChecked = true;
+      })
+
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -90,6 +124,8 @@ const authSlice = createSlice({
         state.error = action.payload as string;
         state.sessionChecked = true;
       })
+
+
       .addCase(checkUserSession.pending, (state) => {
         state.loading = true;
       })
@@ -105,6 +141,8 @@ const authSlice = createSlice({
         state.user = null;
         state.sessionChecked = true;
       })
+
+      
       .addCase(logoutUser.pending, (state) => {
         state.loading = true;
       })

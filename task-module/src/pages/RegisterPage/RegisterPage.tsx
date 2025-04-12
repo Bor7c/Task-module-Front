@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authAPI } from '../../api/auth';
 import { useAppDispatch } from '../../redux/store';
-import { loginUser } from '../../redux/authSlice';
+import { registerUser } from '../../redux/authSlice';
 import './RegisterPage.css';
 
 const RegisterPage: React.FC = () => {
@@ -13,45 +12,67 @@ const RegisterPage: React.FC = () => {
     confirmPassword: ''
   });
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    setError(''); // Сбрасываем ошибку при изменении полей
+    setError('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Валидация на клиенте
     if (formData.password !== formData.confirmPassword) {
       setError('Пароли не совпадают');
       return;
     }
 
+    if (formData.password.length < 8) {
+      setError('Пароль должен содержать минимум 8 символов');
+      return;
+    }
+
+    if (formData.username.length < 4) {
+      setError('Имя пользователя должно содержать минимум 4 символа');
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
-      const { username, email, password } = formData;
-      // Используем Redux thunk для регистрации и автоматического входа
       const result = await dispatch(
-        loginUser({ username, password }) // Предполагаем, что регистрация сразу логинит пользователя
+        registerUser({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password
+        })
       ).unwrap();
       
       if (result) {
         navigate('/');
       }
-    } catch (err) {
-      setError('Ошибка регистрации. Возможно, пользователь уже существует.');
-      console.error('Registration error:', err);
+    } catch (err: any) {
+      setError(err.message || 'Ошибка регистрации');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="register-container">
       <h2>Регистрация</h2>
-      {error && <div className="error-message" role="alert">{error}</div>}
+      {error && (
+        <div className="error-message" role="alert">
+          {error.split(';').map((msg, i) => (
+            <p key={i}>{msg.trim()}</p>
+          ))}
+        </div>
+      )}
       <form onSubmit={handleSubmit} noValidate>
-        <div className="form-group">
+      <div className="form-group">
           <label htmlFor="username">Имя пользователя:</label>
           <input
             id="username"
@@ -114,11 +135,14 @@ const RegisterPage: React.FC = () => {
           <small id="confirm-password-help">Пароли должны совпадать</small>
         </div>
         
-        <button type="submit" className="register-button">
-          Зарегистрироваться
+        <button 
+          type="submit" 
+          className="register-button"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Регистрация...' : 'Зарегистрироваться'}
         </button>
       </form>
-      
       <div className="login-link">
         Уже есть аккаунт? <a href="/login">Войдите</a>
       </div>

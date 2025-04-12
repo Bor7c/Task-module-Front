@@ -22,16 +22,6 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="home-page">
-      <header className="header">
-        <h1>Список задач</h1>
-        <button 
-          onClick={handleLogout} 
-          className="logout-button"
-          aria-label="Выйти из системы"
-        >
-          Выйти
-        </button>
-      </header>
       <main>
         <TaskList />
       </main>

@@ -39,14 +39,6 @@
   font-size: 0.8rem;
 }
 
-.error-message {
-  color: #d32f2f;
-  background-color: #fdecea;
-  padding: 0.75rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  text-align: center;
-}
 
 .register-button {
   width: 100%;
@@ -77,4 +69,17 @@
 
 .login-link a:hover {
   text-decoration: underline;
+}
+
+.error-message {
+  color: #e74c3c;
+  background-color: #fde8e8;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  border-left: 4px solid #e74c3c;
+}
+
+.error-message p {
+  margin: 4px 0;
 }

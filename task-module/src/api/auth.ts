@@ -15,9 +15,14 @@ interface AuthResponse {
   user: UserData;
 }
 
+// Обновленный интерфейс для ошибок
 interface ErrorResponse {
   detail?: string;
   non_field_errors?: string[];
+  error?: string; // Добавляем поле error
+  username?: string[]; // Для ошибок валидации username
+  email?: string[]; // Для ошибок валидации email
+  password?: string[]; // Для ошибок валидации password
 }
 
 export const authAPI = {
@@ -36,6 +41,7 @@ export const authAPI = {
       throw new Error(
         axiosError.response?.data?.detail || 
         axiosError.response?.data?.non_field_errors?.join(', ') || 
+        axiosError.response?.data?.error || // Теперь это поле существует
         'Login failed'
       );
     }
@@ -53,10 +59,30 @@ export const authAPI = {
       };
     } catch (error) {
       const axiosError = error as AxiosError<ErrorResponse>;
+      
+      // Улучшенная обработка ошибок регистрации
+      const errorMessages = [];
+      if (axiosError.response?.data?.username) {
+        errorMessages.push(`Username: ${axiosError.response.data.username.join(', ')}`);
+      }
+      if (axiosError.response?.data?.email) {
+        errorMessages.push(`Email: ${axiosError.response.data.email.join(', ')}`);
+      }
+      if (axiosError.response?.data?.password) {
+        errorMessages.push(`Password: ${axiosError.response.data.password.join(', ')}`);
+      }
+      
+      const mainError = 
+        axiosError.response?.data?.error ||
+        axiosError.response?.data?.detail ||
+        axiosError.response?.data?.non_field_errors?.join(', ');
+      
+      if (mainError) {
+        errorMessages.unshift(mainError);
+      }
+      
       throw new Error(
-        axiosError.response?.data?.detail || 
-        axiosError.response?.data?.non_field_errors?.join(', ') || 
-        'Registration failed'
+        errorMessages.join('; ') || 'Registration failed'
       );
     }
   },
@@ -71,7 +97,6 @@ export const authAPI = {
         withCredentials: true,
       });
       
-      // Очищаем как куки, так и localStorage
       document.cookie = 'sessionid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
       localStorage.removeItem('session_id');
     } catch (error) {
