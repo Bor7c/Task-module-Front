@@ -6,10 +6,12 @@ interface UserData {
   username: string;
   email: string;
   role: string;
+  role_display?: string;
+  is_staff?: boolean;
 }
 
 interface AuthResponse {
-  session_id: string;
+  session_id?: string;
   user: UserData;
 }
 
@@ -19,14 +21,14 @@ interface ErrorResponse {
 }
 
 export const authAPI = {
-  login: async (credentials: { username: string; password: string }): Promise<{ user: UserData }> => {
+  async login(credentials: { username: string; password: string }): Promise<AuthResponse> {
     try {
       const response = await api.post('/auth/login/', credentials, {
         withCredentials: true,
       });
       
-      // Возвращаем объект с user для совместимости со слайсом
       return {
+        session_id: response.data.session_id,
         user: response.data.user
       };
     } catch (error) {
@@ -39,13 +41,14 @@ export const authAPI = {
     }
   },
 
-  register: async (data: { username: string; email: string; password: string }): Promise<{ user: UserData }> => {
+  async register(data: { username: string; email: string; password: string }): Promise<AuthResponse> {
     try {
       const response = await api.post('/auth/register/', data, {
         withCredentials: true,
       });
       
       return {
+        session_id: response.data.session_id,
         user: response.data.user
       };
     } catch (error) {
@@ -58,30 +61,40 @@ export const authAPI = {
     }
   },
 
-  logout: async (): Promise<void> => {
+  async logout(): Promise<void> {
     try {
+      const sessionId = localStorage.getItem('session_id');
       await api.post('/auth/logout/', {}, {
+        headers: {
+          'X-Session-ID': sessionId || '',
+        },
         withCredentials: true,
       });
       
+      // Очищаем как куки, так и localStorage
       document.cookie = 'sessionid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      localStorage.removeItem('session_id');
     } catch (error) {
       console.error('Logout error:', error);
       throw error;
     }
   },
 
-  checkSession: async (): Promise<{ user: UserData } | null> => {
+  async checkSession(): Promise<AuthResponse> {
     try {
+      const sessionId = localStorage.getItem('session_id');
       const response = await api.get('/auth/session-check/', {
+        headers: {
+          'X-Session-ID': sessionId || '',
+        },
         withCredentials: true,
       });
       
       return {
-        user: response.data.user
+        user: response.data
       };
     } catch (error) {
-      return null;
+      throw new Error('Session check failed');
     }
   }
 };
