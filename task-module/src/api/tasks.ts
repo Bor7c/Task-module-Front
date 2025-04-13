@@ -67,6 +67,40 @@ export const createTask = async (taskData: Omit<Task, 'id'>): Promise<Task> => {
   return response.json();
 };
 
+export const updateTaskStatus = async (id: number, status: string): Promise<Task> => {
+  const response = await fetch(`${API_URL}/tasks/${id}/`, {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    credentials: 'include',
+    body: JSON.stringify({ status }),
+  });
+
+  await checkResponse(response, `Ошибка при обновлении статуса задачи ${id}`);
+  return response.json();
+};
+
+export const updateTaskDescription = async (id: number, description: string): Promise<Task> => {
+  const response = await fetch(`${API_URL}/tasks/${id}/`, {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    credentials: 'include',
+    body: JSON.stringify({ description }),
+  });
+
+  await checkResponse(response, `Ошибка при обновлении описания задачи ${id}`);
+  return response.json();
+};
+
+export const deleteTask = async (id: number): Promise<void> => {
+  const response = await fetch(`${API_URL}/tasks/${id}/`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+    credentials: 'include',
+  });
+
+  await checkResponse(response, `Ошибка при удалении задачи ${id}`);
+};
+
 // Комментарии
 export const fetchComments = async (taskId: number): Promise<Comment[]> => {
   const response = await fetch(`${API_URL}/tasks/${taskId}/comments/`, {
@@ -122,6 +156,18 @@ export const addComment = async (taskId: number, text: string): Promise<Comment>
   return comment;
 };
 
+export const updateComment = async (id: number, text: string): Promise<Comment> => {
+  const response = await fetch(`${API_URL}/comments/${id}/`, {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    credentials: 'include',
+    body: JSON.stringify({ text }),
+  });
+
+  await checkResponse(response, `Ошибка при обновлении комментария ${id}`);
+  return response.json();
+};
+
 
 export const deleteComment = async (commentId: number): Promise<void> => {
   const response = await fetch(`${API_URL}/comments/${commentId}/`, {
@@ -133,25 +179,3 @@ export const deleteComment = async (commentId: number): Promise<void> => {
   await checkResponse(response, `Ошибка при удалении комментария ${commentId}`);
 };
 
-// Дополнительные методы для задач
-export const updateTask = async (id: number, taskData: Partial<Task>): Promise<Task> => {
-  const response = await fetch(`${API_URL}/tasks/${id}/`, {
-    method: 'PATCH',
-    headers: getAuthHeaders(),
-    credentials: 'include',
-    body: JSON.stringify(taskData),
-  });
-
-  await checkResponse(response, `Ошибка при обновлении задачи ${id}`);
-  return response.json();
-};
-
-export const deleteTask = async (id: number): Promise<void> => {
-  const response = await fetch(`${API_URL}/tasks/${id}/`, {
-    method: 'DELETE',
-    headers: getAuthHeaders(),
-    credentials: 'include',
-  });
-
-  await checkResponse(response, `Ошибка при удалении задачи ${id}`);
-};

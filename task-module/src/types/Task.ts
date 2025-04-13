@@ -2,54 +2,46 @@ import { User } from "./User";
 
 export interface Comment {
   id: number;
-  task: number;         // ID задачи
-  author: User;         // Полная информация об авторе
   text: string;
-  created_at: string;   // ISO строка даты
-  updated_at?: string;  // Опционально, если комментарии можно редактировать
-  is_system: boolean;   // Системный ли комментарий
-}
-
-export interface TaskStatus {
-  code: string;         // Например: 'open', 'in_progress'
-  display: string;      // Например: 'Открыта', 'В работе'
-}
-
-export interface TaskPriority {
-  code: string;         // Например: 'low', 'high'
-  display: string;      // Например: 'Низкий', 'Высокий'
+  created_at: string;
+  modified_at?: string;
+  is_system: boolean;
+  is_modified: boolean;
+  is_deleted: boolean;
+  author: User;
+  task?: number;
 }
 
 export interface Task {
   id: number;
   title: string;
   description: string;
-  status: string;       // Код статуса
-  status_display?: string; // Отображаемое название статуса
-  priority: string;     // Код приоритета
-  priority_display?: string; // Отображаемое название приоритета
-  responsible: User | null; // Ответственный пользователь
-  created_by: User;     // Автор задачи
-  created_at: string;   // ISO строка даты создания
-  updated_at: string;   // ISO строка даты обновления
-  deadline: string | null; // ISO строка дедлайна или null
-  comments?: Comment[]; // Опциональный массив комментариев
-  
-  // Дополнительные поля, которые могут быть полезны
-  tags?: string[];      // Теги задачи
-  is_closed?: boolean;  // Флаг закрытия задачи
+  status: string;
+  status_display: string;
+  priority: string;
+  priority_display: string;
+  responsible: User | null;
+  created_by: User;
+  created_at: string;
+  updated_at: string;
+  closed_at: string | null;
+  deadline: string | null;
+  is_deleted: boolean;
+  comments?: Comment[];
+  comments_count?: number;
+  is_closed?: boolean;
 }
 
-// Дополнительные типы для работы с задачами
-export interface TaskCreateData {
+export interface TaskCreateUpdateData {
   title: string;
-  description: string;
+  description?: string;
   status?: string;
   priority?: string;
   responsible_id?: number | null;
   deadline?: string | null;
 }
 
-export interface TaskUpdateData extends Partial<TaskCreateData> {
-  // Можно добавить специфичные для обновления поля
+export interface CommentCreateData {
+  text: string;
+  task_id?: number;
 }

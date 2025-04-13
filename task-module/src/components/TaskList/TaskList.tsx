@@ -2,12 +2,14 @@ import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { loadTasks } from '../../redux/tasksSlice';
 import { useNavigate } from 'react-router-dom';
+import { Task } from '../../types/Task';
 import './TaskList.css';
 
 const TaskList: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { tasks, loading, error } = useAppSelector((state) => state.tasks);
+  const { user } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(loadTasks());
@@ -15,6 +17,10 @@ const TaskList: React.FC = () => {
 
   const handleTaskClick = (taskId: number) => {
     navigate(`/tasks/${taskId}`);
+  };
+
+  const handleCreateTask = () => {
+    navigate('/tasks/new');
   };
 
   const getPriorityColor = (priority: string) => {
@@ -30,8 +36,11 @@ const TaskList: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'in_progress': return '#1e90ff';
-      case 'completed': return '#2ed573';
+      case 'solved': return '#2ed573';
+      case 'closed': return '#ff4757';
       case 'unassigned': return '#ff7f50';
+      case 'awaiting_response': return '#ffa502';
+      case 'awaiting_action': return '#ffa502';
       default: return '#dfe4ea';
     }
   };
@@ -51,8 +60,17 @@ const TaskList: React.FC = () => {
 
   return (
     <div className="task-list-container">
+      <div className="list-header">
+        <h2>Список задач</h2>
+        {user && (
+          <button onClick={handleCreateTask} className="create-task-btn">
+            <i className="icon-plus"></i> Новая задача
+          </button>
+        )}
+      </div>
+      
       <div className="task-grid">
-        {tasks.map((task) => (
+        {tasks.map((task: Task) => (
           <div 
             key={task.id} 
             className="task-card"
