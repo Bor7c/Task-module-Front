@@ -33,7 +33,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className="layout">
       <header className="header">
-        <h1>Task Management System</h1>
+        <h1>Simple Task Manager</h1>
         {isAuthenticated && (
           <div className="user-panel">
             <span className="username">{user?.username}</span>
