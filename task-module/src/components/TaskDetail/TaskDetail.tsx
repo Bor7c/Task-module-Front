@@ -179,17 +179,25 @@ const TaskDetail: React.FC = () => {
   const renderComment = (comment: Comment) => {
     if (editingCommentId === comment.id) {
       return (
-        <div className="comment-edit">
+        <div key={comment.id} className="comment-edit">
           <textarea
             value={editedCommentText}
             onChange={(e) => setEditedCommentText(e.target.value)}
             rows={3}
+            className="comment-edit-textarea"
           />
-          <div className="edit-actions">
-            <button onClick={saveCommentEdit} className="save-btn">
+          <div className="comment-edit-actions">
+            <button 
+              onClick={saveCommentEdit} 
+              className="btn btn-primary btn-sm"
+              disabled={!editedCommentText.trim()}
+            >
               Сохранить
             </button>
-            <button onClick={cancelCommentEdit} className="cancel-btn">
+            <button 
+              onClick={cancelCommentEdit} 
+              className="btn btn-outline-secondary btn-sm"
+            >
               Отмена
             </button>
           </div>
@@ -204,7 +212,7 @@ const TaskDetail: React.FC = () => {
             <span className="author-avatar">
               {comment.author.username.charAt(0).toUpperCase()}
             </span>
-            <div>
+            <div className="author-info">
               <span className="author-name">{comment.author.username}</span>
               {comment.is_system && <span className="system-tag">Системное</span>}
               <span className="comment-date">
@@ -213,21 +221,22 @@ const TaskDetail: React.FC = () => {
               </span>
             </div>
           </div>
+          
           {!comment.is_system && user?.id === comment.author.id && (
             <div className="comment-actions">
-              <button 
+              <button
                 onClick={() => startCommentEdit(comment)}
-                className="edit-btn"
+                className="btn btn-outline-primary btn-sm"
                 title="Редактировать"
               >
-                <i className="icon-edit"></i>
+                <i className="bi bi-pencil"></i>
               </button>
-              <button 
+              <button
                 onClick={() => handleDeleteComment(comment.id)}
-                className="delete-btn"
+                className="btn btn-outline-danger btn-sm"
                 title="Удалить"
               >
-                <i className="icon-trash"></i>
+                <i className="bi bi-trash"></i>
               </button>
             </div>
           )}
