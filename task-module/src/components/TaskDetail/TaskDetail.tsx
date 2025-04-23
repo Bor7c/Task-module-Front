@@ -7,7 +7,10 @@ import {
   removeComment,
   updateTaskStatus,
   updateTaskDescription,
-  updateExistingComment
+  updateExistingComment,
+  updateTaskTitle,
+  updateTaskPriority,
+  updateTaskResponsible
 } from '../../redux/tasksSlice';
 import { AppDispatch, RootState } from '../../redux/store';
 import { Comment, Task } from '../../types/Task';
@@ -27,6 +30,13 @@ const TaskDetail: React.FC = () => {
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editedCommentText, setEditedCommentText] = useState('');
 
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedTitle, setEditedTitle] = useState('');
+  const [isChangingPriority, setIsChangingPriority] = useState(false);
+  const [newPriority, setNewPriority] = useState('');
+  const [isChangingResponsible, setIsChangingResponsible] = useState(false);
+  const [newResponsibleId, setNewResponsibleId] = useState<number | null>(null);
+
   useEffect(() => {
     if (id) {
       dispatch(loadTaskById(Number(id)));
@@ -36,11 +46,14 @@ const TaskDetail: React.FC = () => {
   useEffect(() => {
     if (currentTask) {
       setEditedDescription(currentTask.description || '');
+      setEditedTitle(currentTask.title);
+      setNewPriority(currentTask.priority);
+      setNewResponsibleId(currentTask.responsible?.id || null);
     }
   }, [currentTask]);
 
   const handleStatusChange = async (newStatus: string) => {
-    if (!id) return;
+    if (!id || !currentTask) return;
     try {
       await dispatch(updateTaskStatus({ id: Number(id), status: newStatus })).unwrap();
     } catch (err) {
@@ -49,7 +62,7 @@ const TaskDetail: React.FC = () => {
   };
 
   const handleDescriptionSave = async () => {
-    if (!id) return;
+    if (!id || !currentTask) return;
     try {
       await dispatch(updateTaskDescription({ 
         id: Number(id), 
@@ -85,6 +98,101 @@ const TaskDetail: React.FC = () => {
       } catch (err) {
         console.error('Ошибка при удалении комментария:', err);
       }
+    }
+  };
+
+  const handleTitleSave = async () => {
+    if (!id || !currentTask || !editedTitle.trim()) return;
+    try {
+      await dispatch(updateTaskTitle({ 
+        id: Number(id), 
+        title: editedTitle 
+      })).unwrap();
+      setIsEditingTitle(false);
+    } catch (err) {
+      console.error('Ошибка при сохранении названия:', err);
+    }
+  };
+  
+  const handlePriorityChange = async () => {
+    if (!id || !currentTask) return;
+    try {
+      await dispatch(updateTaskPriority({ 
+        id: Number(id), 
+        priority: newPriority 
+      })).unwrap();
+      setIsChangingPriority(false);
+    } catch (err) {
+      console.error('Ошибка при изменении приоритета:', err);
+    }
+  };
+  
+  const handleResponsibleChange = async () => {
+    if (!id || !currentTask) return;
+    try {
+      await dispatch(updateTaskResponsible({ 
+        id: Number(id), 
+        responsible_id: newResponsibleId 
+      })).unwrap();
+      setIsChangingResponsible(false);
+    } catch (err) {
+      console.error('Ошибка при изменении ответственного:', err);
+    }
+  };
+  
+  const handleTakeTask = async () => {
+    if (!id || !user || !currentTask) return;
+    try {
+      await dispatch(updateTaskResponsible({ 
+        id: Number(id), 
+        responsible_id: user.id 
+      })).unwrap();
+      await dispatch(updateTaskStatus({ 
+        id: Number(id), 
+        status: 'assigned' 
+      })).unwrap();
+    } catch (err) {
+      console.error('Ошибка при взятии задачи:', err);
+    }
+  };
+  
+  const handleReleaseTask = async () => {
+    if (!id || !currentTask) return;
+    try {
+      await dispatch(updateTaskResponsible({ 
+        id: Number(id), 
+        responsible_id: null 
+      })).unwrap();
+      await dispatch(updateTaskStatus({ 
+        id: Number(id), 
+        status: 'unassigned' 
+      })).unwrap();
+    } catch (err) {
+      console.error('Ошибка при снятии задачи:', err);
+    }
+  };
+  
+  const handleMarkSolved = async () => {
+    if (!id || !currentTask) return;
+    try {
+      await dispatch(updateTaskStatus({ 
+        id: Number(id), 
+        status: 'solved' 
+      })).unwrap();
+    } catch (err) {
+      console.error('Ошибка при отметке задачи как решенной:', err);
+    }
+  };
+  
+  const handleMarkClosed = async () => {
+    if (!id || !currentTask) return;
+    try {
+      await dispatch(updateTaskStatus({ 
+        id: Number(id), 
+        status: 'closed' 
+      })).unwrap();
+    } catch (err) {
+      console.error('Ошибка при закрытии задачи:', err);
     }
   };
 
@@ -134,6 +242,8 @@ const TaskDetail: React.FC = () => {
   };
 
   const renderDescription = () => {
+    if (!currentTask) return null;
+
     if (isEditingDescription) {
       return (
         <div className="description-edit">
@@ -161,7 +271,7 @@ const TaskDetail: React.FC = () => {
       <div className="task-description">
         <h3>
           Описание
-          {user?.id === currentTask?.created_by.id && (
+          {user?.id === currentTask.created_by.id && (
             <button 
               onClick={() => setIsEditingDescription(true)}
               className="edit-btn"
@@ -171,7 +281,7 @@ const TaskDetail: React.FC = () => {
             </button>
           )}
         </h3>
-        <p>{currentTask?.description || 'Нет описания'}</p>
+        <p>{currentTask.description || 'Нет описания'}</p>
       </div>
     );
   };
@@ -247,24 +357,69 @@ const TaskDetail: React.FC = () => {
   };
 
   const renderStatusControls = () => {
-    if (!currentTask) return null;
+    if (!currentTask || !user) return null;
     
+    const isCreator = user.id === currentTask.created_by.id;
+    const isResponsible = currentTask.responsible?.id === user.id;
+    const canEdit = isCreator || isResponsible;
+  
+    if (currentTask.status === 'unassigned' && !isCreator) {
+      return (
+        <button 
+          onClick={handleTakeTask}
+          className="btn btn-primary"
+        >
+          Взять в работу
+        </button>
+      );
+    }
+  
+    if (currentTask.status === 'assigned' && isResponsible) {
+      return (
+        <button 
+          onClick={handleReleaseTask}
+          className="btn btn-outline-secondary"
+        >
+          Снять задачу
+        </button>
+      );
+    }
+  
+    if (['assigned', 'in_progress', 'awaiting_response', 'awaiting_action'].includes(currentTask.status) && isResponsible) {
+      return (
+        <button 
+          onClick={handleMarkSolved}
+          className="btn btn-success"
+        >
+          Отметить как решенное
+        </button>
+      );
+    }
+  
+    if (currentTask.status === 'solved' && isCreator) {
+      return (
+        <button 
+          onClick={handleMarkClosed}
+          className="btn btn-danger"
+        >
+          Закрыть задачу
+        </button>
+      );
+    }
+  
     const statusOptions = [
-      { value: 'unassigned', label: 'Не назначен' },
-      { value: 'assigned', label: 'Назначен' },
       { value: 'in_progress', label: 'В работе' },
-      { value: 'solved', label: 'Решен' },
-      { value: 'closed', label: 'Закрыт' },
       { value: 'awaiting_response', label: 'Ожидает ответа' },
       { value: 'awaiting_action', label: 'Ожидает действий' },
     ];
-
+  
     return (
       <div className="status-controls">
         <select
           value={currentTask.status}
           onChange={(e) => handleStatusChange(e.target.value)}
-          disabled={!user || (user.id !== currentTask.created_by.id && user.id !== currentTask.responsible?.id)}
+          disabled={!canEdit}
+          className="form-select"
         >
           {statusOptions.map(option => (
             <option key={option.value} value={option.value}>
@@ -273,6 +428,177 @@ const TaskDetail: React.FC = () => {
           ))}
         </select>
       </div>
+    );
+  };
+  
+  const renderTitle = () => {
+    if (!currentTask) return null;
+
+    if (isEditingTitle) {
+      return (
+        <div className="title-edit">
+          <input
+            type="text"
+            value={editedTitle}
+            onChange={(e) => setEditedTitle(e.target.value)}
+            className="form-control"
+          />
+          <div className="edit-actions mt-2">
+            <button onClick={handleTitleSave} className="btn btn-primary btn-sm">
+              Сохранить
+            </button>
+            <button 
+              onClick={() => setIsEditingTitle(false)} 
+              className="btn btn-outline-secondary btn-sm ms-2"
+            >
+              Отмена
+            </button>
+          </div>
+        </div>
+      );
+    }
+    
+    return (
+      <h1 className="task-title">
+        {currentTask.title}
+        {user?.id === currentTask.created_by.id && (
+          <button 
+            onClick={() => setIsEditingTitle(true)}
+            className="btn btn-link btn-sm"
+            title="Редактировать название"
+          >
+            <i className="bi bi-pencil"></i>
+          </button>
+        )}
+      </h1>
+    );
+  };
+  
+  const renderPriority = () => {
+    if (!currentTask) return null;
+
+    if (isChangingPriority) {
+      return (
+        <div className="priority-edit">
+          <select
+            value={newPriority}
+            onChange={(e) => setNewPriority(e.target.value)}
+            className="form-select form-select-sm"
+          >
+            <option value="low">Низкий</option>
+            <option value="medium">Средний</option>
+            <option value="high">Высокий</option>
+            <option value="critical">Критический</option>
+          </select>
+          <div className="edit-actions mt-2">
+            <button 
+              onClick={handlePriorityChange}
+              className="btn btn-primary btn-sm"
+            >
+              Сохранить
+            </button>
+            <button 
+              onClick={() => setIsChangingPriority(false)}
+              className="btn btn-outline-secondary btn-sm ms-2"
+            >
+              Отмена
+            </button>
+          </div>
+        </div>
+      );
+    }
+    
+    return (
+      <span 
+        className="priority-badge"
+        style={{ backgroundColor: getPriorityColor(currentTask.priority) }}
+        onClick={() => setIsChangingPriority(true)}
+      >
+        {currentTask.priority_display}
+        {user?.id === currentTask.created_by.id && (
+          <i className="bi bi-pencil ms-1"></i>
+        )}
+      </span>
+    );
+  };
+
+  const renderResponsible = () => {
+    if (!currentTask) return null;
+
+    if (!currentTask.responsible) {
+      if (isChangingResponsible) {
+        return (
+          <div className="responsible-edit">
+            <input
+              type="text"
+              placeholder="ID пользователя"
+              value={newResponsibleId || ''}
+              onChange={(e) => setNewResponsibleId(Number(e.target.value) || null)}
+              className="form-control form-control-sm"
+            />
+            <div className="edit-actions mt-2">
+              <button 
+                onClick={handleResponsibleChange}
+                className="btn btn-primary btn-sm"
+              >
+                Сохранить
+              </button>
+              <button 
+                onClick={() => setIsChangingResponsible(false)}
+                className="btn btn-outline-secondary btn-sm ms-2"
+              >
+                Отмена
+              </button>
+            </div>
+          </div>
+        );
+      }
+      
+      return (
+        <span onClick={() => setIsChangingResponsible(true)}>
+          Не назначен
+          {user?.id === currentTask.created_by.id && (
+            <i className="bi bi-pencil ms-1"></i>
+          )}
+        </span>
+      );
+    }
+    
+    if (isChangingResponsible) {
+      return (
+        <div className="responsible-edit">
+          <input
+            type="text"
+            placeholder="ID пользователя"
+            value={newResponsibleId || ''}
+            onChange={(e) => setNewResponsibleId(Number(e.target.value) || null)}
+            className="form-control form-control-sm"
+          />
+          <div className="edit-actions mt-2">
+            <button 
+              onClick={handleResponsibleChange}
+              className="btn btn-primary btn-sm"
+            >
+              Сохранить
+            </button>
+            <button 
+              onClick={() => setIsChangingResponsible(false)}
+              className="btn btn-outline-secondary btn-sm ms-2"
+            >
+              Отмена
+            </button>
+          </div>
+        </div>
+      );
+    }
+    
+    return (
+      <span onClick={() => setIsChangingResponsible(true)}>
+        {currentTask.responsible.username}
+        {user?.id === currentTask.created_by.id && (
+          <i className="bi bi-pencil ms-1"></i>
+        )}
+      </span>
     );
   };
 
@@ -289,19 +615,14 @@ const TaskDetail: React.FC = () => {
   return (
     <div className="task-detail-page">
       <div className="task-container">
-        <button onClick={() => navigate(-1)} className="back-button">
-          <i className="icon-arrow-left"></i> Назад к списку
+        <button onClick={() => navigate(-1)} className="btn btn-outline-secondary mb-3">
+          <i className="bi bi-arrow-left"></i> Назад к списку
         </button>
         
         <div className="task-header">
-          <h1 className="task-title">{currentTask.title}</h1>
-          <div className="task-meta">
-            <span 
-              className="priority-badge"
-              style={{ backgroundColor: getPriorityColor(currentTask.priority) }}
-            >
-              {currentTask.priority_display}
-            </span>
+          {renderTitle()}
+          <div className="task-meta d-flex align-items-center gap-3">
+            {renderPriority()}
             {renderStatusControls()}
           </div>
         </div>
@@ -318,12 +639,10 @@ const TaskDetail: React.FC = () => {
               <span className="info-label">Автор:</span>
               <span>{currentTask.created_by.username}</span>
             </div>
-            {currentTask.responsible && (
-              <div className="info-item">
-                <span className="info-label">Ответственный:</span>
-                <span>{currentTask.responsible.username}</span>
-              </div>
-            )}
+            <div className="info-item">
+              <span className="info-label">Ответственный:</span>
+              {renderResponsible()}
+            </div>
             {currentTask.deadline && (
               <div className="info-item">
                 <span className="info-label">Дедлайн:</span>

@@ -91,6 +91,43 @@ export const updateTaskDescription = async (id: number, description: string): Pr
   return response.json();
 };
 
+
+export const updateTaskPriority = async (id: number, priority: string): Promise<Task> => {
+  const response = await fetch(`${API_URL}/tasks/${id}/`, {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    credentials: 'include',
+    body: JSON.stringify({ priority }),
+  });
+
+  await checkResponse(response, `Ошибка при обновлении приоритета задачи ${id}`);
+  return response.json();
+};
+
+export const updateTaskResponsible = async (id: number, responsible_id: number | null): Promise<Task> => {
+  const response = await fetch(`${API_URL}/tasks/${id}/`, {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    credentials: 'include',
+    body: JSON.stringify({ responsible: responsible_id }),
+  });
+
+  await checkResponse(response, `Ошибка при обновлении ответственного задачи ${id}`);
+  return response.json();
+};
+
+export const updateTaskTitle = async (id: number, title: string): Promise<Task> => {
+  const response = await fetch(`${API_URL}/tasks/${id}/`, {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    credentials: 'include',
+    body: JSON.stringify({ title }),
+  });
+
+  await checkResponse(response, `Ошибка при обновлении названия задачи ${id}`);
+  return response.json();
+};
+
 export const deleteTask = async (id: number): Promise<void> => {
   const response = await fetch(`${API_URL}/tasks/${id}/`, {
     method: 'DELETE',

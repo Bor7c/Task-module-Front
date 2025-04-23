@@ -6,6 +6,9 @@ import {
   fetchComments, 
   addComment, 
   deleteComment,
+  updateTaskPriority as apiUpdateTaskPriority,
+  updateTaskResponsible as apiUpdateTaskResponsible,
+  updateTaskTitle as apiUpdateTaskTitle,
   updateTaskStatus as apiUpdateTaskStatus,
   updateTaskDescription as apiUpdateTaskDescription,
   updateComment as apiUpdateComment
@@ -81,6 +84,41 @@ export const updateExistingComment = createAsyncThunk<Comment, { id: number; tex
     }
   }
 );
+
+export const updateTaskPriority = createAsyncThunk<Task, { id: number; priority: string }, { rejectValue: string }>(
+  'tasks/updatePriority',
+  async ({ id, priority }, { rejectWithValue }) => {
+    try {
+      return await apiUpdateTaskPriority(id, priority);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const updateTaskResponsible = createAsyncThunk<Task, { id: number; responsible_id: number | null }, { rejectValue: string }>(
+  'tasks/updateResponsible',
+  async ({ id, responsible_id }, { rejectWithValue }) => {
+    try {
+      return await apiUpdateTaskResponsible(id, responsible_id);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const updateTaskTitle = createAsyncThunk<Task, { id: number; title: string }, { rejectValue: string }>(
+  'tasks/updateTitle',
+  async ({ id, title }, { rejectWithValue }) => {
+    try {
+      return await apiUpdateTaskTitle(id, title);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
 
 export const addNewComment = createAsyncThunk<Comment, { taskId: number; text: string }, { rejectValue: string }>(
   'tasks/addComment',
@@ -158,6 +196,31 @@ const tasksSlice = createSlice({
           state.currentTask = { ...state.currentTask, ...action.payload };
         }
       })
+      .addCase(updateTaskPriority.fulfilled, (state, action) => {
+        if (state.currentTask?.id === action.payload.id) {
+          state.currentTask = { ...state.currentTask, ...action.payload };
+        }
+        state.tasks = state.tasks.map(task => 
+          task.id === action.payload.id ? { ...task, ...action.payload } : task
+        );
+      })
+      .addCase(updateTaskResponsible.fulfilled, (state, action) => {
+        if (state.currentTask?.id === action.payload.id) {
+          state.currentTask = { ...state.currentTask, ...action.payload };
+        }
+        state.tasks = state.tasks.map(task => 
+          task.id === action.payload.id ? { ...task, ...action.payload } : task
+        );
+      })
+      .addCase(updateTaskTitle.fulfilled, (state, action) => {
+        if (state.currentTask?.id === action.payload.id) {
+          state.currentTask = { ...state.currentTask, ...action.payload };
+        }
+        state.tasks = state.tasks.map(task => 
+          task.id === action.payload.id ? { ...task, ...action.payload } : task
+        );
+      })
+
       .addCase(updateExistingComment.fulfilled, (state, action) => {
         if (state.currentTask?.comments) {
           state.currentTask.comments = state.currentTask.comments.map(comment =>

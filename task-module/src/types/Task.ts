@@ -45,3 +45,10 @@ export interface CommentCreateData {
   text: string;
   task_id?: number;
 }
+
+interface TasksState {
+  tasks: Task[];
+  currentTask: (Task & { comments: Comment[] }) | null;
+  loading: boolean;
+  error: string | null;
+}
