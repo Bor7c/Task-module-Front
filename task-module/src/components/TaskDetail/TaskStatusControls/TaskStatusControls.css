@@ -1,0 +1,224 @@
+:root {
+    --red: hsl(0, 78%, 62%);
+    --cyan: hsl(180, 62%, 55%);
+    --orange: hsl(34, 97%, 64%);
+    --blue: hsl(212, 86%, 64%);
+    --dark-blue: hsl(234, 12%, 34%);
+    --grayish-blue: hsl(229, 6%, 66%);
+    --light-gray: hsl(0, 0%, 98%);
+    --white: hsl(0, 0%, 100%);
+    --shadow: 0px 10px 20px -10px rgba(0, 0, 0, 0.1);
+    --border-radius: 8px;
+    --transition: all 0.2s ease;
+  }
+  
+  /* Основной контейнер */
+  .status-container {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--light-gray);
+  }
+  
+  /* Заголовок и бейдж статуса */
+  .status-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .status-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--dark-blue);
+    margin-right: 1rem;
+  }
+  
+  .status-badge {
+    padding-left: 0.75rem;
+    border-left-width: 4px;
+    border-left-style: solid;
+    display: flex;
+    align-items: center;
+  }
+  
+  .status-text {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  
+  /* Цвета статусов */
+  .status-badge.unassigned {
+    border-color: var(--grayish-blue);
+  }
+  .status-badge.unassigned .status-text {
+    color: var(--grayish-blue);
+  }
+  
+  .status-badge.assigned {
+    border-color: var(--blue);
+  }
+  .status-badge.assigned .status-text {
+    color: var(--blue);
+  }
+  
+  .status-badge.in_progress {
+    border-color: var(--orange);
+  }
+  .status-badge.in_progress .status-text {
+    color: var(--orange);
+  }
+  
+  .status-badge.solved {
+    border-color: var(--cyan);
+  }
+  .status-badge.solved .status-text {
+    color: var(--cyan);
+  }
+  
+  .status-badge.closed {
+    border-color: hsl(270, 50%, 60%);
+  }
+  .status-badge.closed .status-text {
+    color: hsl(270, 50%, 60%);
+  }
+  
+  .status-badge.awaiting_response {
+    border-color: hsl(190, 90%, 50%);
+  }
+  .status-badge.awaiting_response .status-text {
+    color: hsl(190, 90%, 50%);
+  }
+  
+  .status-badge.awaiting_action {
+    border-color: var(--red);
+  }
+  .status-badge.awaiting_action .status-text {
+    color: var(--red);
+  }
+  
+  /* Выбор статуса */
+  .status-select {
+    margin-left: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--grayish-blue);
+    background-color: var(--white);
+    transition: var(--transition);
+  }
+  
+  .status-select:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
+  }
+  
+  /* Кнопки действий */
+  .status-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  
+  .action-buttons-group {
+    display: flex;
+    gap: 0.75rem;
+    margin-left: 0.75rem;
+  }
+  
+  .action-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+  }
+  
+  .action-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
+  }
+  
+  .take-btn {
+    background-color: var(--blue);
+    color: var(--white);
+  }
+  
+  .take-btn:hover {
+    background-color: hsl(212, 86%, 58%);
+  }
+  
+  .release-btn {
+    background-color: var(--light-gray);
+    color: var(--dark-blue);
+    border: 1px solid var(--grayish-blue);
+  }
+  
+  .release-btn:hover {
+    background-color: hsl(0, 0%, 95%);
+  }
+  
+  .start-btn {
+    background-color: var(--orange);
+    color: var(--white);
+  }
+  
+  .start-btn:hover {
+    background-color: hsl(34, 97%, 58%);
+  }
+  
+  .solve-btn {
+    background-color: var(--cyan);
+    color: var(--white);
+  }
+  
+  .solve-btn:hover {
+    background-color: hsl(180, 62%, 50%);
+  }
+  
+  .close-btn {
+    background-color: hsl(270, 50%, 60%);
+    color: var(--white);
+  }
+  
+  .close-btn:hover {
+    background-color: hsl(270, 50%, 55%);
+  }
+  
+  /* Адаптивность */
+  @media (max-width: 768px) {
+    .status-container {
+      padding: 1rem;
+    }
+    
+    .status-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .status-title {
+      margin-bottom: 0.5rem;
+      margin-right: 0;
+    }
+    
+    .status-actions {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    
+    .action-buttons-group {
+      margin-left: 0;
+    }
+    
+    .status-select {
+      margin-left: 0;
+      width: 100%;
+    }
+  }

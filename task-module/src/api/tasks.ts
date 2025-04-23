@@ -128,14 +128,14 @@ export const updateTaskTitle = async (id: number, title: string): Promise<Task> 
   return response.json();
 };
 
-export const deleteTask = async (id: number): Promise<void> => {
-  const response = await fetch(`${API_URL}/tasks/${id}/`, {
+export const deleteTask = async (taskId: number): Promise<void> => {
+  const response = await fetch(`${API_URL}/tasks/${taskId}/`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
     credentials: 'include',
   });
 
-  await checkResponse(response, `Ошибка при удалении задачи ${id}`);
+  await checkResponse(response, `Ошибка при удалении задачи ${taskId}`);
 };
 
 // Комментарии
