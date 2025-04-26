@@ -1,206 +1,94 @@
-/* Основной контейнер доски */
+/* Основной контейнер */
 .kanban-board-container {
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    background-color: #f8f8f8;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 1200px;
-    margin: 0 auto;
+  width: 100%;
+  max-width: 100vw;
+  padding: 20px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.board-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kanban-table {
+  display: table;
+  width: 100%;
+  table-layout: fixed; /* Зафиксированная ширина для всех колонок */
+  margin-top: 20px;
+}
+
+.kanban-column {
+  display: table-cell;
+  padding: 15px;
+  width: 16.66%; /* Равномерно распределяем пространство */
+  vertical-align: top;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.column-title {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.task-card {
+  background: #ffffff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.task-card:hover {
+  background-color: #f1f5f9;
+}
+
+.show-completed-btn-wrapper {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.show-completed-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.show-completed-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .kanban-table {
+    display: block;
   }
-  
-  /* Заголовок доски с кнопками */
-  .board-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+
+  .kanban-column {
+    display: block;
+    width: 100%;
     margin-bottom: 20px;
   }
-  
-  .board-header h1 {
-    font-size: 2rem;
-    color: #333;
-    font-weight: bold;
-  }
-  
-  .board-header button {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .board-header button:hover {
-    background-color: #0056b3;
-  }
-  
-  /* Контейнер для колонок доски */
-  .kanban-columns {
-    display: flex;
-    gap: 20px;
-    margin-top: 20px;
-  }
-  
-  /* Колонка на доске */
-  .kanban-column {
-    flex: 1;
-    background-color: #fff;
+}
+
+@media (max-width: 480px) {
+  .kanban-board-container {
     padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
   }
-  
-  .column-title {
-    font-size: 1.5rem;
-    margin-bottom: 15px;
-    color: #333;
-  }
-  
-  /* Список задач в колонке */
-  .task-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding: 10px;
-    overflow-y: auto;
-    flex-grow: 1;
-  }
-  
-  /* Карточка задачи */
+
   .task-card {
-    background-color: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    transition: transform 0.2s ease, background-color 0.3s ease;
+    padding: 12px;
   }
-  
-  .task-card:hover {
-    background-color: #f0f0f0;
-    transform: translateY(-5px);
-  }
-  
-  /* Заголовок карточки задачи */
-  .task-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .task-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin: 0;
-    color: #333;
-  }
-  
-  /* Стикеры для приоритета и статуса задачи */
-  .task-badges {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .priority-badge, .status-badge {
-    padding: 5px 10px;
-    border-radius: 20px;
-    color: white;
-    font-size: 0.9rem;
-    font-weight: bold;
-  }
-  
-  .priority-badge.low {
-    background-color: #28a745;
-  }
-  
-  .priority-badge.medium {
-    background-color: #ffc107;
-  }
-  
-  .priority-badge.high {
-    background-color: #dc3545;
-  }
-  
-  .status-badge.todo {
-    background-color: #6c757d;
-  }
-  
-  .status-badge.in_progress {
-    background-color: #007bff;
-  }
-  
-  .status-badge.done {
-    background-color: #28a745;
-  }
-  
-  /* Метаданные задачи (приоритет, ответственный) */
-  .task-meta {
-    margin-top: 15px;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .meta-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #666;
-  }
-  
-  .meta-text {
-    font-size: 0.9rem;
-  }
-  
-  .meta-text strong {
-    color: #333;
-  }
-  
-  /* Футер карточки задачи с дополнительной информацией */
-  .task-footer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-  }
-  
-  .footer-item {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-    font-size: 0.9rem;
-    color: #666;
-  }
-  
-  .footer-item svg {
-    color: #007bff;
-    cursor: pointer;
-    transition: color 0.3s ease;
-  }
-  
-  .footer-item svg:hover {
-    color: #0056b3;
-  }
-  
-  /* Стиль кнопки "Назад" */
-  .back-button {
-    margin-top: 20px;
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s ease;
-  }
-  
-  .back-button:hover {
-    background-color: #0056b3;
-  }
-  
+}
