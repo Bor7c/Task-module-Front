@@ -1,248 +1,100 @@
-:root {
-  --red: hsl(0, 78%, 62%);
-  --cyan: hsl(180, 62%, 55%);
-  --orange: hsl(34, 97%, 64%);
-  --blue: hsl(212, 86%, 64%);
-  --varyDarkBlue: hsl(234, 12%, 34%);
-  --grayishBlue: hsl(229, 6%, 66%);
-  --veryLightGray: hsl(0, 0%, 98%);
-  --weight1: 200;
-  --weight2: 400;
-  --weight3: 600;
-  
-  /* Task specific colors */
-  --priority-critical: var(--red);
-  --priority-high: hsl(0, 70%, 50%);
-  --priority-medium: var(--orange);
-  --priority-low: hsl(120, 60%, 50%);
-  --priority-default: var(--grayishBlue);
-  
-  --status-in-progress: var(--blue);
-  --status-solved: hsl(120, 60%, 50%);
-  --status-closed: var(--grayishBlue);
-  --status-unassigned: hsl(0, 0%, 70%);
-  --status-awaiting: var(--orange);
-  --status-default: var(--cyan);
-}
+/* TaskList.css */
 
-.task-list-container {
-  font-family: 'Poppins', sans-serif;
-  background-color: var(--veryLightGray);
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.list-header {
-  text-align: center;
-  margin-bottom: 3rem;
-}
-
-.list-title {
-  color: var(--varyDarkBlue);
-  font-weight: var(--weight3);
-  font-size: 2rem;
-  margin-bottom: 1rem;
-}
-
-.list-header p {
-  color: var(--grayishBlue);
-  max-width: 600px;
-  margin: 0 auto 2rem;
-}
-
-.create-task-btn {
-  background-color: var(--blue);
-  color: white;
-  border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 5px;
-  font-weight: var(--weight3);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.create-task-btn:hover {
-  background-color: hsl(212, 86%, 54%);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.task-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-.task-card {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0px 10px 20px -10px var(--grayishBlue);
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-  border-top: 4px solid var(--cyan);
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.task-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0px 15px 30px -10px var(--grayishBlue);
-}
-
-.task-header {
-  margin-bottom: 1rem;
-  border-bottom: 1px solid var(--veryLightGray);
-  padding-bottom: 1rem;
-}
-
-.task-title {
-  color: var(--varyDarkBlue);
-  font-weight: var(--weight3);
-  margin: 0 0 0.5rem 0;
-  font-size: 1.2rem;
-}
-
-.task-badges {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.status-badge, .priority-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: var(--weight3);
-  color: white;
-}
-
-.task-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-  flex-grow: 1;
-}
-
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--grayishBlue);
-  font-size: 0.9rem;
-}
-
-.meta-text {
-  color: var(--varyDarkBlue);
-}
-
-.task-footer {
-  display: flex;
-  justify-content: space-between;
-  margin-top: auto;
-  padding-top: 1rem;
-  border-top: 1px solid var(--veryLightGray);
-  font-size: 0.85rem;
-}
-
-.footer-item {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  color: var(--grayishBlue);
-}
-
-.empty-state {
-  text-align: center;
-  padding: 3rem;
-  color: var(--grayishBlue);
-}
-
-.empty-state i {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  color: var(--grayishBlue);
-}
-
-.empty-state p {
-  margin-bottom: 1.5rem;
-}
-
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 200px;
-  color: var(--grayishBlue);
-}
-
-.spinner {
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  border-radius: 50%;
-  border-top: 4px solid var(--blue);
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.error-message {
-  color: var(--red);
-  text-align: center;
-  padding: 2rem;
-  font-weight: var(--weight3);
-}
-
-@media (max-width: 768px) {
-  .task-grid {
-    grid-template-columns: 1fr;
+.kanban-board-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
   }
   
-  .task-list-container {
-    padding: 1rem;
+  .board-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
-}
-
-.task-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid var(--veryLightGray);
-  padding-bottom: 1rem;
-  gap: 1rem;
-}
-
-.task-title {
-  color: var(--varyDarkBlue);
-  font-weight: var(--weight3);
-  margin: 0;
-  font-size: 1.2rem;
-  flex-grow: 1;
-}
-
-.task-badges {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.priority-badge {
-  order: 2; /* Приоритет будет справа */
-  margin-left: auto; /* Отталкиваем вправо */
-}
-
-.status-badge {
-  order: 1; /* Статус останется слева */
-}
+  
+  .kanban-columns {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+  }
+  
+  .kanban-column {
+    flex: 1;
+    background-color: #f4f4f4;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .column-title {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  
+  .task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .task-card {
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+  }
+  
+  .task-card:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .task-title {
+    font-size: 1.1rem;
+    margin: 0;
+  }
+  
+  .task-badges {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .priority-badge, .status-badge {
+    padding: 5px 10px;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.8rem;
+  }
+  
+  .task-meta {
+    margin-top: 10px;
+  }
+  
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .meta-text {
+    font-size: 0.9rem;
+  }
+  
+  .task-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  
+  .footer-item {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+  

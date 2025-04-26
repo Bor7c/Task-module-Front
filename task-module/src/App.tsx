@@ -5,7 +5,7 @@ import { checkUserSession } from './redux/authSlice';
 import HomePage from './pages/HomePage/HomePage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
-import TaskDetail from './components/TaskDetail/TaskDetail';
+// import TaskDetail from './pages/TaskPage/TaskDetail';
 import Layout from './components/Layout/Layout';
 import LoadingScreen from './components/common/LoadingScreen';
 
@@ -79,7 +79,7 @@ const App: React.FC = () => {
             />
           )}
         />
-        <Route
+        {/* <Route
           path="/tasks/:id"
           element={isAuthenticated ? (
             <TaskDetail />
@@ -90,7 +90,7 @@ const App: React.FC = () => {
               state={{ from: location }} 
             />
           )}
-        />
+        /> */}
         <Route 
           path="*" 
           element={
