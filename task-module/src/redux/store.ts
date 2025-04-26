@@ -4,11 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { TypedUseSelectorHook } from 'react-redux';
 import authReducer from './authSlice';
 import tasksReducer from './tasksSlice'; // Добавляем tasksReducer
+import taskDetailsReducer from './taskDetailsSlice'; // Импортируем taskDetailsReducer
 
 const store = configureStore({
   reducer: {
     auth: authReducer,
     tasks: tasksReducer, // Добавляем tasksReducer в store
+    taskDetails: taskDetailsReducer, // Добавляем taskDetailsReducer в store
   },
 });
 

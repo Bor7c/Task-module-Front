@@ -23,7 +23,7 @@ export interface Task {
   priority_display: string;
   status: 'in_progress' | 'awaiting_response' | 'closed' | 'unassigned';
   status_display: string;
-  responsible?: { username: string };
+  responsible?: { username: string } | null;
   created_at: string;
   deadline?: string;
   comments_count: number;
