@@ -1,0 +1,138 @@
+/* TaskDetail.css */
+
+/* Обертка для карточки задачи */
+.task-detail-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  /* Заголовок задачи */
+  .task-detail-container h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Вход в режим редактирования */
+  .edit-task-inputs input,
+  .edit-task-inputs textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Кнопка сохранения */
+  .save-task-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #007bff;
+    color: white;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .save-task-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Раздел для выбора статуса и приоритета */
+  .task-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Блок для назначения ответственного */
+  .assign-responsible-container {
+    margin-bottom: 1.5rem;
+  }
+  
+  .assign-responsible-container button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #28a745;
+    color: white;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .assign-responsible-container button:hover {
+    background-color: #218838;
+  }
+  
+  .remove-responsible-btn {
+    background-color: #dc3545;
+    padding: 0.5rem 1rem;
+    color: white;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+  }
+  
+  .remove-responsible-btn:hover {
+    background-color: #c82333;
+  }
+  
+  /* Блок комментариев */
+  .comment-section {
+    margin-top: 2rem;
+  }
+  
+  .comment-section textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .comment-section button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #007bff;
+    color: white;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .comment-section button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Кнопка для возврата */
+  .back-btn {
+    width: 100%;
+    margin-top: 2rem;
+    padding: 0.75rem;
+    color: #007bff;
+    text-align: center;
+    text-decoration: underline;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  
+  .back-btn:hover {
+    color: #0056b3;
+  }
+  

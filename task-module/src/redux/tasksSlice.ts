@@ -1,7 +1,7 @@
 // src/redux/tasksSlice.ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import * as taskAPI from '../api/tasksApi';  // Импортируем наши API функции
-import { Task } from '../types/Task';
+import { Task } from '../types/Types';
 
 interface TasksState {
   tasks: Task[];

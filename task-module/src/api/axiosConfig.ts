@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: 'http://localhost:8000/api',
-  withCredentials: true, // Важно для работы с куками
+  withCredentials: true,
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
@@ -17,30 +17,27 @@ function getCookie(name: string): string | null {
   return null;
 }
 
-// Интерсептор для добавления необходимых заголовков
+// Интерцептор запроса
 api.interceptors.request.use(config => {
-  // Добавляем CSRF токен для модифицирующих запросов
   const csrfToken = getCookie('csrftoken');
   if (csrfToken && ['post', 'put', 'patch', 'delete'].includes(config.method?.toLowerCase() || '')) {
     config.headers['X-CSRFToken'] = csrfToken;
   }
 
-  // Кука session_token будет отправляться автоматически благодаря withCredentials: true
-  // Но если бэкенд требует X-Session-ID в заголовке, берем его из куки:
-  const sessionToken = getCookie('session_token');
-  if (sessionToken) {
-    config.headers['X-Session-ID'] = sessionToken;
+  const sessionId = localStorage.getItem('session_id');
+  if (sessionId) {
+    config.headers['X-Session-ID'] = sessionId;
   }
 
   return config;
 });
 
-// Интерсептор для обработки ошибок
+// Интерцептор ответа
 api.interceptors.response.use(
   response => response,
   error => {
     if (error.response?.status === 403 || error.response?.status === 401) {
-      // Перенаправляем на страницу входа при ошибках аутентификации
+      localStorage.removeItem('session_id');
       window.location.href = '/login?next=' + encodeURIComponent(window.location.pathname);
     }
     return Promise.reject(error);

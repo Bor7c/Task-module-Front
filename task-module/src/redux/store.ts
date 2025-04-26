@@ -3,14 +3,16 @@ import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import type { TypedUseSelectorHook } from 'react-redux';
 import authReducer from './authSlice';
-import tasksReducer from './tasksSlice'; // Добавляем tasksReducer
-import taskDetailsReducer from './taskDetailsSlice'; // Импортируем taskDetailsReducer
+import tasksReducer from './tasksSlice';
+import taskDetailsReducer from './taskDetailsSlice';
+import usersReducer from './usersSlice'; // Импортируем usersSlice
 
 const store = configureStore({
   reducer: {
     auth: authReducer,
-    tasks: tasksReducer, // Добавляем tasksReducer в store
-    taskDetails: taskDetailsReducer, // Добавляем taskDetailsReducer в store
+    tasks: tasksReducer,
+    taskDetails: taskDetailsReducer,
+    users: usersReducer, // Добавляем usersReducer в store
   },
 });
 

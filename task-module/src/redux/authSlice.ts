@@ -1,13 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { authAPI } from '../api/auth';
-import type { UserData } from '../types/User';
+import type { User } from '../types/Types';
 
+// Тип состояния
 interface AuthState {
-  user: UserData | null;
+  user: User | null;
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
-  sessionChecked: boolean; // Добавляем флаг проверки сессии
+  sessionChecked: boolean;
 }
 
 const initialState: AuthState = {
@@ -18,6 +19,18 @@ const initialState: AuthState = {
   sessionChecked: false,
 };
 
+// 🔥 Универсальная функция для адаптации user
+const adaptUser = (rawUser: any): User => ({
+  id: rawUser.id,
+  username: rawUser.username,
+  email: rawUser.email,
+  first_name: rawUser.first_name ?? '',
+  last_name: rawUser.last_name ?? '',
+  role: rawUser.role ?? 'developer', // 🔥 <-- обязательно укажем роль (например, default developer)
+  is_active: rawUser.is_active ?? true,
+});
+
+// --- Async Thunks --- //
 
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
@@ -34,13 +47,11 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (credentials: { username: string; password: string }, { rejectWithValue }) => {
     try {
       const response = await authAPI.login(credentials);
-      // Сохраняем session_id в localStorage при успешном входе
       if (response.session_id) {
         localStorage.setItem('session_id', response.session_id);
       }
@@ -81,6 +92,8 @@ export const logoutUser = createAsyncThunk(
   }
 );
 
+// --- Slice --- //
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -93,13 +106,14 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
 
+      // --- Register User ---
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
+        state.user = adaptUser(action.payload.user);
         state.isAuthenticated = true;
         state.sessionChecked = true;
       })
@@ -109,13 +123,14 @@ const authSlice = createSlice({
         state.sessionChecked = true;
       })
 
+      // --- Login User ---
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
+        state.user = adaptUser(action.payload.user);
         state.isAuthenticated = true;
         state.sessionChecked = true;
       })
@@ -125,13 +140,13 @@ const authSlice = createSlice({
         state.sessionChecked = true;
       })
 
-
+      // --- Check Session ---
       .addCase(checkUserSession.pending, (state) => {
         state.loading = true;
       })
       .addCase(checkUserSession.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
+        state.user = adaptUser(action.payload.user);
         state.isAuthenticated = true;
         state.sessionChecked = true;
       })
@@ -142,7 +157,7 @@ const authSlice = createSlice({
         state.sessionChecked = true;
       })
 
-      
+      // --- Logout User ---
       .addCase(logoutUser.pending, (state) => {
         state.loading = true;
       })

@@ -1,5 +1,5 @@
 import api from './axiosConfig';
-import { Comment } from '../types/Task';
+import { Comment } from '../types/Types';
 
 export const fetchComments = async (taskId: number): Promise<Comment[]> => {
   const response = await api.get(`/tasks/${taskId}/comments/`);

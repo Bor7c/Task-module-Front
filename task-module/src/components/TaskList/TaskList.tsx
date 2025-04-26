@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { loadTasks } from '../../redux/tasksSlice';
 import { useNavigate } from 'react-router-dom';
-import { Task } from '../../types/Task';
+import { Task } from '../../types/Types';
 import './TaskList.css';
 
 const TaskList: React.FC = () => {
