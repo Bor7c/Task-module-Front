@@ -5,12 +5,15 @@ import { useNavigate } from 'react-router-dom';
 import { Task } from '../../types/Types';
 import TaskCard from '../TaskCard/TaskCard'; // Импортируем новый компонент
 import './TaskList.css';
+import { Button } from '../ui/Button/Button'; // Импортируем компонент Button
 
 const TaskList: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { tasks, loading, error } = useAppSelector((state) => state.tasks);
   const { user } = useAppSelector((state) => state.auth);
+
+  // Состояние для отображения/скрытия групп задач
   const [showCompleted, setShowCompleted] = useState(false);
 
   useEffect(() => {
@@ -43,7 +46,6 @@ const TaskList: React.FC = () => {
         return 'var(--status-awaiting)';
       case 'solved': return 'var(--status-solved)';
       case 'closed': return 'var(--status-closed)';
-      case 'unassigned': return 'var(--status-unassigned)';
       default: return 'var(--status-default)';
     }
   };
@@ -62,7 +64,6 @@ const TaskList: React.FC = () => {
   }
 
   const statusOrder = [
-    { label: 'Не назначено', value: 'unassigned' },
     { label: 'В работе', value: 'in_progress' },
     { label: 'Ожидает ответа', value: 'awaiting_response' },
     { label: 'Ожидает действия', value: 'awaiting_action' },
@@ -93,9 +94,15 @@ const TaskList: React.FC = () => {
 
       <div className="kanban-table">
         {statusOrder.map(({ label, value }) => {
+          // Если состояние showCompleted === true, то показываем задачи решенные и закрытые
+          // Иначе показываем все остальные статусы
           if ((value === 'solved' || value === 'closed') && !showCompleted) {
             return null;
           }
+          if ((value === 'in_progress' || value === 'awaiting_response' || value === 'awaiting_action') && showCompleted) {
+            return null;
+          }
+
           return (
             <div key={label} className="kanban-column">
               <h3 className="column-title">{label}</h3>
@@ -120,11 +127,14 @@ const TaskList: React.FC = () => {
         })}
       </div>
 
-      {/* Кнопка показать/скрыть решенные */}
-      <div className="show-completed-btn-wrapper">
-        <button className="show-completed-btn" onClick={() => setShowCompleted(!showCompleted)}>
-          {showCompleted ? 'Скрыть решенные и закрытые' : 'Показать решенные и закрытые'}
-        </button>
+      {/* Одна кнопка для переключения отображения */}
+      <div className="toggle-btn-wrapper">
+        <Button
+          onClick={() => setShowCompleted(!showCompleted)}
+          className="toggle-completed-btn"
+        >
+          {showCompleted ? 'Показать задачи в работе' : 'Показать решенные и закрытые задачи'}
+        </Button>
       </div>
     </div>
   );

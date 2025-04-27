@@ -44,19 +44,26 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, getPriorityColor }) 
       </div>
 
       <div className="task-footer">
-        <div className="footer-item">
-          <i className="icon-user"></i>
-          <span className="meta-text">
-            {task.responsible?.username || 'Не назначен'}
-          </span>
+        <div className="footer-left">
+          <div className="footer-item">
+            <i className="icon-calendar"></i>
+            <span className="meta-text">
+              {new Date(task.created_at).toLocaleDateString('ru-RU')}
+            </span>
+          </div>
+          <div className="footer-item">
+            <i className="icon-comment"></i>
+            <span>{task.comments_count || 0} комментариев</span>
+          </div>
         </div>
-        <div className="footer-item">
-          <i className="icon-comment"></i>
-          <span>{task.comments_count || 0} комментариев</span>
-        </div>
-        <div className="footer-item">
-          <i className="icon-eye"></i>
-          <span>Подробнее</span>
+
+        <div className="footer-right">
+          <div className="footer-item">
+            <i className="icon-user"></i>
+            <span className="meta-text">
+              {task.responsible?.username || 'Не назначен'}
+            </span>
+          </div>
         </div>
       </div>
     </div>

@@ -1,8 +1,9 @@
 import React from 'react';
+import './Button.css';  // Подключим файл стилей
 
-export const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement>> = ({ children, ...props }) => {
+export const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement>> = ({ children, className, ...props }) => {
   return (
-    <button {...props} className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+    <button {...props} className={`custom-btn ${className}`}>
       {children}
     </button>
   );

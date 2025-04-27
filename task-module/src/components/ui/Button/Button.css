@@ -1,0 +1,41 @@
+/* Button.css */
+
+.custom-btn {
+  padding: 10px 20px; /* Внутренние отступы */
+  background-color: #007bff; /* Цвет фона */
+  color: white; /* Цвет текста */
+  font-size: 1rem; /* Размер шрифта */
+  font-weight: 500; /* Толщина шрифта */
+  border-radius: 8px; /* Скругленные углы */
+  border: none; /* Без рамки */
+  cursor: pointer; /* Курсор в виде руки */
+  transition: background-color 0.3s, transform 0.2s; /* Плавные анимации */
+}
+
+/* Стили при наведении */
+.custom-btn:hover {
+  background-color: #0056b3; /* Темнее при наведении */
+  transform: translateY(-2px); /* Легкий подъем */
+}
+
+/* Стили при фокусе (например, после нажатия) */
+.custom-btn:focus {
+  outline: none; /* Убираем стандартную обводку при фокусе */
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5); /* Добавляем тень */
+}
+
+/* Стили для кнопки с дополнительным классом */
+.custom-btn.secondary {
+  background-color: #6c757d; /* Серый цвет для второго типа кнопок */
+}
+
+.custom-btn.secondary:hover {
+  background-color: #5a6268; /* Темнее для второго типа кнопки */
+}
+
+/* Дополнительные состояния, например, для отключенной кнопки */
+.custom-btn:disabled {
+  background-color: #e0e0e0;
+  color: #b0b0b0;
+  cursor: not-allowed;
+}
