@@ -120,10 +120,20 @@ const TaskDetail: React.FC = () => {
     if (task && (editedTitle !== task.title || editedDescription !== task.description)) {
       // Сохраняем изменения задачи
       if (editedTitle !== task.title) {
-        dispatch(updateTaskTitle({ id: task.id, title: editedTitle }));
+        dispatch(updateTaskTitle({ id: task.id, title: editedTitle })).then(() => {
+          // После успешного обновления, мы можем обновить состояние задачи в редуксе
+          if (task && task.id) {
+            dispatch(loadTaskById(task.id));  // Перезагружаем задачу с актуальными данными
+          }
+        });
       }
       if (editedDescription !== task.description) {
-        dispatch(updateTaskDescription({ id: task.id, description: editedDescription }));
+        dispatch(updateTaskDescription({ id: task.id, description: editedDescription })).then(() => {
+          // После успешного обновления, мы можем обновить состояние задачи в редуксе
+          if (task && task.id) {
+            dispatch(loadTaskById(task.id));  // Перезагружаем задачу с актуальными данными
+          }
+        });
       }
     }
     setIsEditing(false);
