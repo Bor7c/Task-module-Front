@@ -2,7 +2,7 @@
 .kanban-board-container {
   width: 100%;
   max-width: 100vw;
-  padding: 20px;
+  padding: 0px;
   background-color: #f9fafb;
   border-radius: 8px;
   overflow-x: auto;
@@ -17,14 +17,14 @@
 .kanban-table {
   display: table;
   width: 100%;
-  table-layout: fixed; /* Зафиксированная ширина для всех колонок */
+  table-layout: fixed;
   margin-top: 20px;
 }
 
 .kanban-column {
   display: table-cell;
   padding: 15px;
-  width: 16.66%; /* Равномерно распределяем пространство */
+  width: 16.66%;
   vertical-align: top;
   background-color: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -50,12 +50,23 @@
   background-color: #f1f5f9;
 }
 
-.show-completed-btn-wrapper {
+/* Центрируем блок с текстом "Задачи отсутствуют" */
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  text-align: center;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.toggle-btn-wrapper {
   margin-top: 20px;
   text-align: center;
 }
 
-.show-completed-btn {
+.toggle-completed-btn {
   background-color: #007bff;
   color: white;
   border: none;
@@ -66,7 +77,7 @@
   transition: background-color 0.3s;
 }
 
-.show-completed-btn:hover {
+.toggle-completed-btn:hover {
   background-color: #0056b3;
 }
 
