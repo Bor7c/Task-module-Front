@@ -7,11 +7,14 @@ import {
   updateTaskPriority,
   assignTaskResponsible,
   removeResponsible,
+  updateTaskTitle,
+  updateTaskDescription,
 } from '../../redux/taskDetailsSlice';
 import { setUsers, setLoading, setError } from '../../redux/usersSlice';
-import { Task, User } from '../../types/Types';
+import { Task, User, Comment } from '../../types/Types';
 import LoadingScreen from '../../components/common/LoadingScreen';
 import { fetchUsers } from '../../api/users';
+import { fetchComments, addComment } from '../../api/commentsApi';
 import './TaskDetail.css';
 
 type TaskStatus = 'in_progress' | 'solved' | 'closed' | 'awaiting_response' | 'awaiting_action';
@@ -24,14 +27,15 @@ const TaskDetail: React.FC = () => {
   const { task, loading, error } = useAppSelector((state) => state.taskDetails);
   const { users } = useAppSelector((state) => state.users);
   const currentUser = useAppSelector((state) => state.auth.user);
-
+  const [comments, setComments] = useState<Comment[]>([]);
+  
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
   const [editedDescription, setEditedDescription] = useState('');
   const [newComment, setNewComment] = useState('');
   const [localStatus, setLocalStatus] = useState<TaskStatus>('awaiting_action');
 
-  // Загружаем ТОЛЬКО пользователей
+  // Загружаем пользователей
   useEffect(() => {
     if (users.length === 0) {
       dispatch(setLoading(true));
@@ -47,7 +51,7 @@ const TaskDetail: React.FC = () => {
     }
   }, [dispatch, users.length]);
 
-  // Загружаем ТОЛЬКО задачу
+  // Загружаем задачу
   useEffect(() => {
     if (!currentUser) {
       navigate('/login');
@@ -57,6 +61,15 @@ const TaskDetail: React.FC = () => {
       dispatch(loadTaskById(Number(id)));
     }
   }, [dispatch, id, currentUser, navigate]);
+
+  // Загружаем комментарии задачи
+  useEffect(() => {
+    if (id) {
+      fetchComments(Number(id))
+        .then((data) => setComments(data))
+        .catch(() => dispatch(setError('Ошибка загрузки комментариев')));
+    }
+  }, [id]);
 
   // Когда задача загружена — заполняем поля
   useEffect(() => {
@@ -69,10 +82,7 @@ const TaskDetail: React.FC = () => {
 
   const handleStatusChange = (status: TaskStatus) => {
     if (task) {
-      // Сначала обновляем локально
       setLocalStatus(status);
-
-      // Отправляем изменение на сервер
       dispatch(updateTaskStatus({ id: task.id, status }));
     }
   };
@@ -97,14 +107,24 @@ const TaskDetail: React.FC = () => {
 
   const handleAddComment = () => {
     if (newComment.trim() && task) {
-      // Здесь можно будет отправить комментарий на сервер
-      setNewComment('');
+      addComment(task.id, newComment.trim())
+        .then(() => {
+          setNewComment('');
+          fetchComments(task.id).then((data) => setComments(data)); // Перезагружаем комментарии
+        })
+        .catch(() => dispatch(setError('Ошибка добавления комментария')));
     }
   };
 
   const handleSaveTask = () => {
     if (task && (editedTitle !== task.title || editedDescription !== task.description)) {
       // Сохраняем изменения задачи
+      if (editedTitle !== task.title) {
+        dispatch(updateTaskTitle({ id: task.id, title: editedTitle }));
+      }
+      if (editedDescription !== task.description) {
+        dispatch(updateTaskDescription({ id: task.id, description: editedDescription }));
+      }
     }
     setIsEditing(false);
   };
@@ -126,7 +146,7 @@ const TaskDetail: React.FC = () => {
     }
   };
 
-  if (loading && !task) return <LoadingScreen fullScreen />; // только при полном отсутствии задачи
+  if (loading && !task) return <LoadingScreen fullScreen />;
   if (error) return <div className="text-red-500 text-center mt-10">{error}</div>;
   if (!task) return <div className="text-center mt-10 text-gray-500">Задача не найдена</div>;
 
@@ -169,8 +189,7 @@ const TaskDetail: React.FC = () => {
       <div className="task-status-priority-container">
         <div>
           <strong>Статус:</strong>
-          <p>{readableStatus(localStatus)}</p> {/* Используем локальное состояние для отображения */}
-          {/* Статус может быть изменен всеми пользователями */}
+          <p>{readableStatus(localStatus)}</p>
           <div className="status-buttons">
             {localStatus !== 'in_progress' && (
               <button onClick={() => handleStatusChange('in_progress')} className="status-btn">
@@ -209,7 +228,6 @@ const TaskDetail: React.FC = () => {
           {task.responsible ? (
             <div className="assigned-responsible">
               <p>{task.responsible.username}</p>
-              {/* Ответственного можно удалить только администратору или создателю задачи */}
               {isAdminOrOwner && (
                 <button
                   onClick={handleRemoveResponsible}
@@ -236,7 +254,7 @@ const TaskDetail: React.FC = () => {
                 onClick={() => handleAssignResponsible(currentUser?.id || 0)}
                 className="assign-responsible-btn"
               >
-                Назначить себя
+                Назначить на меня
               </button>
             </div>
           )}
@@ -256,6 +274,13 @@ const TaskDetail: React.FC = () => {
           >
             Добавить комментарий
           </button>
+          <div className="comments-list">
+            {comments.map((comment) => (
+              <div key={comment.id} className="comment">
+                <p>{comment.text}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

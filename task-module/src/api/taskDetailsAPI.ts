@@ -43,11 +43,6 @@ export const updateTaskDescription = async (id: number, description: string): Pr
   return response.data;
 };
 
-// Функция для добавления комментария
-export const addComment = async (taskId: number, text: string): Promise<void> => {
-  await api.post(`/tasks/${taskId}/comments/`, { text });
-};
-
 // Функция для получения списка пользователей (если нужно для назначения ответственного)
 export const fetchUsers = async (): Promise<any[]> => {
   const response = await api.get('/users/');
