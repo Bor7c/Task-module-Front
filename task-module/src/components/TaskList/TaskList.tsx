@@ -25,7 +25,7 @@ const TaskList: React.FC = () => {
   };
 
   const handleCreateTask = () => {
-    navigate('/tasks/new');
+    navigate('/create-task');
   };
 
   const getPriorityColor = (priority: string) => {

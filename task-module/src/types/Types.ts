@@ -3,8 +3,8 @@ export interface Task {
   id: number;
   title: string;
   description: string | null;
-  status: 'in_progress' | 'solved' | 'closed' | 'awaiting_response' | 'awaiting_action';
-  priority: 'low' | 'medium' | 'high' | 'critical';
+  status: TaskStatus;
+  priority: TaskPriority;
   responsible: User | null;
   is_assigned: boolean;
   created_by: User;
@@ -20,6 +20,9 @@ export interface Task {
   comments_count: number;
 }
 
+// Типы для приоритета и статуса
+export type TaskPriority = 'low' | 'medium' | 'high' | 'critical';
+export type TaskStatus = 'in_progress' | 'solved' | 'closed' | 'awaiting_response' | 'awaiting_action';
 
 // Тип для комментария
 export interface Comment {
@@ -31,6 +34,7 @@ export interface Comment {
   updated_at: string; // Дата последнего обновления
   is_system: boolean; // Является ли это системным сообщением
   is_deleted: boolean; // Удалён ли комментарий
+  is_modified: boolean; // Удалён ли комментарий
 }
 
 // Тип для пользователя
@@ -40,28 +44,31 @@ export interface User {
   first_name: string;
   last_name: string;
   email: string;
-  role: 'admin' | 'manager' | 'developer'; // Роль пользователя
+  role: UserRole; // Роль пользователя
   is_active: boolean; // Активность пользователя
 }
 
+export type UserRole = 'admin' | 'manager' | 'developer';
 
-const getPriorityDisplay = (priority: string): string => {
+// Функция для отображения приоритета
+const getPriorityDisplay = (priority: TaskPriority): string => {
   switch (priority) {
     case 'critical': return 'Критический';
     case 'high': return 'Высокий';
     case 'medium': return 'Средний';
     case 'low': return 'Низкий';
-    default: return 'Неизвестный';
+    default: return 'Неизвестный'; // Этот default теперь теоретически недостижим
   }
 };
 
-const getStatusDisplay = (status: string): string => {
+// Функция для отображения статуса
+const getStatusDisplay = (status: TaskStatus): string => {
   switch (status) {
     case 'in_progress': return 'В работе';
     case 'awaiting_response': return 'Ожидает ответа';
     case 'awaiting_action': return 'Ожидает действия';
     case 'solved': return 'Решено';
     case 'closed': return 'Закрыто';
-    default: return 'Неизвестный статус';
+    default: return 'Неизвестный статус'; // Этот default теоретически недостижим
   }
 };

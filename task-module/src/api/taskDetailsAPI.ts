@@ -19,15 +19,21 @@ export const updateTaskPriority = async (id: number, priority: string): Promise<
   return response.data;
 };
 
-// Функция для назначения ответственного
-export const updateTaskResponsible = async (id: number, responsible_id: number | null): Promise<Task> => {
-  const response = await api.patch(`/tasks/${id}/`, { responsible: responsible_id });
+// Функция для назначения другого пользователя ответственным
+export const updateTaskResponsible = async (id: number, userId: number): Promise<Task> => {
+  const response = await api.post(`/tasks/${id}/assign_responsible/`, { user_id: userId });
+  return response.data;
+};
+
+// Функция для назначения себя ответственным
+export const assignToMe = async (id: number): Promise<Task> => {
+  const response = await api.post(`/tasks/${id}/assign_to_me/`);
   return response.data;
 };
 
 // Функция для удаления ответственного
-export const removeResponsible = async (taskId: number): Promise<Task> => {
-  const response = await api.patch(`/tasks/${taskId}/`, { responsible: null });
+export const removeResponsible = async (id: number): Promise<Task> => {
+  const response = await api.post(`/tasks/${id}/remove_responsible/`);
   return response.data;
 };
 
@@ -43,9 +49,8 @@ export const updateTaskDescription = async (id: number, description: string): Pr
   return response.data;
 };
 
-// Функция для получения списка пользователей (если нужно для назначения ответственного)
+// Функция для получения списка пользователей
 export const fetchUsers = async (): Promise<any[]> => {
   const response = await api.get('/users/');
   return response.data;
 };
-

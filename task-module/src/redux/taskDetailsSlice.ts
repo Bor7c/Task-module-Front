@@ -108,6 +108,8 @@ export const updateTaskDescription = createAsyncThunk<Task, { id: number, descri
   }
 );
 
+// Новые методы для работы с комментариями
+
 export const addComment = createAsyncThunk<Comment, { taskId: number, text: string }>(
   'taskDetails/addComment',
   async ({ taskId, text }) => {
@@ -128,6 +130,34 @@ export const loadComments = createAsyncThunk<Comment[], number>(
       return comments;
     } catch (error) {
       throw new Error('Не удалось загрузить комментарии');
+    }
+  }
+);
+
+// Новая асинхронная операция для удаления комментария
+
+export const removeComment = createAsyncThunk<number, number>(
+  'taskDetails/removeComment',
+  async (commentId) => {
+    try {
+      await commentsAPI.deleteComment(commentId);
+      return commentId; // Возвращаем ID удаленного комментария для удаления его из состояния
+    } catch (error) {
+      throw new Error('Не удалось удалить комментарий');
+    }
+  }
+);
+
+// Новая асинхронная операция для обновления комментария
+
+export const updateComment = createAsyncThunk<Comment, { id: number, text: string }>(
+  'taskDetails/updateComment',
+  async ({ id, text }) => {
+    try {
+      const updatedComment = await commentsAPI.updateComment(id, text);
+      return updatedComment;
+    } catch (error) {
+      throw new Error('Не удалось обновить комментарий');
     }
   }
 );
@@ -269,6 +299,33 @@ const taskDetailsSlice = createSlice({
         state.comments = action.payload;
       })
       .addCase(loadComments.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Произошла ошибка';
+      })
+      .addCase(removeComment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(removeComment.fulfilled, (state, action) => {
+        state.loading = false;
+        state.comments = state.comments.filter(comment => comment.id !== action.payload);
+      })
+      .addCase(removeComment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Произошла ошибка';
+      })
+      .addCase(updateComment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateComment.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedComments = state.comments.map(comment =>
+          comment.id === action.payload.id ? action.payload : comment
+        );
+        state.comments = updatedComments;
+      })
+      .addCase(updateComment.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Произошла ошибка';
       })

@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage/HomePage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
 import TaskDetail from './pages/TaskPage/TaskDetail';
+import CreateTaskPage from './pages/CreateTaskPage/CreateTaskPage'; // 👈 Новый импорт
 import Layout from './components/Layout/Layout';
 import LoadingScreen from './components/common/LoadingScreen';
 
@@ -19,25 +20,19 @@ const App: React.FC = () => {
     error 
   } = useAppSelector((state) => state.auth);
 
-  // Проверяем сессию при загрузке и при изменении пути
   useEffect(() => {
     const sessionId = localStorage.getItem('session_id');
-    
-    // Проверяем сессию только если есть session_id
     if (sessionId) {
       dispatch(checkUserSession());
     } else {
-      // Если нет session_id, сразу считаем что не авторизованы
       dispatch({ type: 'auth/checkSession/rejected' });
     }
   }, [dispatch, location.pathname]);
 
-  // Пока не проверили сессию, показываем загрузку
   if (!sessionChecked) {
     return <LoadingScreen fullScreen />;
   }
 
-  // Если идет загрузка (но сессия уже проверена), показываем мини-лоадер
   if (loading) {
     return (
       <Layout>
@@ -83,6 +78,19 @@ const App: React.FC = () => {
           path="/tasks/:id"
           element={isAuthenticated ? (
             <TaskDetail />
+          ) : (
+            <Navigate 
+              to="/login" 
+              replace 
+              state={{ from: location }} 
+            />
+          )}
+        />
+        {/* Новый роут для создания задачи */}
+        <Route
+          path="/create-task"
+          element={isAuthenticated ? (
+            <CreateTaskPage />
           ) : (
             <Navigate 
               to="/login" 
