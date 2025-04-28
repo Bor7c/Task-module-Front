@@ -1,10 +1,9 @@
-import api  from './axiosConfig';
+import api from './axiosConfig';
 
 interface TaskCreatePayload {
   title: string;
   description: string;
-  priority: 'Low' | 'Medium' | 'High';
-  status?: 'Open' | 'In Progress' | 'Completed';
+  priority: 'low' | 'medium' | 'high'  | 'critical';
 }
 
 export const createTask = async (taskData: TaskCreatePayload) => {

@@ -2,17 +2,20 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import type { TypedUseSelectorHook } from 'react-redux';
+
 import authReducer from './authSlice';
 import tasksReducer from './tasksSlice';
 import taskDetailsReducer from './taskDetailsSlice';
-import usersReducer from './usersSlice'; // Импортируем usersSlice
+import usersReducer from './usersSlice';
+import createTaskFormReducer from './createTaskFormSlice'; // Новый редьюсер для формы создания задачи
 
 const store = configureStore({
   reducer: {
     auth: authReducer,
     tasks: tasksReducer,
     taskDetails: taskDetailsReducer,
-    users: usersReducer, // Добавляем usersReducer в store
+    users: usersReducer,
+    createTaskForm: createTaskFormReducer, // Добавили сюда
   },
 });
 
