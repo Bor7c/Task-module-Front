@@ -70,16 +70,6 @@ const TaskList: React.FC = () => {
       date.getFullYear() === today.getFullYear();
   };
 
-  const isOverdue = (dateString: string) => {
-    if (!dateString) return false;
-    const date = new Date(dateString);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    date.setHours(0, 0, 0, 0);
-    
-    return date < today;
-  };
-
   const getDaysWithoutUpdate = (updatedAt: string) => {
     if (!updatedAt) return 0;
     
@@ -89,6 +79,7 @@ const TaskList: React.FC = () => {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
+  // Подсчитываем количество задач с дедлайном на сегодня
   const getTodaysTasks = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -103,18 +94,12 @@ const TaskList: React.FC = () => {
     }).length;
   };
 
+  // Используем свойство is_overdue с бэкенда для подсчета просроченных задач
   const getOverdueTasks = () => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    return tasks.filter(task => {
-      if (task.deadline && !completedStatuses.includes(task.status)) {
-        const deadline = new Date(task.deadline);
-        deadline.setHours(0, 0, 0, 0);
-        return deadline.getTime() < today.getTime();
-      }
-      return false;
-    }).length;
+    // Показываем только активные задачи с флагом is_overdue в счетчике
+    return tasks.filter(task => 
+      !completedStatuses.includes(task.status) && task.is_overdue
+    ).length;
   };
 
   if (loading && !tasks.length) {
@@ -144,11 +129,9 @@ const TaskList: React.FC = () => {
       isToday(task.deadline)
     );
   } else if (filterType === 'overdue') {
-    filteredTasks = filteredTasks.filter(task => 
-      !completedStatuses.includes(task.status) && 
-      task.deadline && 
-      isOverdue(task.deadline)
-    );
+    // При фильтрации просроченных задач показываем ВСЕ задачи с флагом is_overdue,
+    // включая решенные и закрытые с этим флагом
+    filteredTasks = filteredTasks.filter(task => task.is_overdue);
   }
   
   // Применяем фильтр по дням без обновления
@@ -195,6 +178,11 @@ const TaskList: React.FC = () => {
   const tasksToday = getTodaysTasks();
   const overdueTasksCount = getOverdueTasks();
 
+  // Подсчёт просроченных задач в разделе завершенных для бейджей
+  const completedOverdueTasks = tasks.filter(task => 
+    completedStatuses.includes(task.status) && task.is_overdue
+  ).length;
+
   return (
     <div className="task-list">
       <div className="task-list__header">
@@ -203,6 +191,11 @@ const TaskList: React.FC = () => {
             Задачи 
             <span className="task-list__counts-inline">
               (всего: {totalTasks}, активных: {activeTasks.length})
+              {completedOverdueTasks > 0 && (
+                <span className="task-list__overdue-completed-badge">
+                  {completedOverdueTasks} завершено с просрочкой
+                </span>
+              )}
             </span>
           </h1>
           <div className="task-list__actions">
@@ -332,7 +325,14 @@ const TaskList: React.FC = () => {
           >
             <FaClipboardCheck />
             <span>Завершенные</span>
-            <span className="task-list__tab-count">{completedTasks.length}</span>
+            <span className="task-list__tab-count">
+              {completedTasks.length}
+              {completedOverdueTasks > 0 && (
+                <span className="task-list__tab-overdue-badge" title="Задачи, завершенные с просрочкой">
+                  +{completedOverdueTasks}
+                </span>
+              )}
+            </span>
           </button>
         </div>
       </div>
@@ -352,7 +352,7 @@ const TaskList: React.FC = () => {
               ) : (
                 statusTasks.map((task) => {
                   const isTaskToday = task.deadline && isToday(task.deadline);
-                  const isTaskOverdue = task.deadline && isOverdue(task.deadline);
+                  const isTaskOverdue = task.is_overdue;
                   
                   return (
                     <div 
@@ -369,11 +369,15 @@ const TaskList: React.FC = () => {
                       
                       <h3 className="task-list__card-title">{task.title}</h3>
                       
+                      {/* Показываем бейдж просроченности всегда если is_overdue=true, даже для закрытых/решенных задач */}
                       {(isTaskToday || isTaskOverdue) && (
                         <div className="task-list__card-status">
                           {isTaskOverdue && (
                             <span className="task-list__card-status-badge task-list__card-status-overdue">
-                              <FaExclamationCircle /> Просрочена
+                              <FaExclamationCircle /> 
+                              {completedStatuses.includes(task.status) 
+                                ? 'Завершена с просрочкой' 
+                                : 'Просрочена'}
                             </span>
                           )}
                           {isTaskToday && !isTaskOverdue && (

@@ -18,6 +18,7 @@ export interface Task {
   priority_display: string;
   status_display: string;
   comments_count: number;
+  is_overdue: boolean; // Новое свойство
 }
 
 // Типы для приоритета и статуса

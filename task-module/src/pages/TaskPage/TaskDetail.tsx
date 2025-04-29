@@ -16,7 +16,7 @@ import {
 } from '../../redux/taskDetailsSlice';
 import { setUsers, setLoading, setError } from '../../redux/usersSlice';
 import { fetchUsers } from '../../api/users';
-import { FaEdit, FaTrash, FaSave, FaUserPlus, FaArrowLeft, FaRegClock, FaSync } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSave, FaUserPlus, FaArrowLeft, FaRegClock, FaSync, FaExclamationCircle } from 'react-icons/fa';
 import LoadingScreen from '../../components/common/LoadingScreen';
 import { Task, User, Comment } from '../../types/Types';
 import './TaskDetail.css';
@@ -54,7 +54,6 @@ const TaskDetail: React.FC = () => {
         setShowCloseConfirmation(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
@@ -101,9 +100,11 @@ const TaskDetail: React.FC = () => {
       if (status === 'closed') {
         setShowCloseConfirmation(true);
       } else {
-        setLocalStatus(status);
         dispatch(updateTaskStatus({ id: task.id, status }))
-          .then(() => dispatch(loadTaskById(Number(id))));
+          .then(() => {
+            setLocalStatus(status);
+            dispatch(loadTaskById(Number(id)));
+          });
         setIsAwaitingMenuOpen(false);
       }
     }
@@ -111,9 +112,11 @@ const TaskDetail: React.FC = () => {
 
   const confirmCloseTask = () => {
     if (task) {
-      setLocalStatus('closed');
       dispatch(updateTaskStatus({ id: task.id, status: 'closed' }))
-        .then(() => dispatch(loadTaskById(Number(id))));
+        .then(() => {
+          setLocalStatus('closed');
+          dispatch(loadTaskById(Number(id)));
+        });
       setShowCloseConfirmation(false);
     }
   };
@@ -240,7 +243,7 @@ const TaskDetail: React.FC = () => {
       case 'closed': return 'Закрыто';
       case 'awaiting_response': return 'Ожидает ответа';
       case 'awaiting_action': return 'Ожидает действий';
-      default: return 'Неиз';
+      default: return 'Неизвестно';
     }
   };
 
@@ -251,7 +254,7 @@ const TaskDetail: React.FC = () => {
   return (
     <div className="task-detail-container">
       <div className="task-detail__header">
-        <button onClick={() => navigate('/')} className="task-detail__back-btn">
+        <button onClick={() => navigate('/tasks')} className="task-detail__back-btn">
           <FaArrowLeft /> Назад
         </button>
         
@@ -342,14 +345,21 @@ const TaskDetail: React.FC = () => {
                 disabled={currentUser?.id !== task.created_by.id}
               />
             ) : (
-              <h1 className="task-detail__title">
-                {task.title}
-                {currentUser?.id === task.created_by.id && (
-                  <button onClick={() => setIsEditing(true)} className="task-detail__edit-title-btn">
-                    <FaEdit />
-                  </button>
+              <div className="task-detail__title-wrapper">
+                <h1 className="task-detail__title">
+                  {task.title}
+                  {currentUser?.id === task.created_by.id && (
+                    <button onClick={() => setIsEditing(true)} className="task-detail__edit-title-btn">
+                      <FaEdit />
+                    </button>
+                  )}
+                </h1>
+                {task.is_overdue && (
+                  <div className="task-detail__overdue-badge">
+                    <FaExclamationCircle /> Просрочена
+                  </div>
                 )}
-              </h1>
+              </div>
             )}
           </div>
           
@@ -378,7 +388,7 @@ const TaskDetail: React.FC = () => {
             ) : (
               <div className="task-detail__description">
                 <h3>Описание:</h3>
-                <p className="task-detail__description-text">{task.description || 'Нет описания'}</p>
+                <p className="task-detail__description-text">{task.description || '👉 Нет описания'}</p>
                 {currentUser?.id === task.created_by.id && (
                   <button onClick={() => setIsEditing(true)} className="task-detail__edit-description-btn">
                     <FaEdit /> Редактировать
@@ -388,7 +398,7 @@ const TaskDetail: React.FC = () => {
             )}
           </div>
           
-          {/* Комментарии перемещены под блок описания */}
+          {/* Комментарии */}
           <div className="task-detail__comment-section">
             <h2>Комментарии ({comments.filter(comment => !comment.is_deleted).length})</h2>
             <div className="task-detail__add-comment">
@@ -480,6 +490,7 @@ const TaskDetail: React.FC = () => {
                   value={localPriority}
                   onChange={(e) => handlePriorityChange(e.target.value)}
                   className={`task-detail__priority-select ${getPriorityClass(localPriority)}`}
+                  disabled={localStatus === 'closed'}
                 >
                   <option value="low">Низкий</option>
                   <option value="medium">Средний</option>
@@ -498,6 +509,7 @@ const TaskDetail: React.FC = () => {
                       onClick={handleRemoveResponsible} 
                       className="task-detail__remove-responsible-btn"
                       title="Снять ответственного"
+                      disabled={localStatus === 'closed'}
                     >
                       Снять
                     </button>
@@ -507,6 +519,7 @@ const TaskDetail: React.FC = () => {
                     onChange={(e) => handleAssignResponsible(Number(e.target.value))}
                     value={task.responsible?.id || ''}
                     className="task-detail__user-select"
+                    disabled={localStatus === 'closed'}
                   >
                     <option value="">{task.responsible ? task.responsible.username : "Не назначен"}</option>
                     {users.map((user: User) => (
@@ -522,7 +535,7 @@ const TaskDetail: React.FC = () => {
                 <button 
                   onClick={() => handleAssignResponsible(currentUser?.id || 0)} 
                   className="task-detail__assign-btn"
-                  disabled={currentUser?.id === task.responsible?.id}
+                  disabled={currentUser?.id === task.responsible?.id || localStatus === 'closed'}
                 >
                   <FaUserPlus /> Назначить на меня
                 </button>
@@ -535,10 +548,19 @@ const TaskDetail: React.FC = () => {
                 <p><strong>Создана:</strong> {formatDate(task.created_at)}</p>
                 <p><strong>Автор:</strong> {task.created_by.username}</p>
                 {task.deadline && (
-                  <p><strong>Срок выполнения:</strong> {formatDate(task.deadline)}</p>
+                  <p className={task.is_overdue ? 'task-detail__overdue-text' : ''}>
+                    <strong>Срок выполнения:</strong> {formatDate(task.deadline)}
+                  </p>
                 )}
                 {task.closed_at && (
-                  <p><strong>Закрыта:</strong> {formatDate(task.closed_at)}</p>
+                  <p className={task.is_overdue ? 'task-detail__late-closed' : 'task-detail__on-time-closed'}>
+                    <strong>Закрыта:</strong> {formatDate(task.closed_at)}
+                  </p>
+                )}
+                {task.is_overdue && task.status === 'closed' && (
+                  <p className="task-detail__overdue-note">
+                    <FaExclamationCircle /> Задача была закрыта после срока выполнения
+                  </p>
                 )}
               </div>
             </div>
