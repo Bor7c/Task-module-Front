@@ -18,8 +18,8 @@ import { setUsers, setLoading, setError } from '../../redux/usersSlice';
 import { Task, User, Comment } from '../../types/Types';
 import LoadingScreen from '../../components/common/LoadingScreen';
 import { fetchUsers } from '../../api/users';
+import { FaEdit, FaTrash, FaSave, FaUserPlus, FaArrowLeft } from 'react-icons/fa';
 import './TaskDetail.css';
-import { FaEdit, FaTrash, FaSave, FaUserPlus } from 'react-icons/fa';
 
 type TaskStatus = 'in_progress' | 'solved' | 'closed' | 'awaiting_response' | 'awaiting_action';
 
@@ -159,8 +159,8 @@ const TaskDetail: React.FC = () => {
   const readableStatus = (status: TaskStatus) => {
     switch (status) {
       case 'in_progress': return 'В работе';
-      case 'solved': return 'Решен';
-      case 'closed': return 'Закрыт';
+      case 'solved': return 'Решено';
+      case 'closed': return 'Закрыто';
       case 'awaiting_response': return 'Ожидает ответа';
       case 'awaiting_action': return 'Ожидает действий';
       default: return 'Неизвестный статус';
@@ -173,6 +173,11 @@ const TaskDetail: React.FC = () => {
 
   return (
     <div className="task-detail-container">
+      
+      <button onClick={() => navigate('/')} className="back-btn">
+        <FaArrowLeft /> Назад
+      </button>
+
       <h1 className="task-title">{task.title}</h1>
 
       {isEditing ? (
@@ -210,11 +215,22 @@ const TaskDetail: React.FC = () => {
       )}
 
       <div className="task-status-priority-container">
-        <div>
+        <div className="status-block">
           <strong>Статус:</strong>
           <p>{readableStatus(localStatus)}</p>
           {task.updated_at && <p className="status-updated">Изменено: {new Date(task.updated_at).toLocaleString()}</p>}
+
           <div className="status-buttons">
+            {localStatus !== 'solved' && localStatus !== 'closed' && (
+              <button onClick={() => handleStatusChange('solved')} className="status-btn">
+                Решено
+              </button>
+            )}
+            {localStatus === 'solved' && (
+              <button onClick={() => handleStatusChange('closed')} className="status-btn">
+                Закрыть
+              </button>
+            )}
             {localStatus !== 'in_progress' && (
               <button onClick={() => handleStatusChange('in_progress')} className="status-btn">Взять в работу</button>
             )}
@@ -227,7 +243,7 @@ const TaskDetail: React.FC = () => {
           </div>
         </div>
 
-        <div>
+        <div className="priority-block">
           <strong>Приоритет:</strong>
           <select
             defaultValue={task.priority}
@@ -241,93 +257,87 @@ const TaskDetail: React.FC = () => {
           </select>
         </div>
 
-        <div>
+        <div className="responsible-block">
           <strong>Ответственный:</strong>
-          {task.responsible ? (
+          {task.responsible && (
             <div className="assigned-responsible">
               <p>{task.responsible.username}</p>
               <button onClick={handleRemoveResponsible} className="remove-responsible-btn">
                 Снять
               </button>
             </div>
-          ) : (
-            <div className="assign-responsible-container">
-              <select
-                onChange={(e) => handleAssignResponsible(Number(e.target.value))}
-                className="task-select"
-              >
-                <option value="">Выбрать пользователя</option>
-                {users.map((user: User) => (
-                  <option key={user.id} value={user.id}>
-                    {user.username}
-                  </option>
-                ))}
-              </select>
-              <button onClick={() => handleAssignResponsible(currentUser?.id || 0)} className="assign-responsible-btn">
-                <FaUserPlus /> Назначить на меня
-              </button>
-            </div>
           )}
+          <div className="assign-responsible-container">
+            <select
+              onChange={(e) => handleAssignResponsible(Number(e.target.value))}
+              value={task.responsible?.id || ''}
+              className="task-select"
+            >
+              <option value="">Выбрать пользователя</option>
+              {users.map((user: User) => (
+                <option key={user.id} value={user.id}>
+                  {user.username}
+                </option>
+              ))}
+            </select>
+            <button onClick={() => handleAssignResponsible(currentUser?.id || 0)} className="assign-responsible-btn">
+              <FaUserPlus /> Назначить на меня
+            </button>
+          </div>
         </div>
       </div>
 
-    <div className="comment-section">
+      <div className="comment-section">
         <strong>Комментарии:</strong>
         <textarea
-            placeholder="Добавить комментарий..."
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            className="input-field"
+          placeholder="Добавить комментарий..."
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          className="input-field"
         />
         <button onClick={handleAddComment} className="comment-btn">Добавить комментарий</button>
+
         <div className="comments-list">
-            {comments.map((comment) => (
+          {comments.map((comment) => (
             <div key={comment.id} className="comment-card">
-                {/* Шапочка комментария */}
-                <div className="comment-header">
+              <div className="comment-header">
                 <div className="comment-author-info">
-                    <p><strong>{comment.author.username}</strong></p>
-                    <p className="comment-date">{new Date(comment.updated_at).toLocaleString()}</p>
+                  <p><strong>{comment.author.username}</strong></p>
+                  <p className="comment-date">{new Date(comment.updated_at).toLocaleString()}</p>
                 </div>
-                {/* Кнопки для редактирования и удаления только для автора комментария */}
                 {comment.author.id === currentUser?.id && (
-                    <div className="comment-actions">
+                  <div className="comment-actions">
                     <button onClick={() => handleEditComment(comment)} className="edit-comment-btn">
-                        <FaEdit />
+                      <FaEdit />
                     </button>
                     <button onClick={() => handleDeleteComment(comment.id)} className="delete-comment-btn">
-                        <FaTrash />
+                      <FaTrash />
                     </button>
-                    </div>
+                  </div>
                 )}
-                </div>
-                
-                {/* Тело комментария */}
-                <div className="comment-body">
+              </div>
+
+              <div className="comment-body">
                 {editingCommentId === comment.id ? (
-                    <>
+                  <>
                     <textarea
-                        value={editedCommentText}
-                        onChange={(e) => setEditedCommentText(e.target.value)}
-                        className="input-field"
+                      value={editedCommentText}
+                      onChange={(e) => setEditedCommentText(e.target.value)}
+                      className="input-field"
                     />
                     <button onClick={handleSaveComment} className="save-comment-btn">
-                        <FaSave /> Сохранить
+                      <FaSave /> Сохранить
                     </button>
-                    </>
+                  </>
                 ) : (
-                    <p>{comment.text}</p>
+                  <p>{comment.text}</p>
                 )}
-                </div>
+              </div>
             </div>
-            ))}
+          ))}
         </div>
-        </div>
+      </div>
 
-
-      <button onClick={() => navigate('/')} className="back-btn">
-        Назад
-      </button>
     </div>
   );
 };
