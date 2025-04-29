@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import {
@@ -16,7 +16,7 @@ import {
 } from '../../redux/taskDetailsSlice';
 import { setUsers, setLoading, setError } from '../../redux/usersSlice';
 import { fetchUsers } from '../../api/users';
-import { FaEdit, FaTrash, FaSave, FaUserPlus, FaArrowLeft } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSave, FaUserPlus, FaArrowLeft, FaRegClock, FaSync } from 'react-icons/fa';
 import LoadingScreen from '../../components/common/LoadingScreen';
 import { Task, User, Comment } from '../../types/Types';
 import './TaskDetail.css';
@@ -27,19 +27,40 @@ const TaskDetail: React.FC = () => {
   const { id } = useParams();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
   const { task, loading, error, comments } = useAppSelector((state) => state.taskDetails);
   const { users } = useAppSelector((state) => state.users);
   const currentUser = useAppSelector((state) => state.auth.user);
-
+  
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
   const [editedDescription, setEditedDescription] = useState('');
   const [newComment, setNewComment] = useState('');
   const [localStatus, setLocalStatus] = useState<TaskStatus>('awaiting_action');
+  const [localPriority, setLocalPriority] = useState('medium');
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editedCommentText, setEditedCommentText] = useState('');
+  const [isAwaitingMenuOpen, setIsAwaitingMenuOpen] = useState(false);
+  const [showCloseConfirmation, setShowCloseConfirmation] = useState(false);
+  
+  const awaitingMenuRef = useRef<HTMLDivElement>(null);
+  const closeConfirmationRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (awaitingMenuRef.current && !awaitingMenuRef.current.contains(event.target as Node)) {
+        setIsAwaitingMenuOpen(false);
+      }
+      if (closeConfirmationRef.current && !closeConfirmationRef.current.contains(event.target as Node)) {
+        setShowCloseConfirmation(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+  
   useEffect(() => {
     if (users.length === 0) {
       dispatch(setLoading(true));
@@ -71,31 +92,55 @@ const TaskDetail: React.FC = () => {
       setEditedTitle(task.title);
       setEditedDescription(task.description || '');
       setLocalStatus(task.status);
+      setLocalPriority(task.priority);
     }
   }, [task]);
 
   const handleStatusChange = (status: TaskStatus) => {
     if (task) {
-      setLocalStatus(status);
-      dispatch(updateTaskStatus({ id: task.id, status }));
+      if (status === 'closed') {
+        setShowCloseConfirmation(true);
+      } else {
+        setLocalStatus(status);
+        dispatch(updateTaskStatus({ id: task.id, status }))
+          .then(() => dispatch(loadTaskById(Number(id))));
+        setIsAwaitingMenuOpen(false);
+      }
     }
+  };
+
+  const confirmCloseTask = () => {
+    if (task) {
+      setLocalStatus('closed');
+      dispatch(updateTaskStatus({ id: task.id, status: 'closed' }))
+        .then(() => dispatch(loadTaskById(Number(id))));
+      setShowCloseConfirmation(false);
+    }
+  };
+
+  const cancelCloseTask = () => {
+    setShowCloseConfirmation(false);
   };
 
   const handlePriorityChange = (priority: string) => {
     if (task) {
-      dispatch(updateTaskPriority({ id: task.id, priority }));
+      setLocalPriority(priority);
+      dispatch(updateTaskPriority({ id: task.id, priority }))
+        .then(() => dispatch(loadTaskById(Number(id))));
     }
   };
 
   const handleAssignResponsible = (userId: number) => {
     if (task) {
-      dispatch(assignTaskResponsible({ id: task.id, responsible_id: userId }));
+      dispatch(assignTaskResponsible({ id: task.id, responsible_id: userId }))
+        .then(() => dispatch(loadTaskById(Number(id))));
     }
   };
 
   const handleRemoveResponsible = () => {
     if (task) {
-      dispatch(removeResponsible(task.id));
+      dispatch(removeResponsible(task.id))
+        .then(() => dispatch(loadTaskById(Number(id))));
     }
   };
 
@@ -156,6 +201,38 @@ const TaskDetail: React.FC = () => {
     }
   };
 
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Не указано';
+    return new Date(dateString).toLocaleString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const getStatusClass = (status: TaskStatus) => {
+    switch (status) {
+      case 'in_progress': return 'task-detail__status-in-progress';
+      case 'solved': return 'task-detail__status-solved';
+      case 'closed': return 'task-detail__status-closed';
+      case 'awaiting_response': return 'task-detail__status-awaiting-response';
+      case 'awaiting_action': return 'task-detail__status-awaiting-action';
+      default: return '';
+    }
+  };
+
+  const getPriorityClass = (priority: string) => {
+    switch (priority) {
+      case 'low': return 'task-detail__priority-low';
+      case 'medium': return 'task-detail__priority-medium';
+      case 'high': return 'task-detail__priority-high';
+      case 'critical': return 'task-detail__priority-critical';
+      default: return '';
+    }
+  };
+
   const readableStatus = (status: TaskStatus) => {
     switch (status) {
       case 'in_progress': return 'В работе';
@@ -163,175 +240,308 @@ const TaskDetail: React.FC = () => {
       case 'closed': return 'Закрыто';
       case 'awaiting_response': return 'Ожидает ответа';
       case 'awaiting_action': return 'Ожидает действий';
-      default: return 'Неизвестный статус';
+      default: return 'Неиз';
     }
   };
 
   if (loading && !task) return <LoadingScreen fullScreen />;
-  if (error) return <div className="text-red-500 text-center mt-10">{error}</div>;
-  if (!task) return <div className="text-center mt-10 text-gray-500">Задача не найдена</div>;
+  if (error) return <div className="task-detail__error">{error}</div>;
+  if (!task) return <div className="task-detail__not-found">Задача не найдена</div>;
 
   return (
     <div className="task-detail-container">
-
-      <button onClick={() => navigate('/')} className="back-btn">
-        <FaArrowLeft /> Назад
-      </button>
-
-      <h1 className="task-title">{task.title}</h1>
-
-      {isEditing ? (
-        <div className="edit-task-inputs">
-          <input
-            type="text"
-            value={editedTitle}
-            onChange={(e) => setEditedTitle(e.target.value)}
-            placeholder="Название задачи"
-            className="input-field"
-            disabled={currentUser?.id !== task.created_by.id}
-          />
-          <textarea
-            value={editedDescription}
-            onChange={(e) => setEditedDescription(e.target.value)}
-            placeholder="Описание задачи"
-            className="input-field"
-            disabled={currentUser?.id !== task.created_by.id}
-          />
-          {currentUser?.id === task.created_by.id && (
-            <button onClick={handleSaveTask} className="save-task-btn">
-              <FaSave /> Сохранить
-            </button>
-          )}
-        </div>
-      ) : (
-        <div className="task-description">
-          <p><strong>Описание:</strong> {task.description || 'Нет описания'}</p>
-          {currentUser?.id === task.created_by.id && (
-            <button onClick={() => setIsEditing(true)} className="edit-task-btn">
-              <FaEdit /> Редактировать
-            </button>
-          )}
-        </div>
-      )}
-
-      <div className="task-status-priority-container">
-        <div className="status-block">
-          <strong>Статус:</strong>
-          <p>{readableStatus(localStatus)}</p>
-          {task.updated_at && <p className="status-updated">Изменено: {new Date(task.updated_at).toLocaleString()}</p>}
-
-          <div className="status-buttons">
-            {localStatus !== 'solved' && localStatus !== 'closed' && (
-              <button onClick={() => handleStatusChange('solved')} className="status-btn">Решено</button>
-            )}
-            {localStatus === 'solved' && (
-              <button onClick={() => handleStatusChange('closed')} className="status-btn">Закрыть</button>
-            )}
-            {localStatus !== 'in_progress' && (
-              <button onClick={() => handleStatusChange('in_progress')} className="status-btn">Взять в работу</button>
-            )}
-            {localStatus !== 'awaiting_response' && (
-              <button onClick={() => handleStatusChange('awaiting_response')} className="status-btn">Ожидает ответа</button>
-            )}
-            {localStatus !== 'awaiting_action' && (
-              <button onClick={() => handleStatusChange('awaiting_action')} className="status-btn">Ожидает действий</button>
-            )}
-          </div>
-        </div>
-
-        <div className="priority-block">
-          <strong>Приоритет:</strong>
-          <select
-            defaultValue={task.priority}
-            onChange={(e) => handlePriorityChange(e.target.value)}
-            className="task-select"
-          >
-            <option value="low">Низкий</option>
-            <option value="medium">Средний</option>
-            <option value="high">Высокий</option>
-            <option value="critical">Критический</option>
-          </select>
-        </div>
-
-        <div className="responsible-block">
-          <div className="assign-responsible-container">
-            <select
-              onChange={(e) => handleAssignResponsible(Number(e.target.value))}
-              value={task.responsible?.id || ''}
-              className="task-select"
+      <div className="task-detail__header">
+        <button onClick={() => navigate('/')} className="task-detail__back-btn">
+          <FaArrowLeft /> Назад
+        </button>
+        
+        <div className="task-detail__action-buttons">
+          {/* В работу */}
+          {localStatus !== 'in_progress' && localStatus !== 'closed' && (
+            <button 
+              onClick={() => handleStatusChange('in_progress')} 
+              className="task-detail__status-btn task-detail__in-progress-btn"
             >
-              <option value="">Выбрать пользователя</option>
-              {users.map((user: User) => (
-                <option key={user.id} value={user.id}>
-                  {user.username}
-                </option>
-              ))}
-            </select>
-
-            <button onClick={() => handleAssignResponsible(currentUser?.id || 0)} className="assign-responsible-btn">
-              <FaUserPlus /> Назначить на меня
+              {localStatus === 'solved' ? 'Возобновить работу' : 'Взять в работу'}
             </button>
-
-            {task.responsible && (
-              <button onClick={handleRemoveResponsible} className="remove-responsible-btn">
-                Снять
+          )}
+          
+          {/* Ожидание с выпадающим меню */}
+          {localStatus !== 'closed' && (
+            <div className="task-detail__dropdown-container" ref={awaitingMenuRef}>
+              <button 
+                onClick={() => setIsAwaitingMenuOpen(!isAwaitingMenuOpen)} 
+                className="task-detail__status-btn task-detail__awaiting-btn"
+              >
+                Ожидание
               </button>
-            )}
-          </div>
+              {isAwaitingMenuOpen && (
+                <div className="task-detail__dropdown-menu">
+                  <button 
+                    onClick={() => handleStatusChange('awaiting_action')} 
+                    className="task-detail__dropdown-item"
+                  >
+                    Ожидает действий
+                  </button>
+                  <button 
+                    onClick={() => handleStatusChange('awaiting_response')} 
+                    className="task-detail__dropdown-item"
+                  >
+                    Ожидает ответа
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Решено / Закрыть */}
+          {localStatus !== 'solved' && localStatus !== 'closed' && (
+            <button 
+              onClick={() => handleStatusChange('solved')} 
+              className="task-detail__status-btn task-detail__solved-btn"
+            >
+              Решено
+            </button>
+          )}
+          
+          {localStatus === 'solved' && (
+            <button 
+              onClick={() => handleStatusChange('closed')} 
+              className="task-detail__status-btn task-detail__closed-btn"
+            >
+              Закрыть
+            </button>
+          )}
         </div>
       </div>
-
-      <div className="comment-section">
-        <strong>Комментарии:</strong>
-        <textarea
-          placeholder="Добавить комментарий..."
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          className="input-field"
-        />
-        <button onClick={handleAddComment} className="comment-btn">Добавить комментарий</button>
-
-        <div className="comments-list">
-          {comments.map((comment) => (
-            <div key={comment.id} className="comment-card">
-              <div className="comment-header">
-                <div className="comment-author-info">
-                  <p><strong>{comment.author.username}</strong></p>
-                  <p className="comment-date">{new Date(comment.updated_at).toLocaleString()}</p>
-                </div>
-                {comment.author.id === currentUser?.id && (
-                  <div className="comment-actions">
-                    <button onClick={() => handleEditComment(comment)} className="edit-comment-btn">
-                      <FaEdit />
+      
+      {/* Модальное окно подтверждения закрытия */}
+      {showCloseConfirmation && (
+        <div className="task-detail__modal-overlay">
+          <div className="task-detail__modal-dialog" ref={closeConfirmationRef}>
+            <h3>Подтверждение закрытия</h3>
+            <p>Вы уверены, что хотите закрыть задачу? Это действие нельзя будет отменить.</p>
+            <div className="task-detail__modal-actions">
+              <button onClick={cancelCloseTask} className="task-detail__modal-cancel">Отмена</button>
+              <button onClick={confirmCloseTask} className="task-detail__modal-confirm">Подтвердить</button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <div className="task-detail__content">
+        <div className="task-detail__left-column">
+          <div className="task-detail__title-container">
+            {isEditing ? (
+              <input
+                type="text"
+                value={editedTitle}
+                onChange={(e) => setEditedTitle(e.target.value)}
+                placeholder="Название задачи"
+                className="task-detail__title-input"
+                disabled={currentUser?.id !== task.created_by.id}
+              />
+            ) : (
+              <h1 className="task-detail__title">
+                {task.title}
+                {currentUser?.id === task.created_by.id && (
+                  <button onClick={() => setIsEditing(true)} className="task-detail__edit-title-btn">
+                    <FaEdit />
+                  </button>
+                )}
+              </h1>
+            )}
+          </div>
+          
+          <div className="task-detail__description-container">
+            {isEditing ? (
+              <div className="task-detail__edit-container">
+                <textarea
+                  value={editedDescription}
+                  onChange={(e) => setEditedDescription(e.target.value)}
+                  placeholder="Описание задачи"
+                  className="task-detail__description-textarea"
+                  disabled={currentUser?.id !== task.created_by.id}
+                />
+                
+                {currentUser?.id === task.created_by.id && (
+                  <div className="task-detail__edit-actions">
+                    <button onClick={handleSaveTask} className="task-detail__save-btn">
+                      <FaSave /> Сохранить
                     </button>
-                    <button onClick={() => handleDeleteComment(comment.id)} className="delete-comment-btn">
-                      <FaTrash />
+                    <button onClick={() => setIsEditing(false)} className="task-detail__cancel-btn">
+                      Отмена
                     </button>
                   </div>
                 )}
               </div>
-
-              <div className="comment-body">
-                {editingCommentId === comment.id ? (
-                  <>
-                    <textarea
-                      value={editedCommentText}
-                      onChange={(e) => setEditedCommentText(e.target.value)}
-                      className="input-field"
-                    />
-                    <button onClick={handleSaveComment} className="save-comment-btn">
-                      <FaSave /> Сохранить
+            ) : (
+              <div className="task-detail__description">
+                <h3>Описание:</h3>
+                <p className="task-detail__description-text">{task.description || 'Нет описания'}</p>
+                {currentUser?.id === task.created_by.id && (
+                  <button onClick={() => setIsEditing(true)} className="task-detail__edit-description-btn">
+                    <FaEdit /> Редактировать
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+          
+          {/* Комментарии перемещены под блок описания */}
+          <div className="task-detail__comment-section">
+            <h2>Комментарии ({comments.filter(comment => !comment.is_deleted).length})</h2>
+            <div className="task-detail__add-comment">
+              <textarea
+                placeholder="Добавить комментарий..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                className="task-detail__comment-textarea"
+              />
+              <button 
+                onClick={handleAddComment} 
+                className="task-detail__comment-btn"
+                disabled={!newComment.trim()}
+              >
+                Добавить комментарий
+              </button>
+            </div>
+            
+            <div className="task-detail__comments-list">
+              {comments
+                .filter(comment => !comment.is_deleted)
+                .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                .map((comment) => (
+                  <div key={comment.id} className="task-detail__comment-card">
+                    <div className="task-detail__comment-header">
+                      <div className="task-detail__comment-author">
+                        <p className="task-detail__author-name">{comment.author.username}</p>
+                        <p className="task-detail__comment-meta">
+                          {comment.is_modified && !comment.is_system && 
+                            <span className="task-detail__modified-badge">изменен</span>
+                          }
+                          <span className="task-detail__comment-date">{formatDate(comment.updated_at)}</span>
+                        </p>
+                      </div>
+                      {comment.author.id === currentUser?.id && (
+                        <div className="task-detail__comment-actions">
+                          <button onClick={() => handleEditComment(comment)} className="task-detail__edit-comment-btn">
+                            <FaEdit />
+                          </button>
+                          <button onClick={() => handleDeleteComment(comment.id)} className="task-detail__delete-comment-btn">
+                            <FaTrash />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div className="task-detail__comment-body">
+                      {editingCommentId === comment.id ? (
+                        <>
+                          <textarea
+                            value={editedCommentText}
+                            onChange={(e) => setEditedCommentText(e.target.value)}
+                            className="task-detail__edit-comment-textarea"
+                          />
+                          <button onClick={handleSaveComment} className="task-detail__save-comment-btn">
+                            <FaSave /> Сохранить
+                          </button>
+                        </>
+                      ) : (
+                        <p>{comment.text}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              {comments.filter(comment => !comment.is_deleted).length === 0 && (
+                <p className="task-detail__no-comments">Нет комментариев</p>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        <div className="task-detail__right-column">
+          <div className="task-detail__info-card">
+            <div className="task-detail__info-section">
+              <h3>Статус</h3>
+              <div className={`task-detail__status-badge ${getStatusClass(localStatus)}`}>
+                {readableStatus(localStatus)}
+              </div>
+              {task.updated_at && (
+                <p className="task-detail__timestamp">
+                  <FaRegClock /> Обновлено: {formatDate(task.updated_at)}
+                </p>
+              )}
+            </div>
+            
+            <div className="task-detail__info-section">
+              <h3>Приоритет</h3>
+              <div className="task-detail__priority-selector">
+                <select
+                  value={localPriority}
+                  onChange={(e) => handlePriorityChange(e.target.value)}
+                  className={`task-detail__priority-select ${getPriorityClass(localPriority)}`}
+                >
+                  <option value="low">Низкий</option>
+                  <option value="medium">Средний</option>
+                  <option value="high">Высокий</option>
+                  <option value="critical">Критический</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="task-detail__info-section">
+              <h3>Ответственный</h3>
+              <div className="task-detail__responsible-info">
+                {task.responsible ? (
+                  <div className="task-detail__current-responsible">
+                    <p>{task.responsible.username}</p>
+                    <button onClick={handleRemoveResponsible} className="task-detail__remove-responsible-btn">
+                      Снять
                     </button>
-                  </>
+                  </div>
                 ) : (
-                  <p>{comment.text}</p>
+                  <p>Не назначен</p>
+                )}
+                
+                <div className="task-detail__assign-container">
+                  <select
+                    onChange={(e) => handleAssignResponsible(Number(e.target.value))}
+                    value={task.responsible?.id || ''}
+                    className="task-detail__user-select"
+                  >
+                    <option value="">Выбрать пользователя</option>
+                    {users.map((user: User) => (
+                      <option key={user.id} value={user.id}>
+                        {user.username}
+                      </option>
+                    ))}
+                  </select>
+                  <button 
+                    onClick={() => handleAssignResponsible(currentUser?.id || 0)} 
+                    className="task-detail__assign-btn"
+                  >
+                    <FaUserPlus /> Назначить на меня
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="task-detail__info-section">
+              <h3>Информация о задаче</h3>
+              <div className="task-detail__additional-info">
+                <p><strong>Создана:</strong> {formatDate(task.created_at)}</p>
+                <p><strong>Автор:</strong> {task.created_by.username}</p>
+                {task.deadline && (
+                  <p><strong>Срок выполнения:</strong> {formatDate(task.deadline)}</p>
+                )}
+                {task.closed_at && (
+                  <p><strong>Закрыта:</strong> {formatDate(task.closed_at)}</p>
                 )}
               </div>
             </div>
-          ))}
+          </div>
         </div>
       </div>
-
     </div>
   );
 };
