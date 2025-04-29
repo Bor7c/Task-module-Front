@@ -15,10 +15,10 @@ import {
   removeComment
 } from '../../redux/taskDetailsSlice';
 import { setUsers, setLoading, setError } from '../../redux/usersSlice';
-import { Task, User, Comment } from '../../types/Types';
-import LoadingScreen from '../../components/common/LoadingScreen';
 import { fetchUsers } from '../../api/users';
 import { FaEdit, FaTrash, FaSave, FaUserPlus, FaArrowLeft } from 'react-icons/fa';
+import LoadingScreen from '../../components/common/LoadingScreen';
+import { Task, User, Comment } from '../../types/Types';
 import './TaskDetail.css';
 
 type TaskStatus = 'in_progress' | 'solved' | 'closed' | 'awaiting_response' | 'awaiting_action';
@@ -88,7 +88,7 @@ const TaskDetail: React.FC = () => {
   };
 
   const handleAssignResponsible = (userId: number) => {
-    if (task && userId) {
+    if (task) {
       dispatch(assignTaskResponsible({ id: task.id, responsible_id: userId }));
     }
   };
@@ -173,7 +173,7 @@ const TaskDetail: React.FC = () => {
 
   return (
     <div className="task-detail-container">
-      
+
       <button onClick={() => navigate('/')} className="back-btn">
         <FaArrowLeft /> Назад
       </button>
@@ -222,14 +222,10 @@ const TaskDetail: React.FC = () => {
 
           <div className="status-buttons">
             {localStatus !== 'solved' && localStatus !== 'closed' && (
-              <button onClick={() => handleStatusChange('solved')} className="status-btn">
-                Решено
-              </button>
+              <button onClick={() => handleStatusChange('solved')} className="status-btn">Решено</button>
             )}
             {localStatus === 'solved' && (
-              <button onClick={() => handleStatusChange('closed')} className="status-btn">
-                Закрыть
-              </button>
+              <button onClick={() => handleStatusChange('closed')} className="status-btn">Закрыть</button>
             )}
             {localStatus !== 'in_progress' && (
               <button onClick={() => handleStatusChange('in_progress')} className="status-btn">Взять в работу</button>
@@ -258,15 +254,6 @@ const TaskDetail: React.FC = () => {
         </div>
 
         <div className="responsible-block">
-          <strong>Ответственный:</strong>
-          {task.responsible && (
-            <div className="assigned-responsible">
-              <p>{task.responsible.username}</p>
-              <button onClick={handleRemoveResponsible} className="remove-responsible-btn">
-                Снять
-              </button>
-            </div>
-          )}
           <div className="assign-responsible-container">
             <select
               onChange={(e) => handleAssignResponsible(Number(e.target.value))}
@@ -280,9 +267,16 @@ const TaskDetail: React.FC = () => {
                 </option>
               ))}
             </select>
+
             <button onClick={() => handleAssignResponsible(currentUser?.id || 0)} className="assign-responsible-btn">
               <FaUserPlus /> Назначить на меня
             </button>
+
+            {task.responsible && (
+              <button onClick={handleRemoveResponsible} className="remove-responsible-btn">
+                Снять
+              </button>
+            )}
           </div>
         </div>
       </div>
