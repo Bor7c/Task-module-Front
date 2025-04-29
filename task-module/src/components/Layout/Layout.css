@@ -1,50 +1,297 @@
-.layout {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+/* TaskManagerLayout.css */
+:root {
+  --tm-primary-color: #4361ee;
+  --tm-primary-light: #e9eeff;
+  --tm-secondary-color: #3a0ca3;
+  --tm-accent-color: #7209b7;
+  --tm-success-color: #10b981;
+  --tm-warning-color: #f59e0b;
+  --tm-danger-color: #ef4444;
+  --tm-info-color: #3b82f6;
+  
+  --tm-text-color: #334155;
+  --tm-text-light: #64748b;
+  --tm-text-lighter: #94a3b8;
+  
+  --tm-background-color: #f8fafc;
+  --tm-card-background: white;
+  --tm-border-color: #e2e8f0;
+  
+  --tm-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --tm-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --tm-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  --tm-radius-sm: 6px;
+  --tm-radius-md: 8px;
+  --tm-radius-lg: 12px;
+
+  --tm-header-height: 64px;
+  --tm-nav-width: 280px;
+}
+
+/* Layout Structure */
+.tm-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--tm-background-color);
+  color: var(--tm-text-color);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.tm-body {
+  display: flex;
+  flex-grow: 1;
+  position: relative;
+}
+
+/* Header Styles */
+.tm-header {
+  height: var(--tm-header-height);
+  background-color: var(--tm-card-background);
+  box-shadow: var(--tm-shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--tm-border-color);
+}
+
+.tm-header-container {
+  height: 100%;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tm-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.tm-header-right {
+  margin-left: auto; /* Прижимает пользователя к правому краю */
+}
+
+.tm-menu-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--tm-radius-md);
+  border: none;
+  background-color: transparent;
+  color: var(--tm-text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.tm-menu-toggle:hover {
+  background-color: var(--tm-primary-light);
+  color: var(--tm-primary-color);
+}
+
+.tm-menu-toggle svg {
+  font-size: 20px;
+}
+
+.tm-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--tm-text-color);
+}
+
+.tm-logo-text {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* User and Avatar */
+.tm-user {
+  position: relative;
+}
+
+.tm-user-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: var(--tm-radius-md);
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.tm-user-button:hover {
+  background-color: var(--tm-primary-light);
+}
+
+.tm-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--tm-primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.tm-username {
+  font-weight: 500;
+  color: var(--tm-text-color);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tm-user-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background-color: var(--tm-card-background);
+  border-radius: var(--tm-radius-md);
+  box-shadow: var(--tm-shadow-lg);
+  min-width: 200px;
+  z-index: 10;
+  overflow: hidden;
+  border: 1px solid var(--tm-border-color);
+}
+
+.tm-user-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  width: 100%;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s;
+  color: var(--tm-text-color);
+}
+
+.tm-user-menu-item:hover {
+  background-color: var(--tm-primary-light);
+  color: var(--tm-primary-color);
+}
+
+.tm-user-menu-item:not(:last-child) {
+  border-bottom: 1px solid var(--tm-border-color);
+}
+
+/* Navigation Styles */
+.tm-nav {
+  position: fixed;
+  top: var(--tm-header-height);
+  left: 0;
+  width: var(--tm-nav-width);
+  height: calc(100vh - var(--tm-header-height));
+  background-color: var(--tm-card-background);
+  z-index: 99;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  box-shadow: var(--tm-shadow-lg);
+}
+
+.tm-nav-open {
+  transform: translateX(0);
+}
+
+.tm-nav-content {
+  padding: 20px 0;
+}
+
+.tm-nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 16px;
+}
+
+.tm-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--tm-radius-md);
+  text-decoration: none;
+  color: var(--tm-text-light);
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.tm-nav-item:hover {
+  background-color: var(--tm-primary-light);
+  color: var(--tm-primary-color);
+}
+
+.tm-nav-item-active {
+  background-color: var(--tm-primary-light);
+  color: var(--tm-primary-color);
+  font-weight: 500;
+}
+
+.tm-nav-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.tm-overlay {
+  position: fixed;
+  top: var(--tm-header-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 98;
+}
+
+/* Main Content */
+.tm-main {
+  flex-grow: 1;
+  width: 100%;
+  min-height: calc(100vh - var(--tm-header-height));
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .tm-header-container {
+    padding: 0 16px;
   }
   
-  .header {
-    background-color: #2c3e50;
-    color: white;
-    padding: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .tm-username {
+    display: none;
   }
   
-  .main-content {
-    flex: 1;
-    padding: 1rem;
+  .tm-nav {
+    width: 260px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tm-logo-text {
+    font-size: 16px;
   }
   
-  .user-panel {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+  .tm-user-menu {
+    position: fixed;
+    top: var(--tm-header-height);
+    left: 0;
+    right: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
   }
   
-  .username {
-    font-weight: bold;
+  .tm-nav {
+    width: 100%;
   }
-  
-  .logout-button {
-    background: #e74c3c;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .logout-button:hover {
-    background: #c0392b;
-  }
-  
-  .app-loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    font-size: 1.2rem;
-  }
+}
