@@ -492,37 +492,40 @@ const TaskDetail: React.FC = () => {
             <div className="task-detail__info-section">
               <h3>Ответственный</h3>
               <div className="task-detail__responsible-info">
-                {task.responsible ? (
-                  <div className="task-detail__current-responsible">
-                    <p>{task.responsible.username}</p>
-                    <button onClick={handleRemoveResponsible} className="task-detail__remove-responsible-btn">
+                <div className="task-detail__responsible-controls">
+                  {task.responsible && (
+                    <button 
+                      onClick={handleRemoveResponsible} 
+                      className="task-detail__remove-responsible-btn"
+                      title="Снять ответственного"
+                    >
                       Снять
                     </button>
-                  </div>
-                ) : (
-                  <p>Не назначен</p>
-                )}
-                
-                <div className="task-detail__assign-container">
+                  )}
+                  
                   <select
                     onChange={(e) => handleAssignResponsible(Number(e.target.value))}
                     value={task.responsible?.id || ''}
                     className="task-detail__user-select"
                   >
-                    <option value="">Выбрать пользователя</option>
+                    <option value="">{task.responsible ? task.responsible.username : "Не назначен"}</option>
                     {users.map((user: User) => (
-                      <option key={user.id} value={user.id}>
-                        {user.username}
-                      </option>
+                      user.id !== task.responsible?.id && (
+                        <option key={user.id} value={user.id}>
+                          {user.username}
+                        </option>
+                      )
                     ))}
                   </select>
-                  <button 
-                    onClick={() => handleAssignResponsible(currentUser?.id || 0)} 
-                    className="task-detail__assign-btn"
-                  >
-                    <FaUserPlus /> Назначить на меня
-                  </button>
                 </div>
+                
+                <button 
+                  onClick={() => handleAssignResponsible(currentUser?.id || 0)} 
+                  className="task-detail__assign-btn"
+                  disabled={currentUser?.id === task.responsible?.id}
+                >
+                  <FaUserPlus /> Назначить на меня
+                </button>
               </div>
             </div>
             
