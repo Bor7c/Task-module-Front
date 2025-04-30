@@ -4,6 +4,7 @@ interface TaskCreatePayload {
   title: string;
   description: string;
   priority: 'low' | 'medium' | 'high'  | 'critical';
+  deadline?: string; // Опциональное поле для срока
 }
 
 export const createTask = async (taskData: TaskCreatePayload) => {

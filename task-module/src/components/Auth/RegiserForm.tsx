@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { authAPI } from '../../api/auth';
 import { useAppDispatch } from '../../redux/store';
 import { loginUser } from '../../redux/authSlice';
@@ -23,6 +23,11 @@ const RegisterForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
+  // Очистка куки "session_token" при загрузке компонента
+  useEffect(() => {
+    document.cookie = "session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -53,9 +58,8 @@ const RegisterForm: React.FC = () => {
     e.preventDefault();
     
     if (!validateForm()) return;
-
     setIsSubmitting(true);
-
+    
     try {
       const { username, email, password } = formData;
       
@@ -66,7 +70,7 @@ const RegisterForm: React.FC = () => {
       const result = await dispatch(
         loginUser({ username, password })
       ).unwrap();
-
+      
       if (result) {
         navigate('/');
       }
@@ -82,89 +86,94 @@ const RegisterForm: React.FC = () => {
   };
 
   return (
-    <div className="auth-container">
-      <h2>Регистрация</h2>
-      {error && (
-        <div className="error-message" role="alert">
-          {error}
+    <div className="stm-auth-page">
+      <div className="stm-auth-card">
+        <div className="stm-auth-header">
+          <h1>Simple Task Manager</h1>
+          <h2>Регистрация</h2>
+          <p className="stm-auth-subtitle">Создайте учетную запись для работы с задачами</p>
         </div>
-      )}
-      
-      <form onSubmit={handleSubmit} noValidate>
-        <div className="form-group">
-          <label htmlFor="username">Имя пользователя:</label>
-          <input
-            id="username"
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            required
-            minLength={4}
-            autoComplete="username"
-            aria-describedby="username-help"
-          />
-          <small id="username-help">Минимум 4 символа</small>
+        {error && (
+          <div className="stm-auth-error">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>{error}</span>
+          </div>
+        )}
+        <form onSubmit={handleSubmit} className="stm-auth-form" noValidate>
+          <div className="stm-form-field">
+            <label htmlFor="username">Имя пользователя</label>
+            <input
+              id="username"
+              type="text"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              placeholder="Минимум 4 символа"
+              required
+              minLength={4}
+              autoComplete="username"
+            />
+          </div>
+          
+          <div className="stm-form-field">
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="your@email.com"
+              required
+              autoComplete="email"
+            />
+          </div>
+          
+          <div className="stm-form-field">
+            <label htmlFor="password">Пароль</label>
+            <input
+              id="password"
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Минимум 8 символов"
+              required
+              minLength={8}
+              autoComplete="new-password"
+            />
+          </div>
+          
+          <div className="stm-form-field">
+            <label htmlFor="confirmPassword">Подтвердите пароль</label>
+            <input
+              id="confirmPassword"
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder="Повторите ваш пароль"
+              required
+              minLength={8}
+              autoComplete="new-password"
+            />
+          </div>
+          
+          <button 
+            type="submit" 
+            className="stm-auth-button"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Регистрация...' : 'Зарегистрироваться'}
+          </button>
+        </form>
+        <div className="stm-auth-footer">
+          <p>Уже есть аккаунт? <Link to="/login">Войдите</Link></p>
         </div>
-
-        <div className="form-group">
-          <label htmlFor="email">Email:</label>
-          <input
-            id="email"
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            autoComplete="email"
-            aria-describedby="email-help"
-          />
-          <small id="email-help">Введите действительный email</small>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="password">Пароль:</label>
-          <input
-            id="password"
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            minLength={8}
-            autoComplete="new-password"
-            aria-describedby="password-help"
-          />
-          <small id="password-help">Минимум 8 символов</small>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="confirmPassword">Подтвердите пароль:</label>
-          <input
-            id="confirmPassword"
-            type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-            minLength={8}
-            autoComplete="new-password"
-            aria-describedby="confirm-password-help"
-          />
-          <small id="confirm-password-help">Повторите ваш пароль</small>
-        </div>
-
-        <button 
-          type="submit" 
-          className="submit-button"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Регистрация...' : 'Зарегистрироваться'}
-        </button>
-      </form>
-
-      <div className="auth-footer">
-        Уже есть аккаунт? <a href="/login">Войдите</a>
       </div>
     </div>
   );
