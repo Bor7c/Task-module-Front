@@ -49,6 +49,7 @@ export const updateUserProfilePicture = async (file: File): Promise<void> => {
   }
 };
 
+
 // Функция для удаления фото профиля
 export const deleteUserProfilePicture = async (): Promise<void> => {
   try {

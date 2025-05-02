@@ -27,6 +27,7 @@ const adaptUser = (rawUser: any): User => ({
   first_name: rawUser.first_name ?? '',
   last_name: rawUser.last_name ?? '',
   role: rawUser.role ?? 'developer', // 🔥 <-- обязательно укажем роль (например, default developer)
+  role_display: rawUser.role_display ?? '',
   is_active: rawUser.is_active ?? true,
   profile_picture_url: rawUser.profile_picture_url ?? null, // Добавлено поле для URL фотографии профиля
 });

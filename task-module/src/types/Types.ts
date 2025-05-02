@@ -6,6 +6,7 @@ export interface User {
   last_name: string;
   email: string;
   role: UserRole; // Роль пользователя
+  role_display: string;
   is_active: boolean; // Активность пользователя
   profile_picture_url: string | null; // URL фотографии профиля
 }

@@ -6,10 +6,10 @@ export const fetchTasks = async (): Promise<Task[]> => {
   return response.data;
 };
 
-export const createTask = async (taskData: Omit<Task, 'id'>): Promise<Task> => {
-  const response = await api.post('/tasks/', taskData);
-  return response.data;
-};
+// export const createTask = async (taskData: Omit<Task, 'id'>): Promise<Task> => {
+//   const response = await api.post('/tasks/', taskData);
+//   return response.data;
+// };
 
 export const deleteTask = async (taskId: number): Promise<void> => {
   await api.delete(`/tasks/${taskId}/`);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAppSelector } from '../../redux/store';
-import { updateUserProfilePicture } from '../../api/users';
+import { updateUserProfilePicture, deleteUserProfilePicture } from '../../api/users';
 import './UserProfile.css';
 
 const UserProfile: React.FC = () => {
@@ -14,6 +14,11 @@ const UserProfile: React.FC = () => {
     return <div>Пользователь не найден</div>;
   }
 
+  // Формируем полный URL для изображения профиля с учетом порта 8000
+  const profilePictureUrl = user.profile_picture_url 
+    ? `http://localhost:8000${user.profile_picture_url}` 
+    : null;
+
   const handleProfilePictureChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -25,7 +30,6 @@ const UserProfile: React.FC = () => {
     try {
       await updateUserProfilePicture(file);
       setSuccessMessage('Фото профиля успешно обновлено!');
-      // Здесь можно обновить состояние пользователя, если нужно
     } catch (err) {
       setError('Ошибка при обновлении фото профиля.');
       console.error(err);
@@ -35,9 +39,20 @@ const UserProfile: React.FC = () => {
   };
 
   const handleDeleteProfilePicture = async () => {
-    // Реализуйте логику удаления фото профиля
-    setSuccessMessage('Фото профиля удалено!');
-    setMenuVisible(false);
+    setLoading(true);
+    setError(null);
+    setSuccessMessage(null);
+
+    try {
+      await deleteUserProfilePicture();
+      setSuccessMessage('Фото профиля удалено!');
+    } catch (err) {
+      setError('Ошибка при удалении фото профиля.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+      setMenuVisible(false);
+    }
   };
 
   const toggleMenu = () => {
@@ -49,9 +64,9 @@ const UserProfile: React.FC = () => {
       <h1>Профиль пользователя</h1>
       <div className="user-profile-info">
         <div className="profile-picture-container" onClick={toggleMenu}>
-          {user.profile_picture_url ? (
+          {profilePictureUrl ? (
             <img 
-              src={user.profile_picture_url} 
+              src={profilePictureUrl} 
               alt="Profile" 
               className="profile-picture" 
             />
@@ -63,7 +78,7 @@ const UserProfile: React.FC = () => {
           <p><strong>Имя:</strong> {user.first_name} {user.last_name}</p>
           <p><strong>Пользовательское имя:</strong> {user.username}</p>
           <p><strong>Email:</strong> {user.email}</p>
-          <p><strong>Роль:</strong> {user.role}</p>
+          <p><strong>Роль:</strong> {user.role_display}</p>
           <p><strong>Статус:</strong> {user.is_active ? 'Активен' : 'Неактивен'}</p>
         </div>
       </div>
