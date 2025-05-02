@@ -1,3 +1,17 @@
+// Тип для пользователя
+export interface User {
+  id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  role: UserRole; // Роль пользователя
+  is_active: boolean; // Активность пользователя
+  profile_picture_url: string | null; // URL фотографии профиля
+}
+
+export type UserRole = 'admin' | 'manager' | 'developer';
+
 // Тип для задачи
 export interface Task {
   id: number;
@@ -35,21 +49,8 @@ export interface Comment {
   updated_at: string; // Дата последнего обновления
   is_system: boolean; // Является ли это системным сообщением
   is_deleted: boolean; // Удалён ли комментарий
-  is_modified: boolean; // Удалён ли комментарий
+  is_modified: boolean; // Изменён ли комментарий
 }
-
-// Тип для пользователя
-export interface User {
-  id: number;
-  username: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  role: UserRole; // Роль пользователя
-  is_active: boolean; // Активность пользователя
-}
-
-export type UserRole = 'admin' | 'manager' | 'developer';
 
 // Функция для отображения приоритета
 const getPriorityDisplay = (priority: TaskPriority): string => {

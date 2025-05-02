@@ -27,7 +27,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     
     const interval = setInterval(() => {
       dispatch(checkUserSession());
-    }, 300000);
+    }, 300000); // Проверка сессии каждые 5 минут
     
     return () => clearInterval(interval);
   }, [dispatch]);
@@ -48,7 +48,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   const handleProfileClick = () => {
-    navigate('/profile');
+    navigate('/user-profile'); // Обновлено на /user-profile
     setUserMenuOpen(false);
   };
 
@@ -82,7 +82,11 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                 >
                   <div className="tm-avatar">
-                    {user?.username?.charAt(0).toUpperCase()}
+                    {user?.profile_picture_url ? (
+                      <img src={user.profile_picture_url} alt="Avatar" className="tm-avatar-image" />
+                    ) : (
+                      user?.username?.charAt(0).toUpperCase()
+                    )}
                   </div>
                   <span className="tm-username">{user?.username}</span>
                 </button>
@@ -128,13 +132,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   <FaClipboardList className="tm-nav-icon" />
                   <span className="tm-nav-text">Задачи</span>
                 </Link>
-                <Link 
-                  to="/profile" 
-                  className={`tm-nav-item ${isActive('/profile') ? 'tm-nav-item-active' : ''}`}
+                {/* <Link 
+                  to="/user-profile" // Обновлено на /user-profile
+                  className={`tm-nav-item ${isActive('/user-profile') ? 'tm-nav-item-active' : ''}`}
                 >
                   <FaUser className="tm-nav-icon" />
                   <span className="tm-nav-text">Профиль</span>
-                </Link>
+                </Link> */}
                 <Link 
                   to="/settings" 
                   className={`tm-nav-item ${isActive('/settings') ? 'tm-nav-item-active' : ''}`}

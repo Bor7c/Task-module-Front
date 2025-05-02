@@ -6,7 +6,8 @@ import HomePage from './pages/HomePage/HomePage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
 import TaskDetail from './pages/TaskPage/TaskDetail';
-import CreateTaskPage from './pages/CreateTaskPage/CreateTaskPage'; // 👈 Новый импорт
+import CreateTaskPage from './pages/CreateTaskPage/CreateTaskPage'; // Новый импорт
+import UserProfile from './pages/UserProfile/UserProfile'; // Новый импорт
 import Layout from './components/Layout/Layout';
 import LoadingScreen from './components/common/LoadingScreen';
 
@@ -16,8 +17,7 @@ const App: React.FC = () => {
   const { 
     isAuthenticated, 
     loading, 
-    sessionChecked,
-    error 
+    sessionChecked 
   } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
@@ -91,6 +91,19 @@ const App: React.FC = () => {
           path="/create-task"
           element={isAuthenticated ? (
             <CreateTaskPage />
+          ) : (
+            <Navigate 
+              to="/login" 
+              replace 
+              state={{ from: location }} 
+            />
+          )}
+        />
+        {/* Новый роут для профиля пользователя */}
+        <Route
+          path="/user-profile"
+          element={isAuthenticated ? (
+            <UserProfile />
           ) : (
             <Navigate 
               to="/login" 

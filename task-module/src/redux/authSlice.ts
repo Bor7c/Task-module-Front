@@ -28,6 +28,7 @@ const adaptUser = (rawUser: any): User => ({
   last_name: rawUser.last_name ?? '',
   role: rawUser.role ?? 'developer', // 🔥 <-- обязательно укажем роль (например, default developer)
   is_active: rawUser.is_active ?? true,
+  profile_picture_url: rawUser.profile_picture_url ?? null, // Добавлено поле для URL фотографии профиля
 });
 
 // --- Async Thunks --- //
