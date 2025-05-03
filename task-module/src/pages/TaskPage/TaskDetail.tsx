@@ -20,6 +20,7 @@ import { FaEdit, FaTrash, FaSave, FaUserPlus, FaArrowLeft, FaRegClock, FaSync, F
 import LoadingScreen from '../../components/common/LoadingScreen';
 import { Task, User, Comment } from '../../types/Types';
 import './TaskDetail.css';
+import TaskAttachments from '../../components/TaskAttachments/TaskAttachments';
 
 type TaskStatus = 'in_progress' | 'solved' | 'closed' | 'awaiting_response' | 'awaiting_action';
 
@@ -397,6 +398,8 @@ const TaskDetail: React.FC = () => {
               </div>
             )}
           </div>
+
+          <TaskAttachments taskId={task.id} />
           
           {/* Комментарии */}
           <div className="task-detail__comment-section">

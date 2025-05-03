@@ -55,25 +55,13 @@ export interface Comment {
   is_modified: boolean; // Изменён ли комментарий
 }
 
-// Функция для отображения приоритета
-const getPriorityDisplay = (priority: TaskPriority): string => {
-  switch (priority) {
-    case 'critical': return 'Критический';
-    case 'high': return 'Высокий';
-    case 'medium': return 'Средний';
-    case 'low': return 'Низкий';
-    default: return 'Неизвестный'; // Этот default теперь теоретически недостижим
-  }
-};
+export interface Attachment {
+  id: number;
+  file: string;
+  file_url: string;
+  filename: string;
+  uploaded_at: string;
+  task?: number;
+  comment?: number;
+}
 
-// Функция для отображения статуса
-const getStatusDisplay = (status: TaskStatus): string => {
-  switch (status) {
-    case 'in_progress': return 'В работе';
-    case 'awaiting_response': return 'Ожидает ответа';
-    case 'awaiting_action': return 'Ожидает действия';
-    case 'solved': return 'Решено';
-    case 'closed': return 'Закрыто';
-    default: return 'Неизвестный статус'; // Этот default теоретически недостижим
-  }
-};

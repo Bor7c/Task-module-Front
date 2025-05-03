@@ -1,0 +1,123 @@
+.task-attachments {
+    margin-top: 2rem;
+    padding: 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+  }
+  
+  .attachments-list {
+    margin-top: 1rem;
+  }
+  
+  .attachment-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .attachment-info {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+  }
+  
+  .attachment-icon {
+    margin-right: 0.5rem;
+    color: #666;
+  }
+  
+  .attachment-link {
+    flex-grow: 1;
+    margin-right: 1rem;
+    color: #333;
+    text-decoration: none;
+  }
+  
+  .attachment-link:hover {
+    text-decoration: underline;
+  }
+  
+  .attachment-date {
+    color: #888;
+    font-size: 0.8rem;
+  }
+  
+  .attachment-delete-btn {
+    background: none;
+    border: none;
+    color: #ff4444;
+    cursor: pointer;
+  }
+  
+  .file-upload-section {
+    margin-top: 1.5rem;
+  }
+  
+  .file-input-container {
+    margin-bottom: 1rem;
+  }
+  
+  .file-input-label {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .file-input-label:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .file-input {
+    display: none;
+  }
+  
+  .selected-files {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+  }
+  
+  .selected-file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.3rem 0;
+  }
+  
+  .remove-file-btn {
+    background: none;
+    border: none;
+    color: #ff4444;
+    cursor: pointer;
+  }
+  
+  .upload-button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .upload-button:hover {
+    background-color: #45a049;
+  }
+  
+  .upload-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  .error-message {
+    color: #ff4444;
+    margin-bottom: 1rem;
+  }
+  

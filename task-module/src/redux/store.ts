@@ -8,6 +8,9 @@ import tasksReducer from './tasksSlice';
 import taskDetailsReducer from './taskDetailsSlice';
 import usersReducer from './usersSlice';
 import createTaskFormReducer from './createTaskFormSlice'; // Новый редьюсер для формы создания задачи
+import attachmentsReducer from './attachmentsSlice';
+
+
 
 const store = configureStore({
   reducer: {
@@ -16,6 +19,7 @@ const store = configureStore({
     taskDetails: taskDetailsReducer,
     users: usersReducer,
     createTaskForm: createTaskFormReducer, // Добавили сюда
+    attachments: attachmentsReducer,
   },
 });
 
