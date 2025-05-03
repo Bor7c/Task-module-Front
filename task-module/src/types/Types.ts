@@ -1,17 +1,19 @@
 // Тип для пользователя
+export type UserRole = 'admin' | 'manager' | 'developer';
+
 export interface User {
   id: number;
-  username: string;
   first_name: string;
   last_name: string;
+  middle_name: string;
+  username: string;
   email: string;
-  role: UserRole; // Роль пользователя
+  role: UserRole;
   role_display: string;
-  is_active: boolean; // Активность пользователя
-  profile_picture_url: string | null; // URL фотографии профиля
+  is_active: boolean;
+  profile_picture_url?: string;
 }
 
-export type UserRole = 'admin' | 'manager' | 'developer';
 
 // Тип для задачи
 export interface Task {

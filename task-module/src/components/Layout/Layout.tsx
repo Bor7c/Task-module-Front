@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { checkUserSession, logoutUser } from '../../redux/authSlice';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { authAPI } from '../../api/auth';
-import './Layout.css'; // Обновленное название CSS файла
+import './Layout.css';
 import { 
   FaUser, 
   FaBars, 
@@ -21,13 +21,18 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  
+  const [avatarError, setAvatarError] = useState(false);
+
+  const profilePictureUrl = user?.profile_picture_url 
+    ? `http://localhost:8000${user.profile_picture_url}`
+    : null;
+
   useEffect(() => {
     dispatch(checkUserSession());
     
     const interval = setInterval(() => {
       dispatch(checkUserSession());
-    }, 300000); // Проверка сессии каждые 5 минут
+    }, 300000); 
     
     return () => clearInterval(interval);
   }, [dispatch]);
@@ -35,6 +40,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useEffect(() => {
     setMenuOpen(false);
     setUserMenuOpen(false);
+    setAvatarError(false);
   }, [location.pathname]);
 
   const handleLogout = async () => {
@@ -48,7 +54,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   const handleProfileClick = () => {
-    navigate('/user-profile'); // Обновлено на /user-profile
+    navigate('/user-profile');
     setUserMenuOpen(false);
   };
 
@@ -57,50 +63,58 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   return (
-    <div className="tm-layout">
-      <header className="tm-header">
-        <div className="tm-header-container">
-          <div className="tm-header-left">
+    <div className="stm-layout">
+      <header className="stm-header">
+        <div className="stm-header-container">
+          <div className="stm-header-left">
             <button 
-              className="tm-menu-toggle" 
+              className="stm-menu-toggle" 
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label={menuOpen ? "Закрыть меню" : "Открыть меню"}
             >
               {menuOpen ? <FaTimes /> : <FaBars />}
             </button>
             
-            <Link to="/" className="tm-logo">
-              <span className="tm-logo-text">Simple Task Manager</span>
+            <Link to="/" className="stm-logo">
+              <span className="stm-logo-text">Simple Task Manager</span>
             </Link>
           </div>
           
           {isAuthenticated && (
-            <div className="tm-header-right">
-              <div className="tm-user">
+            <div className="stm-header-right">
+              <div className="stm-user">
                 <button 
-                  className="tm-user-button"
+                  className="stm-user-button"
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  aria-expanded={userMenuOpen}
                 >
-                  <div className="tm-avatar">
-                    {user?.profile_picture_url ? (
-                      <img src={user.profile_picture_url} alt="Avatar" className="tm-avatar-image" />
+                  <div className="stm-avatar">
+                    {profilePictureUrl && !avatarError ? (
+                      <img 
+                        src={profilePictureUrl} 
+                        alt={`Аватар ${user?.username}`}
+                        className="stm-avatar-image"
+                        onError={() => setAvatarError(true)}
+                      />
                     ) : (
-                      user?.username?.charAt(0).toUpperCase()
+                      <div className="stm-avatar-fallback">
+                        {user?.username?.charAt(0).toUpperCase()}
+                      </div>
                     )}
                   </div>
-                  <span className="tm-username">{user?.username}</span>
+                  <span className="stm-username">{user?.username}</span>
                 </button>
                 
                 {userMenuOpen && (
-                  <div className="tm-user-menu">
+                  <div className="stm-user-menu">
                     <button 
-                      className="tm-user-menu-item" 
+                      className="stm-user-menu-item" 
                       onClick={handleProfileClick}
                     >
                       <FaUser /> Профиль
                     </button>
                     <button 
-                      className="tm-user-menu-item" 
+                      className="stm-user-menu-item" 
                       onClick={handleLogout}
                     >
                       <FaSignOutAlt /> Выйти
@@ -113,51 +127,44 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </div>
       </header>
       
-      <div className="tm-body">
+      <div className="stm-body">
         {isAuthenticated && (
-          <nav className={`tm-nav ${menuOpen ? 'tm-nav-open' : ''}`}>
-            <div className="tm-nav-content">
-              <div className="tm-nav-menu">
+          <nav className={`stm-nav ${menuOpen ? 'stm-nav-open' : ''}`}>
+            <div className="stm-nav-content">
+              <div className="stm-nav-menu">
                 <Link 
                   to="/" 
-                  className={`tm-nav-item ${isActive('/') ? 'tm-nav-item-active' : ''}`}
+                  className={`stm-nav-item ${isActive('/') ? 'stm-nav-item-active' : ''}`}
                 >
-                  <FaHome className="tm-nav-icon" />
-                  <span className="tm-nav-text">Главная</span>
+                  <FaHome className="stm-nav-icon" />
+                  <span className="stm-nav-text">Главная</span>
                 </Link>
                 <Link 
                   to="/tasks" 
-                  className={`tm-nav-item ${isActive('/tasks') ? 'tm-nav-item-active' : ''}`}
+                  className={`stm-nav-item ${isActive('/tasks') ? 'stm-nav-item-active' : ''}`}
                 >
-                  <FaClipboardList className="tm-nav-icon" />
-                  <span className="tm-nav-text">Задачи</span>
+                  <FaClipboardList className="stm-nav-icon" />
+                  <span className="stm-nav-text">Задачи</span>
                 </Link>
-                {/* <Link 
-                  to="/user-profile" // Обновлено на /user-profile
-                  className={`tm-nav-item ${isActive('/user-profile') ? 'tm-nav-item-active' : ''}`}
-                >
-                  <FaUser className="tm-nav-icon" />
-                  <span className="tm-nav-text">Профиль</span>
-                </Link> */}
                 <Link 
                   to="/settings" 
-                  className={`tm-nav-item ${isActive('/settings') ? 'tm-nav-item-active' : ''}`}
+                  className={`stm-nav-item ${isActive('/settings') ? 'stm-nav-item-active' : ''}`}
                 >
-                  <FaCog className="tm-nav-icon" />
-                  <span className="tm-nav-text">Настройки</span>
+                  <FaCog className="stm-nav-icon" />
+                  <span className="stm-nav-text">Настройки</span>
                 </Link>
               </div>
             </div>
           </nav>
         )}
         
-        <main className="tm-main">
+        <main className="stm-main">
           {children}
         </main>
       </div>
       
       {menuOpen && (
-        <div className="tm-overlay" onClick={() => setMenuOpen(false)} />
+        <div className="stm-overlay" onClick={() => setMenuOpen(false)} />
       )}
     </div>
   );

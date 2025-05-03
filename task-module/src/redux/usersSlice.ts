@@ -27,9 +27,18 @@ const usersSlice = createSlice({
     setError: (state, action: PayloadAction<string>) => {
       state.error = action.payload;
     },
+    updateUser: (state, action: PayloadAction<Partial<User> & { id: number }>) => {
+      const index = state.users.findIndex((user) => user.id === action.payload.id);
+      if (index !== -1) {
+        state.users[index] = {
+          ...state.users[index],
+          ...action.payload,
+        };
+      }
+    },
   },
 });
 
-export const { setUsers, setLoading, setError } = usersSlice.actions;
+export const { setUsers, setLoading, setError, updateUser } = usersSlice.actions;
 
 export default usersSlice.reducer;

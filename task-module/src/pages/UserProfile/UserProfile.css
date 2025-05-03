@@ -1,16 +1,27 @@
 .user-profile {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  background-color: #fff;
+  max-width: 520px;
+  margin: 42px auto 0 auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 40px -8px rgba(67,97,238,0.12);
+  padding: 32px;
+  position: relative;
+  min-width: 0;
+}
+
+.user-profile h1 {
+  font-size: 1.55rem;
+  margin-bottom: 28px;
+  letter-spacing: .01em;
+  color: #243064;
+  font-weight: 700;
 }
 
 .user-profile-info {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  gap: 30px;
+  margin-bottom: 18px;
 }
 
 .profile-picture-container {
@@ -18,66 +29,231 @@
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  cursor: pointer;
-  overflow: hidden;
-  border: 2px solid #eee;
+  box-shadow: 0 2px 12px 0 rgba(67,97,238,0.08);
+  background: linear-gradient(135deg,#e9eeff 65%, #dee4fa 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f0f0f0; /* Цвет фона для заглушки */
+  cursor: pointer;
+  border: 2.5px solid #fff;
+  overflow: hidden;
+  transition: box-shadow .17s, border-color .18s;
 }
-
+.profile-picture-container:focus-visible, .profile-picture-container:hover {
+  box-shadow: 0 6px 20px 0 rgba(67,97,238,0.12);
+  border-color: #aac1fe;
+}
 .profile-picture {
   width: 100%;
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
+  display: block;
+  user-select: none;
 }
-
 .profile-placeholder {
-  font-size: 14px;
-  color: #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg,#b8cafe, #4361ee 66%);
+  font-size: 2.7rem;
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.profile-picture-overlay {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 34px;
+  background: linear-gradient(0deg,rgba(67,97,238,0.94),rgba(67,97,238,0.32) 75%,transparent);
+  color: #fff;
+  font-size: .92rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  letter-spacing: 1px;
+  transition: opacity .18s;
+  border-bottom-left-radius: 50%;
+  border-bottom-right-radius: 50%;
+  z-index: 2;
+}
+.profile-picture-container:hover .profile-picture-overlay,
+.profile-picture-container:focus-visible .profile-picture-overlay {
+  opacity: 1;
+  pointer-events: all;
 }
 
+/* Детали (имя, статус и т.д.) */
 .user-details {
-  flex-grow: 1;
-  margin-left: 20px;
+  flex: 1;
+  min-width: 0;
+}
+.user-details p {
+  font-size: 1.03rem;
+  color: #22223b;
+  opacity: 0.82;
+  margin: 3px 0 3px 0;
+}
+.user-details strong {
+  color: #4361ee;
+  font-weight: 600;
+  letter-spacing: .01em;
 }
 
+/* Меню под аватаром */
 .profile-menu {
   position: absolute;
-  top: 130px; /* Позиционируем меню под изображением */
-  left: 0;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1;
+  top: 154px;
+  left: 32px;
+  min-width: 144px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px -4px rgba(51,65,85,.19);
+  padding: 6px 0;
+  border: 1.5px solid #e2e8f0;
+  z-index: 33;
+  animation: fadeInUp .22s cubic-bezier(.36,1,.54,1);
 }
-
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(12px);}
+  100% { opacity:1; transform:translateY(0);}
+}
 .menu-button {
-  display: block;
-  padding: 10px;
   width: 100%;
-  border: none;
   background: none;
+  border: none;
+  padding: 13px 22px;
+  color: #374151;
+  font-size: 1.04rem;
+  font-weight: 500;
   text-align: left;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background .13s, color .13s;
+  border-radius: 3px;
 }
-
-.menu-button:hover {
-  background-color: #f0f0f0;
+.menu-button:hover,
+.menu-button:focus-visible {
+  background: #e9eeff;
+  color: #4361ee;
+  outline: none;
 }
-
 .upload-input {
-  display: none; /* Скрываем стандартное поле ввода файла */
+  display: none;
 }
 
+/* Сообщения */
+.profile-messages {
+  min-height: 24px;
+  margin-top: 22px;
+}
 .error-message {
-  color: #f44336; /* Красный цвет для ошибок */
+  color: #ef4444;
+  font-weight: 500;
+  background: #fee2e2;
+  border-radius: 4px;
+  padding: 6px 16px;
+  font-size: .99rem;
+  letter-spacing: .01em;
+}
+.success-message {
+  color: #10b981;
+  font-weight: 500;
+  background: #d1fae5;
+  border-radius: 4px;
+  padding: 6px 16px;
+  font-size: .99rem;
+  letter-spacing: .01em;
+}
+.loading-message {
+  color: #2563eb;
+  font-weight: 500;
+  font-size: .99rem;
+  letter-spacing: .01em;
 }
 
-.success-message {
-  color: #4CAF50; /* Зеленый цвет для успешных сообщений */
+/* Responsive */
+@media (max-width: 600px) {
+  .user-profile {
+    padding: 16px 4vw;
+    margin: 16px 0 0 0;
+  }
+  .user-profile-info {
+    gap: 18px;
+  }
+  .profile-menu {
+    left: 4vw;
+    right: 4vw;
+    min-width: 120px;
+  }
+}
+
+/* Новые кнопки */
+.edit-button,
+.cancel-button,
+.save-button {
+  margin-top: 12px;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+/* Цвета */
+.edit-button {
+  background: #4361ee;
+  color: #fff;
+  margin-right: 8px;
+}
+.edit-button:hover {
+  background: #314ed1;
+}
+
+.cancel-button {
+  background: #f3f4f6;
+  color: #374151;
+}
+.cancel-button:hover {
+  background: #e5e7eb;
+}
+
+.save-button {
+  background: #10b981;
+  color: #fff;
+  margin-right: 8px;
+}
+.save-button:hover {
+  background: #059669;
+}
+
+/* Поля ввода */
+.user-details label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.94rem;
+  color: #1f2937;
+}
+.user-details input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  margin-top: 4px;
+  margin-bottom: 12px;
+  background: #f9fafb;
+  transition: border-color 0.2s;
+}
+.user-details input:focus {
+  outline: none;
+  border-color: #4361ee;
+  background: #fff;
 }
