@@ -8,6 +8,10 @@ interface UserData {
   role: string;
   role_display?: string;
   is_staff?: boolean;
+  first_name?: string;
+  last_name?: string;
+  middle_name?: string;
+  profile_picture_url?: string | null;
 }
 
 interface AuthResponse {
@@ -40,17 +44,18 @@ export const authAPI = {
         localStorage.setItem('session_id', session_id);
       }
 
-      authAPI.startSessionAutoRefresh(); // <--- запускаем авто-продление после логина
+      authAPI.startSessionAutoRefresh();
 
       return { session_id, user };
     } catch (error) {
       const axiosError = error as AxiosError<ErrorResponse>;
-      throw new Error(
+      const message =
         axiosError.response?.data?.detail ||
         axiosError.response?.data?.non_field_errors?.join(', ') ||
         axiosError.response?.data?.error ||
-        'Login failed'
-      );
+        'Login failed';
+
+      throw new Error(message);
     }
   },
 
@@ -66,13 +71,14 @@ export const authAPI = {
         localStorage.setItem('session_id', session_id);
       }
 
-      authAPI.startSessionAutoRefresh(); // <--- запускаем авто-продление после регистрации
+      authAPI.startSessionAutoRefresh();
 
       return { session_id, user };
     } catch (error) {
       const axiosError = error as AxiosError<ErrorResponse>;
 
       const errorMessages = [];
+
       if (axiosError.response?.data?.username) {
         errorMessages.push(`Username: ${axiosError.response.data.username.join(', ')}`);
       }
@@ -109,10 +115,10 @@ export const authAPI = {
       document.cookie = 'sessionid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
       localStorage.removeItem('session_id');
 
-      authAPI.stopSessionAutoRefresh(); // <-- остановить авто-обновление при выходе
+      authAPI.stopSessionAutoRefresh();
     } catch (error) {
       console.error('Logout error:', error);
-      throw error;
+      throw new Error('Logout failed');
     }
   },
 
@@ -136,7 +142,6 @@ export const authAPI = {
     }
   },
 
-  /** Новый метод: запуск автообновления сессии */
   startSessionAutoRefresh(intervalMinutes = 5) {
     if (sessionRefreshInterval) {
       clearInterval(sessionRefreshInterval);
@@ -150,10 +155,9 @@ export const authAPI = {
         console.error('Session refresh failed:', error);
         authAPI.stopSessionAutoRefresh();
       }
-    }, intervalMinutes * 60 * 1000); // по умолчанию каждые 5 минут
+    }, intervalMinutes * 60 * 1000);
   },
 
-  /** Новый метод: остановка автообновления */
   stopSessionAutoRefresh() {
     if (sessionRefreshInterval) {
       clearInterval(sessionRefreshInterval);

@@ -14,7 +14,8 @@ import {
   FaFilter, 
   FaSort, 
   FaExclamationCircle, 
-  FaBell 
+  FaBell,
+  FaUser
 } from 'react-icons/fa';
 
 const TaskList: React.FC = () => {
@@ -79,7 +80,13 @@ const TaskList: React.FC = () => {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
-  // Подсчитываем количество задач с дедлайном на сегодня
+  const getProfilePicture = (user: any) => {
+    if (!user) return null;
+    return user.profile_picture_url 
+      // ? `http://localhost:8000${user.profile_picture_url}`
+      // : null;
+  };
+
   const getTodaysTasks = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -94,9 +101,7 @@ const TaskList: React.FC = () => {
     }).length;
   };
 
-  // Используем свойство is_overdue с бэкенда для подсчета просроченных задач
   const getOverdueTasks = () => {
-    // Показываем только активные задачи с флагом is_overdue в счетчике
     return tasks.filter(task => 
       !completedStatuses.includes(task.status) && task.is_overdue
     ).length;
@@ -121,7 +126,6 @@ const TaskList: React.FC = () => {
   // Фильтрация задач
   let filteredTasks = [...tasks];
   
-  // Применяем фильтр по типу (сегодняшние, просроченные)
   if (filterType === 'today') {
     filteredTasks = filteredTasks.filter(task => 
       !completedStatuses.includes(task.status) && 
@@ -129,36 +133,29 @@ const TaskList: React.FC = () => {
       isToday(task.deadline)
     );
   } else if (filterType === 'overdue') {
-    // При фильтрации просроченных задач показываем ВСЕ задачи с флагом is_overdue,
-    // включая решенные и закрытые с этим флагом
     filteredTasks = filteredTasks.filter(task => task.is_overdue);
   }
   
-  // Применяем фильтр по дням без обновления
   if (daysWithoutUpdate !== null) {
     filteredTasks = filteredTasks.filter(task => 
       getDaysWithoutUpdate(task.updated_at) >= daysWithoutUpdate
     );
   }
 
-  // Применяем фильтр по статусу (активные/завершенные)
   const activeTasks = filteredTasks.filter(task => activeStatuses.includes(task.status));
   const completedTasks = filteredTasks.filter(task => completedStatuses.includes(task.status));
   
-  // Выбор между активными и завершенными
   let tasksToDisplay = showCompleted ? completedTasks : activeTasks;
   
-  // Сортировка задач
   tasksToDisplay = tasksToDisplay.sort((a, b) => {
     const dateA = new Date(a[sortBy]).getTime();
     const dateB = new Date(b[sortBy]).getTime();
     
     return sortDirection === 'desc' 
-      ? dateB - dateA  // По убыванию (сначала новые)
-      : dateA - dateB; // По возрастанию (сначала старые)
+      ? dateB - dateA
+      : dateA - dateB;
   });
 
-  // Группировка задач по статусам
   const groupedActiveTasks = {
     'В работе': tasksToDisplay.filter(task => task.status === 'in_progress'),
     'Ожидает ответа': tasksToDisplay.filter(task => task.status === 'awaiting_response'),
@@ -170,15 +167,12 @@ const TaskList: React.FC = () => {
     'Закрыто': tasksToDisplay.filter(task => task.status === 'closed')
   };
   
-  // Выбор групп для отображения
   const displayGroups = showCompleted ? groupedCompletedTasks : groupedActiveTasks;
   
-  // Подсчёт статистики
   const totalTasks = tasks.length;
   const tasksToday = getTodaysTasks();
   const overdueTasksCount = getOverdueTasks();
 
-  // Подсчёт просроченных задач в разделе завершенных для бейджей
   const completedOverdueTasks = tasks.filter(task => 
     completedStatuses.includes(task.status) && task.is_overdue
   ).length;
@@ -353,6 +347,7 @@ const TaskList: React.FC = () => {
                 statusTasks.map((task) => {
                   const isTaskToday = task.deadline && isToday(task.deadline);
                   const isTaskOverdue = task.is_overdue;
+                  const profilePicture = task.responsible ? getProfilePicture(task.responsible) : null;
                   
                   return (
                     <div 
@@ -369,7 +364,6 @@ const TaskList: React.FC = () => {
                       
                       <h3 className="task-list__card-title">{task.title}</h3>
                       
-                      {/* Показываем бейдж просроченности всегда если is_overdue=true, даже для закрытых/решенных задач */}
                       {(isTaskToday || isTaskOverdue) && (
                         <div className="task-list__card-status">
                           {isTaskOverdue && (
@@ -403,7 +397,20 @@ const TaskList: React.FC = () => {
                         {task.responsible && (
                           <div className="task-list__responsible">
                             <div className="task-list__avatar" title={task.responsible.username}>
-                              {task.responsible.username.charAt(0).toUpperCase()}
+                              {profilePicture ? (
+                                <img 
+                                  src={profilePicture} 
+                                  alt={task.responsible.username}
+                                  className="task-list__avatar-img"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).style.display = 'none';
+                                  }}
+                                />
+                              ) : (
+                                <div className="task-list__avatar-fallback">
+                                  {task.responsible.username.charAt(0).toUpperCase()}
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}

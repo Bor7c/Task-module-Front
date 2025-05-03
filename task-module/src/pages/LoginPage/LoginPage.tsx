@@ -1,8 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppDispatch } from '../../redux/store';
 import { loginUser } from '../../redux/authSlice';
 import './LoginPage.css';
+
+interface ErrorPayload {
+  message?: string;
+  error?: string;
+}
 
 const LoginPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -14,46 +19,50 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Очистить сессионный токен при загрузке
-  useEffect(() => {
-    document.cookie = 'session_token=; Max-Age=0; path=/;';
-  }, []);
-
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    e.stopPropagation();
 
-    if (!username || !password) {
+    if (!username.trim() || !password.trim()) {
       setError('Имя пользователя и пароль обязательны');
       return;
     }
+
+    document.cookie = 'session_token=; Max-Age=0; path=/;';
 
     setError('');
     setIsSubmitting(true);
 
     try {
-      const result = await dispatch(loginUser({ username, password })).unwrap();
-
-      if (result) {
+      const resultAction = await dispatch(loginUser({ username, password }));
+      
+      if (loginUser.fulfilled.match(resultAction)) {
         const redirectTo = (location.state as any)?.from || '/';
-        navigate(redirectTo);
+        navigate(redirectTo, { replace: true });
+      } else if (loginUser.rejected.match(resultAction)) {
+        // Безопасное извлечение сообщения об ошибке
+        const payload = resultAction.payload as ErrorPayload | undefined;
+        const errorMessage = 
+          payload?.message || 
+          payload?.error || 
+          resultAction.error?.message || 
+          'Неверные учетные данные';
+        setError(errorMessage);
       }
     } catch (err) {
-      setError('Неверные учетные данные');
+      setError('Произошла непредвиденная ошибка');
       console.error('Ошибка входа:', err);
     } finally {
       setIsSubmitting(false);
     }
   }, [username, password, dispatch, navigate, location.state]);
-
+  
   return (
     <div className="auth-wrapper">
       <div className="auth-container login-container">
         <div className="auth-header">
           <h1>Simple Task Manager</h1>
           <h2>Вход в систему</h2>
-          <p className="auth-description">
-            Используйте свои учетные данные для доступа к системе управления задачами
-          </p>
         </div>
 
         {error && (
@@ -83,6 +92,7 @@ const LoginPage: React.FC = () => {
                 required
                 autoComplete="username"
                 placeholder="Введите имя пользователя"
+                disabled={isSubmitting}
               />
             </div>
           </div>
@@ -102,6 +112,7 @@ const LoginPage: React.FC = () => {
                 required
                 autoComplete="current-password"
                 placeholder="Введите пароль"
+                disabled={isSubmitting}
               />
             </div>
           </div>

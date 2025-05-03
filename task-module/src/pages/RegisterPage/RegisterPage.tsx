@@ -16,7 +16,6 @@ const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  // Очистка куки "session_token" при загрузке компонента
   useEffect(() => {
     document.cookie = "session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   }, []);
@@ -27,39 +26,50 @@ const RegisterPage: React.FC = () => {
     setError('');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-    // Валидация на клиенте
-    if (formData.password !== formData.confirmPassword) {
+
+    const { username, email, password, confirmPassword } = formData;
+
+    // Валидация
+    if (password !== confirmPassword) {
       setError('Пароли не совпадают');
       return;
     }
-    if (formData.password.length < 8) {
+    if (password.length < 8) {
       setError('Пароль должен содержать минимум 8 символов');
       return;
     }
-    if (formData.username.length < 4) {
+    if (username.length < 4) {
       setError('Имя пользователя должно содержать минимум 4 символа');
       return;
     }
-    
+    if (!isValidEmail(email)) {
+      setError('Введите корректный email адрес');
+      return;
+    }
+
     setIsSubmitting(true);
-    
+    setError('');
+
     try {
-      const result = await dispatch(
-        registerUser({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password
-        })
-      ).unwrap();
-      
-      if (result) {
-        navigate('/');
-      }
+      await dispatch(registerUser({ username, email, password })).unwrap();
+      navigate('/');
     } catch (err: any) {
-      setError(err.message || 'Ошибка регистрации');
+      if (err?.status === 409) {
+        setError('Пользователь с таким именем или email уже существует');
+      } else if (err?.data?.message) {
+        setError(err.data.message);
+      } else if (typeof err === 'string') {
+        setError(err);
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Произошла ошибка регистрации. Попробуйте позже.');
+      }
+      console.error('Registration failed:', err);
     } finally {
       setIsSubmitting(false);
     }
@@ -71,9 +81,8 @@ const RegisterPage: React.FC = () => {
         <div className="auth-header">
           <h1>Simple Task Manager</h1>
           <h2>Регистрация</h2>
-          <p className="auth-description">Создайте аккаунт для работы с системой управления задачами</p>
         </div>
-        
+
         {error && (
           <div className="auth-error">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -84,7 +93,7 @@ const RegisterPage: React.FC = () => {
             <span>{error}</span>
           </div>
         )}
-        
+
         <form onSubmit={handleSubmit} className="auth-form" noValidate>
           <div className="form-group">
             <label htmlFor="username">Имя пользователя</label>
@@ -107,7 +116,7 @@ const RegisterPage: React.FC = () => {
             </div>
             <small>Минимум 4 символа, только буквы и цифры</small>
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="email">Email</label>
             <div className="input-wrapper">
@@ -128,7 +137,7 @@ const RegisterPage: React.FC = () => {
             </div>
             <small>Введите действительный email адрес</small>
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="password">Пароль</label>
             <div className="input-wrapper">
@@ -150,7 +159,7 @@ const RegisterPage: React.FC = () => {
             </div>
             <small>Минимум 8 символов, используйте комбинацию цифр и букв</small>
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="confirmPassword">Подтверждение пароля</label>
             <div className="input-wrapper">
@@ -172,23 +181,23 @@ const RegisterPage: React.FC = () => {
             </div>
             <small>Пароли должны совпадать</small>
           </div>
-          
-          <button 
-            type="submit" 
+
+          <button
+            type="submit"
             className="auth-button"
             disabled={isSubmitting}
           >
             {isSubmitting ? (
               <>
                 <svg className="spinner" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="12" cy="12" r="10" fill="none" strokeWidth="4" />
+                  <circle cx="12" cy="12" r="10" fill="none" strokeWidth="4" stroke="currentColor" strokeLinecap="round" strokeDasharray="60" />
                 </svg>
                 Создание аккаунта...
               </>
             ) : 'Зарегистрироваться'}
           </button>
         </form>
-        
+
         <div className="auth-links">
           <p>Уже есть аккаунт? <a href="/login" className="auth-link">Войти в систему</a></p>
         </div>

@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { authAPI } from '../api/auth';
 import type { User } from '../types/Types';
 
-// Тип состояния
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
@@ -19,7 +18,6 @@ const initialState: AuthState = {
   sessionChecked: false,
 };
 
-// 🔥 Универсальная функция для адаптации user
 const adaptUser = (rawUser: any): User => ({
   id: rawUser.id,
   username: rawUser.username,
@@ -27,13 +25,11 @@ const adaptUser = (rawUser: any): User => ({
   first_name: rawUser.first_name ?? '',
   last_name: rawUser.last_name ?? '',
   middle_name: rawUser.middle_name ?? '',
-  role: rawUser.role ?? 'developer', // 🔥 <-- обязательно укажем роль (например, default developer)
+  role: rawUser.role ?? 'developer',
   role_display: rawUser.role_display ?? '',
   is_active: rawUser.is_active ?? true,
-  profile_picture_url: rawUser.profile_picture_url ?? null, // Добавлено поле для URL фотографии профиля
+  profile_picture_url: rawUser.profile_picture_url ?? null,
 });
-
-// --- Async Thunks --- //
 
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
@@ -45,7 +41,8 @@ export const registerUser = createAsyncThunk(
       }
       return response;
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Registration failed');
+      const message = error?.response?.data?.error || error.message || 'Ошибка регистрации';
+      return rejectWithValue(message);
     }
   }
 );
@@ -60,7 +57,8 @@ export const loginUser = createAsyncThunk(
       }
       return response;
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Login failed');
+      const message = error?.response?.data?.error || error.message || 'Ошибка входа';
+      return rejectWithValue(message);
     }
   }
 );
@@ -70,14 +68,14 @@ export const checkUserSession = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const sessionId = localStorage.getItem('session_id');
-      if (!sessionId) throw new Error('No session found');
-      
+      if (!sessionId) throw new Error('Сессия не найдена');
+
       const response = await authAPI.checkSession();
-      if (!response) throw new Error('Session invalid');
+      if (!response) throw new Error('Недействительная сессия');
       return response;
     } catch (error: any) {
       localStorage.removeItem('session_id');
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Ошибка проверки сессии');
     }
   }
 );
@@ -90,12 +88,10 @@ export const logoutUser = createAsyncThunk(
       localStorage.removeItem('session_id');
       return true;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Ошибка выхода');
     }
   }
 );
-
-// --- Slice --- //
 
 const authSlice = createSlice({
   name: 'auth',
@@ -108,8 +104,6 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-
-      // --- Register User ---
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -126,7 +120,6 @@ const authSlice = createSlice({
         state.sessionChecked = true;
       })
 
-      // --- Login User ---
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -143,7 +136,6 @@ const authSlice = createSlice({
         state.sessionChecked = true;
       })
 
-      // --- Check Session ---
       .addCase(checkUserSession.pending, (state) => {
         state.loading = true;
       })
@@ -155,18 +147,16 @@ const authSlice = createSlice({
       })
       .addCase(checkUserSession.rejected, (state) => {
         state.loading = false;
-        state.isAuthenticated = false;
         state.user = null;
+        state.isAuthenticated = false;
         state.sessionChecked = true;
       })
 
-      // --- Logout User ---
       .addCase(logoutUser.pending, (state) => {
         state.loading = true;
       })
-      .addCase(logoutUser.fulfilled, (state) => {
-        Object.assign(state, initialState);
-        state.sessionChecked = true;
+      .addCase(logoutUser.fulfilled, () => {
+        return { ...initialState, sessionChecked: true };
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.loading = false;
