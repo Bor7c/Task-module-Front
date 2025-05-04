@@ -498,7 +498,7 @@
 }
 
 .task-list__empty {
-  padding: 20px;
+  padding: 39px;
   text-align: center;
   color: var(--dark-gray);
   background-color: var(--light-gray);

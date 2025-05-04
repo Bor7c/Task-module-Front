@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaPaperclip, FaTimes, FaDownload, FaTrash } from 'react-icons/fa';
+import { FaPaperclip, FaTimes, FaTrash } from 'react-icons/fa';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { 
     fetchAttachments, 
@@ -8,6 +8,8 @@ import {
     setUploadProgress,
     clearAttachments
 } from '../../redux/attachmentsSlice';
+import { Attachment } from '../../types/Types';
+import './TaskAttachments.css'; // Импортируем стили
 
 interface TaskAttachmentsProps {
     taskId: number;
@@ -21,6 +23,7 @@ const TaskAttachments: React.FC<TaskAttachmentsProps> = ({ taskId }) => {
         error, 
         uploadProgress 
     } = useAppSelector((state) => state.attachments);
+    const currentUser = useAppSelector((state) => state.auth.user);
     
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
@@ -31,6 +34,11 @@ const TaskAttachments: React.FC<TaskAttachmentsProps> = ({ taskId }) => {
             dispatch(clearAttachments());
         };
     }, [taskId, dispatch]);
+
+    const canDeleteAttachment = (attachment: Attachment) => {
+        if (!currentUser) return false;
+        return currentUser.id === attachment.uploaded_by?.id;
+    };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -65,7 +73,6 @@ const TaskAttachments: React.FC<TaskAttachmentsProps> = ({ taskId }) => {
             
             {error && <div className="error-message">{error}</div>}
 
-            {/* Список текущих вложений */}
             <div className="attachments-list">
                 {attachments.map(attachment => (
                     <div key={attachment.id} className="attachment-item">
@@ -79,23 +86,29 @@ const TaskAttachments: React.FC<TaskAttachmentsProps> = ({ taskId }) => {
                             >
                                 {attachment.filename}
                             </a>
-                            <span className="attachment-date">
+                            <span className="attachment-meta">
                                 {new Date(attachment.uploaded_at).toLocaleDateString()}
+                                {attachment.uploaded_by && (
+                                    <span className="uploaded-by">
+                                        {attachment.uploaded_by.username}
+                                    </span>
+                                )}
                             </span>
                         </div>
-                        <button 
-                            onClick={() => handleDelete(attachment.id)}
-                            className="attachment-delete-btn"
-                            title="Удалить вложение"
-                            disabled={loading}
-                        >
-                            <FaTrash />
-                        </button>
+                        {canDeleteAttachment(attachment) && (
+                            <button 
+                                onClick={() => handleDelete(attachment.id)}
+                                className="attachment-delete-btn"
+                                title="Удалить вложение"
+                                disabled={loading}
+                            >
+                                <FaTrash />
+                            </button>
+                        )}
                     </div>
                 ))}
             </div>
 
-            {/* Форма добавления новых файлов */}
             <div className="file-upload-section">
                 <div className="file-input-container">
                     <label className="file-input-label">
@@ -111,7 +124,6 @@ const TaskAttachments: React.FC<TaskAttachmentsProps> = ({ taskId }) => {
                     </label>
                 </div>
 
-                {/* Список выбранных файлов */}
                 {selectedFiles.length > 0 && (
                     <div className="selected-files">
                         <h4>Выбранные файлы:</h4>

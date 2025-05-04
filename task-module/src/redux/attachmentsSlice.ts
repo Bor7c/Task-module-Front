@@ -18,42 +18,41 @@ const initialState: AttachmentsState = {
 };
 
 export const fetchAttachments = createAsyncThunk(
-    'attachments/fetchAttachments',
-    async (taskId: number, { rejectWithValue }) => {
-      try {
-        return await attachmentsApi.getAttachments(taskId);
-      } catch (error) {
-        const err = error as AxiosError<{ message: string }>;
-        return rejectWithValue(err.response?.data?.message || 'Failed to fetch attachments');
-      }
+  'attachments/fetchAttachments',
+  async (taskId: number, { rejectWithValue }) => {
+    try {
+      return await attachmentsApi.getAttachments(taskId);
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      return rejectWithValue(err.response?.data?.message || 'Failed to fetch attachments');
     }
-  );
-  
-  export const uploadAttachments = createAsyncThunk(
-    'attachments/uploadAttachments',
-    async ({ taskId, files }: { taskId: number; files: File[] }, { rejectWithValue }) => {
-      try {
-        return await attachmentsApi.uploadAttachments(taskId, files);
-      } catch (error) {
-        const err = error as AxiosError<{ message: string }>;
-        return rejectWithValue(err.response?.data?.message || 'Failed to upload attachments');
-      }
+  }
+);
+
+export const uploadAttachments = createAsyncThunk(
+  'attachments/uploadAttachments',
+  async ({ taskId, files }: { taskId: number; files: File[] }, { rejectWithValue }) => {
+    try {
+      return await attachmentsApi.uploadAttachments(taskId, files);
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      return rejectWithValue(err.response?.data?.message || 'Failed to upload attachments');
     }
-  );
-  
-  export const removeAttachment = createAsyncThunk(
-    'attachments/removeAttachment',
-    async (attachmentId: number, { rejectWithValue }) => {
-      try {
-        await attachmentsApi.deleteAttachment(attachmentId);
-        return attachmentId;
-      } catch (error) {
-        const err = error as AxiosError<{ message: string }>;
-        return rejectWithValue(err.response?.data?.message || 'Failed to delete attachment');
-      }
+  }
+);
+
+export const removeAttachment = createAsyncThunk(
+  'attachments/removeAttachment',
+  async (attachmentId: number, { rejectWithValue }) => {
+    try {
+      await attachmentsApi.deleteAttachment(attachmentId);
+      return attachmentId;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      return rejectWithValue(err.response?.data?.message || 'Failed to delete attachment');
     }
-  );
-  
+  }
+);
 
 const attachmentsSlice = createSlice({
   name: 'attachments',

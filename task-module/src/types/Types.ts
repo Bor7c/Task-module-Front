@@ -60,5 +60,18 @@ export interface Attachment {
   file_url: string;
   filename: string;
   uploaded_at: string;
+  uploaded_by: {
+    id: number;
+    username: string;
+    // Остальные поля делаем опциональными
+    first_name?: string;
+    last_name?: string;
+    middle_name?: string;
+    email?: string;
+    role?: UserRole;
+    role_display?: string;
+    is_active?: boolean;
+    profile_picture_url?: string;
+  };
+  task: number;
 }
-

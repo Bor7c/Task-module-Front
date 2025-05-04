@@ -80,7 +80,7 @@
   /* Текстовые поля */
   .input-field {
     width: 100%;
-    padding: 15px 16px;
+    padding: 15px 0px;
     border: 1px solid var(--medium-gray);
     border-radius: var(--border-radius);
     font-size: 15px;

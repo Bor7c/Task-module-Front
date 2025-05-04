@@ -254,89 +254,86 @@ const TaskDetail: React.FC = () => {
 
   return (
     <div className="task-detail-container">
-      <div className="task-detail__header">
-        <button onClick={() => navigate('/tasks')} className="task-detail__back-btn">
-          <FaArrowLeft /> Назад
-        </button>
-        
-        <div className="task-detail__action-buttons">
-          {/* В работу */}
-          {localStatus !== 'in_progress' && localStatus !== 'closed' && (
-            <button 
-              onClick={() => handleStatusChange('in_progress')} 
-              className="task-detail__status-btn task-detail__in-progress-btn"
+    <div className="task-detail__header">
+      <button onClick={() => navigate('/tasks')} className="task-detail__back-btn">
+        <FaArrowLeft /> Назад
+      </button>
+
+      <div className="task-detail__action-buttons">
+        {localStatus !== 'in_progress' && localStatus !== 'closed' && (
+          <button
+            onClick={() => handleStatusChange('in_progress')}
+            className="task-detail__status-btn task-detail__in-progress-btn"
+          >
+            {localStatus === 'solved' ? 'Возобновить работу' : 'Взять в работу'}
+          </button>
+        )}
+
+        {localStatus !== 'closed' && (
+          <div className="task-detail__dropdown-container" ref={awaitingMenuRef}>
+            <button
+              onClick={() => setIsAwaitingMenuOpen(!isAwaitingMenuOpen)}
+              className="task-detail__status-btn task-detail__awaiting-btn"
             >
-              {localStatus === 'solved' ? 'Возобновить работу' : 'Взять в работу'}
+              Ожидание
             </button>
-          )}
-          
-          {/* Ожидание с выпадающим меню */}
-          {localStatus !== 'closed' && (
-            <div className="task-detail__dropdown-container" ref={awaitingMenuRef}>
-              <button 
-                onClick={() => setIsAwaitingMenuOpen(!isAwaitingMenuOpen)} 
-                className="task-detail__status-btn task-detail__awaiting-btn"
-              >
-                Ожидание
-              </button>
-              {isAwaitingMenuOpen && (
-                <div className="task-detail__dropdown-menu">
-                  <button 
-                    onClick={() => handleStatusChange('awaiting_action')} 
-                    className="task-detail__dropdown-item"
-                  >
-                    Ожидает действий
-                  </button>
-                  <button 
-                    onClick={() => handleStatusChange('awaiting_response')} 
-                    className="task-detail__dropdown-item"
-                  >
-                    Ожидает ответа
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-          
-          {/* Решено / Закрыть */}
-          {localStatus !== 'solved' && localStatus !== 'closed' && (
-            <button 
-              onClick={() => handleStatusChange('solved')} 
-              className="task-detail__status-btn task-detail__solved-btn"
-            >
-              Решено
-            </button>
-          )}
-          
-          {localStatus === 'solved' && (
-            <button 
-              onClick={() => handleStatusChange('closed')} 
-              className="task-detail__status-btn task-detail__closed-btn"
-            >
-              Закрыть
-            </button>
-          )}
-        </div>
+            {isAwaitingMenuOpen && (
+              <div className="task-detail__dropdown-menu">
+                <button
+                  onClick={() => handleStatusChange('awaiting_action')}
+                  className="task-detail__dropdown-item"
+                >
+                  Ожидает действий
+                </button>
+                <button
+                  onClick={() => handleStatusChange('awaiting_response')}
+                  className="task-detail__dropdown-item"
+                >
+                  Ожидает ответа
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {localStatus !== 'solved' && localStatus !== 'closed' && (
+          <button
+            onClick={() => handleStatusChange('solved')}
+            className="task-detail__status-btn task-detail__solved-btn"
+          >
+            Решено
+          </button>
+        )}
+
+        {localStatus === 'solved' && (
+          <button
+            onClick={() => handleStatusChange('closed')}
+            className="task-detail__status-btn task-detail__closed-btn"
+          >
+            Закрыть
+          </button>
+        )}
       </div>
-      
-      {/* Модальное окно подтверждения закрытия */}
-      {showCloseConfirmation && (
-        <div className="task-detail__modal-overlay">
-          <div className="task-detail__modal-dialog" ref={closeConfirmationRef}>
-            <h3>Подтверждение закрытия</h3>
-            <p>Вы уверены, что хотите закрыть задачу? Это действие нельзя будет отменить.</p>
-            <div className="task-detail__modal-actions">
-              <button onClick={cancelCloseTask} className="task-detail__modal-cancel">Отмена</button>
-              <button onClick={confirmCloseTask} className="task-detail__modal-confirm">Подтвердить</button>
-            </div>
+    </div>
+
+    {showCloseConfirmation && (
+      <div className="task-detail__modal-overlay">
+        <div className="task-detail__modal-dialog" ref={closeConfirmationRef}>
+          <h3>Подтверждение закрытия</h3>
+          <p>Вы уверены, что хотите закрыть задачу? Это действие нельзя будет отменить.</p>
+          <div className="task-detail__modal-actions">
+            <button onClick={cancelCloseTask} className="task-detail__modal-cancel">Отмена</button>
+            <button onClick={confirmCloseTask} className="task-detail__modal-confirm">Подтвердить</button>
           </div>
         </div>
-      )}
-      
-      <div className="task-detail__content">
-        <div className="task-detail__left-column">
-          <div className="task-detail__title-container">
-            {isEditing ? (
+      </div>
+    )}
+
+    <div className="task-detail__content">
+      <div className="task-detail__left-column">
+        <div className="task-detail__description-container">
+          {isEditing ? (
+            <div className="task-detail__edit-container">
               <input
                 type="text"
                 value={editedTitle}
@@ -345,59 +342,42 @@ const TaskDetail: React.FC = () => {
                 className="task-detail__title-input"
                 disabled={currentUser?.id !== task.created_by.id}
               />
-            ) : (
-              <div className="task-detail__title-wrapper">
-                <h1 className="task-detail__title">
-                  {task.title}
-                  {currentUser?.id === task.created_by.id && (
-                    <button onClick={() => setIsEditing(true)} className="task-detail__edit-title-btn">
-                      <FaEdit />
-                    </button>
-                  )}
-                </h1>
-                {task.is_overdue && (
-                  <div className="task-detail__overdue-badge">
-                    <FaExclamationCircle /> Просрочена
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-          
-          <div className="task-detail__description-container">
-            {isEditing ? (
-              <div className="task-detail__edit-container">
-                <textarea
-                  value={editedDescription}
-                  onChange={(e) => setEditedDescription(e.target.value)}
-                  placeholder="Описание задачи"
-                  className="task-detail__description-textarea"
-                  disabled={currentUser?.id !== task.created_by.id}
-                />
-                
-                {currentUser?.id === task.created_by.id && (
-                  <div className="task-detail__edit-actions">
-                    <button onClick={handleSaveTask} className="task-detail__save-btn">
-                      <FaSave /> Сохранить
-                    </button>
-                    <button onClick={() => setIsEditing(false)} className="task-detail__cancel-btn">
-                      Отмена
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="task-detail__description">
-                <h3>Описание:</h3>
-                <p className="task-detail__description-text">{task.description || '👉 Нет описания'}</p>
-                {currentUser?.id === task.created_by.id && (
-                  <button onClick={() => setIsEditing(true)} className="task-detail__edit-description-btn">
-                    <FaEdit /> Редактировать
+              <textarea
+                value={editedDescription}
+                onChange={(e) => setEditedDescription(e.target.value)}
+                placeholder="Описание задачи"
+                className="task-detail__description-textarea"
+                disabled={currentUser?.id !== task.created_by.id}
+              />
+              {currentUser?.id === task.created_by.id && (
+                <div className="task-detail__edit-actions">
+                  <button onClick={handleSaveTask} className="task-detail__save-btn">
+                    <FaSave /> Сохранить
                   </button>
-                )}
-              </div>
-            )}
-          </div>
+                  <button onClick={() => setIsEditing(false)} className="task-detail__cancel-btn">
+                    Отмена
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="task-detail__description">
+              <h1 className="task-detail__title">{task.title}</h1>
+              {task.is_overdue && (
+                <div className="task-detail__overdue-badge">
+                  <FaExclamationCircle /> Просрочена
+                </div>
+              )}
+              <h3>Описание:</h3>
+              <p className="task-detail__description-text">{task.description || '👉 Нет описания'}</p>
+              {currentUser?.id === task.created_by.id && (
+                <button onClick={() => setIsEditing(true)} className="task-detail__edit-description-btn">
+                  <FaEdit /> Редактировать
+                </button>
+              )}
+            </div>
+          )}
+        </div>
 
           <TaskAttachments taskId={task.id} />
           

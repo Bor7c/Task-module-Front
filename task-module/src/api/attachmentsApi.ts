@@ -2,6 +2,8 @@ import axios from './axiosConfig';
 import { AxiosError } from 'axios';
 
 export interface Attachment {
+  task: number;
+  uploaded_by: { id: number; username: string; };
   id: number;
   file_url: string;
   filename: string;

@@ -606,7 +606,6 @@
   .task-detail__edit-comment-textarea {
     width: 100%;
     min-height: 80px;
-    padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-family: inherit;
