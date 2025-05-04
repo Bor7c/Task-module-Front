@@ -57,11 +57,8 @@ export interface Comment {
 
 export interface Attachment {
   id: number;
-  file: string;
   file_url: string;
   filename: string;
   uploaded_at: string;
-  task?: number;
-  comment?: number;
 }
 
