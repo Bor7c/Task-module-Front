@@ -34,28 +34,28 @@ let sessionRefreshInterval: ReturnType<typeof setInterval> | null = null;
 export const authAPI = {
   async login(credentials: { username: string; password: string }): Promise<AuthResponse> {
     try {
-      const response = await api.post('/auth/login/', credentials, {
-        withCredentials: true,
-      });
+        const response = await api.post('/auth/login/', credentials, {
+            withCredentials: true,
+        });
 
-      const { session_id, user } = response.data;
+        const { session_id, user } = response.data;
 
-      if (session_id) {
-        localStorage.setItem('session_id', session_id);
-      }
+        if (session_id) {
+            localStorage.setItem('session_id', session_id);
+        }
 
-      authAPI.startSessionAutoRefresh();
+        authAPI.startSessionAutoRefresh();
 
-      return { session_id, user };
+        return { session_id, user };
     } catch (error) {
-      const axiosError = error as AxiosError<ErrorResponse>;
-      const message =
-        axiosError.response?.data?.detail ||
-        axiosError.response?.data?.non_field_errors?.join(', ') ||
-        axiosError.response?.data?.error ||
-        'Login failed';
+        const axiosError = error as AxiosError<ErrorResponse>;
+        const message =
+            axiosError.response?.data?.detail ||
+            axiosError.response?.data?.non_field_errors?.join(', ') ||
+            axiosError.response?.data?.error ||
+            'Login failed';
 
-      throw new Error(message);
+        throw new Error(message); // Выбрасываем ошибку для обработки в компоненте
     }
   },
 

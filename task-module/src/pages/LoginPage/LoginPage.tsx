@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppDispatch } from '../../redux/store';
 import { loginUser } from '../../redux/authSlice';
 import './LoginPage.css';
+import { authAPI } from '../../api/auth';
 
 interface ErrorPayload {
   message?: string;
@@ -20,43 +21,30 @@ const LoginPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault(); // Предотвращаем обновление страницы
 
     // Валидация
     if (!username.trim() || !password.trim()) {
-      setError('Имя пользователя и пароль обязательны');
-      return;
+        setError('Имя пользователя и пароль обязательны');
+        return;
     }
-
-    // Сброс куки сессии
-    document.cookie = 'session_token=; Max-Age=0; path=/;';
 
     setError('');
     setIsSubmitting(true);
 
     try {
-      const resultAction = await dispatch(loginUser({ username, password }));
-
-      if (loginUser.fulfilled.match(resultAction)) {
-        const redirectTo = (location.state as any)?.from || '/';
-        navigate(redirectTo, { replace: true });
-      } else if (loginUser.rejected.match(resultAction)) {
-        const payload = resultAction.payload as ErrorPayload | undefined;
-        const errorMessage = 
-          payload?.message || 
-          payload?.error || 
-          resultAction.error?.message || 
-          'Неверные учетные данные';
-        setError(errorMessage);
-      }
-    } catch (err) {
-      setError('Произошла непредвиденная ошибка');
+      const result = await authAPI.login({ username, password });
+      const redirectTo = (location.state as any)?.from || '/';
+      navigate(redirectTo, { replace: true });
+  } catch (err) {
+      const errorMessage = (err as Error).message || 'Неизвестная ошибка'; // Утверждение типа
+      setError(errorMessage); // Устанавливаем сообщение об ошибке
       console.error('Ошибка входа:', err);
-    } finally {
+  } finally {
       setIsSubmitting(false);
-    }
-  }, [username, password, dispatch, navigate, location.state]);
+  }
+  
+}, [username, password, dispatch, navigate, location.state]);
 
   return (
     <div className="auth-wrapper">
