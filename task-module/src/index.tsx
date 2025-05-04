@@ -13,24 +13,12 @@ const root = ReactDOM.createRoot(
 // Определяем, находимся ли мы в development-режиме
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-const AppWrapper = isDevelopment 
-  ? (
-    // В development-режиме рендерим без StrictMode
-    <BrowserRouter>
-      <Provider store={store}>
-        <App />
-      </Provider>
-    </BrowserRouter>
-  ) 
-  : (
-    // В production-режиме можно оставить StrictMode
-    <React.StrictMode>
-      <BrowserRouter>
-        <Provider store={store}>
-          <App />
-        </Provider>
-      </BrowserRouter>
-    </React.StrictMode>
-  );
+const AppWrapper = (
+  <BrowserRouter>
+    <Provider store={store}>
+      {isDevelopment ? <App /> : <React.StrictMode><App /></React.StrictMode>}
+    </Provider>
+  </BrowserRouter>
+);
 
 root.render(AppWrapper);
