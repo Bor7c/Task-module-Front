@@ -9,13 +9,14 @@ import {
     clearAttachments
 } from '../../redux/attachmentsSlice';
 import { Attachment } from '../../types/Types';
-import './TaskAttachments.css'; // Импортируем стили
+import './TaskAttachments.css';
 
 interface TaskAttachmentsProps {
     taskId: number;
+    taskStatus: string;
 }
 
-const TaskAttachments: React.FC<TaskAttachmentsProps> = ({ taskId }) => {
+const TaskAttachments: React.FC<TaskAttachmentsProps> = ({ taskId, taskStatus }) => {
     const dispatch = useAppDispatch();
     const { 
         attachments, 
@@ -24,35 +25,38 @@ const TaskAttachments: React.FC<TaskAttachmentsProps> = ({ taskId }) => {
         uploadProgress 
     } = useAppSelector((state) => state.attachments);
     const currentUser = useAppSelector((state) => state.auth.user);
-    
+
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+    const isReadOnly = taskStatus === 'closed';
 
     useEffect(() => {
         dispatch(fetchAttachments(taskId));
-        
         return () => {
             dispatch(clearAttachments());
         };
     }, [taskId, dispatch]);
 
     const canDeleteAttachment = (attachment: Attachment) => {
-        if (!currentUser) return false;
+        if (!currentUser || isReadOnly) return false;
         return currentUser.id === attachment.uploaded_by?.id;
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
+        if (e.target.files && !isReadOnly) {
             const files = Array.from(e.target.files);
             setSelectedFiles(prev => [...prev, ...files]);
         }
     };
 
     const removeSelectedFile = (index: number) => {
-        setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+        if (!isReadOnly) {
+            setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+        }
     };
 
     const handleUpload = () => {
-        if (selectedFiles.length > 0) {
+        if (!isReadOnly && selectedFiles.length > 0) {
             dispatch(uploadAttachments({ taskId, files: selectedFiles }))
                 .unwrap()
                 .then(() => {
@@ -62,7 +66,7 @@ const TaskAttachments: React.FC<TaskAttachmentsProps> = ({ taskId }) => {
     };
 
     const handleDelete = (attachmentId: number) => {
-        if (window.confirm('Вы уверены, что хотите удалить это вложение?')) {
+        if (!isReadOnly && window.confirm('Вы уверены, что хотите удалить это вложение?')) {
             dispatch(removeAttachment(attachmentId));
         }
     };
@@ -109,54 +113,56 @@ const TaskAttachments: React.FC<TaskAttachmentsProps> = ({ taskId }) => {
                 ))}
             </div>
 
-            <div className="file-upload-section">
-                <div className="file-input-container">
-                    <label className="file-input-label">
-                        <FaPaperclip />
-                        <span>Добавить файлы</span>
-                        <input 
-                            type="file" 
-                            multiple
-                            onChange={handleFileChange}
-                            className="file-input"
-                            disabled={loading}
-                        />
-                    </label>
-                </div>
-
-                {selectedFiles.length > 0 && (
-                    <div className="selected-files">
-                        <h4>Выбранные файлы:</h4>
-                        <ul>
-                            {selectedFiles.map((file, index) => (
-                                <li key={index} className="selected-file-item">
-                                    <span>{file.name}</span>
-                                    <button 
-                                        onClick={() => removeSelectedFile(index)}
-                                        className="remove-file-btn"
-                                        disabled={loading}
-                                    >
-                                        <FaTimes />
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                        <button 
-                            onClick={handleUpload}
-                            disabled={loading || selectedFiles.length === 0}
-                            className="upload-button"
-                        >
-                            {loading ? 'Загрузка...' : 'Загрузить'}
-                        </button>
-                        {uploadProgress > 0 && (
-                            <div className="upload-progress">
-                                <progress value={uploadProgress} max="100" />
-                                <span>{uploadProgress}%</span>
-                            </div>
-                        )}
+            {!isReadOnly && (
+                <div className="file-upload-section">
+                    <div className="file-input-container">
+                        <label className="file-input-label">
+                            <FaPaperclip />
+                            <span>Добавить файлы</span>
+                            <input 
+                                type="file" 
+                                multiple
+                                onChange={handleFileChange}
+                                className="file-input"
+                                disabled={loading}
+                            />
+                        </label>
                     </div>
-                )}
-            </div>
+
+                    {selectedFiles.length > 0 && (
+                        <div className="selected-files">
+                            <h4>Выбранные файлы:</h4>
+                            <ul>
+                                {selectedFiles.map((file, index) => (
+                                    <li key={index} className="selected-file-item">
+                                        <span>{file.name}</span>
+                                        <button 
+                                            onClick={() => removeSelectedFile(index)}
+                                            className="remove-file-btn"
+                                            disabled={loading}
+                                        >
+                                            <FaTimes />
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                            <button 
+                                onClick={handleUpload}
+                                disabled={loading || selectedFiles.length === 0}
+                                className="upload-button"
+                            >
+                                {loading ? 'Загрузка...' : 'Загрузить'}
+                            </button>
+                            {uploadProgress > 0 && (
+                                <div className="upload-progress">
+                                    <progress value={uploadProgress} max="100" />
+                                    <span>{uploadProgress}%</span>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

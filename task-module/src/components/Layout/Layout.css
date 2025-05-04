@@ -155,7 +155,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  letter-spacing: 1px;
+  letter-spacing: -1px;
   background: none;
 }
 
