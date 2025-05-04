@@ -2,7 +2,7 @@ import React from 'react';
 import { useAppDispatch } from '../../redux/store';
 import { authAPI } from '../../api/auth';
 import { logoutUser } from '../../redux/authSlice';
-import TaskList from '../../components/TaskList/TaskList';
+import TaskList from '../TaskList/TaskList';
 import './HomePage.css';
 
 const HomePage: React.FC = () => {

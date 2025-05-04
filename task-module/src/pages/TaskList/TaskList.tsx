@@ -323,7 +323,7 @@ const TaskList: React.FC = () => {
               {completedTasks.length}
               {completedOverdueTasks > 0 && (
                 <span className="task-list__tab-overdue-badge" title="Задачи, завершенные с просрочкой">
-                  +{completedOverdueTasks}
+                  {completedOverdueTasks}
                 </span>
               )}
             </span>
