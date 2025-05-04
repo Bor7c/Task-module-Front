@@ -414,12 +414,16 @@
   margin: 0 0 12px 0;
   line-height: 1.4;
   color: #333;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: -webkit-box; /* Для Safari и Chrome */
+  display: box; /* Для старых версий Firefox (не поддерживается в новых) */
+  -webkit-line-clamp: 2; /* Ограничение на 2 строки для WebKit-браузеров */
+  line-clamp: 2; /* Стандартное свойство (пока не поддерживается) */
+  -webkit-box-orient: vertical; /* Для WebKit-браузеров */
+  box-orient: vertical; /* Для старых версий Firefox (не поддерживается в новых) */
+  overflow: hidden; /* Скрыть переполнение */
+  text-overflow: ellipsis; /* Добавить многоточие */
 }
+
 
 .task-list__card-status {
   display: flex;

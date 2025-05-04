@@ -101,7 +101,7 @@
   margin: 3px 0 3px 0;
 }
 .user-details strong {
-  color: #4361ee;
+  color: var(--primary-color);
   font-weight: 600;
   letter-spacing: .01em;
 }
@@ -140,7 +140,7 @@
 .menu-button:hover,
 .menu-button:focus-visible {
   background: #e9eeff;
-  color: #4361ee;
+  color: var(--primary-color);
   outline: none;
 }
 .upload-input {
@@ -171,7 +171,7 @@
   letter-spacing: .01em;
 }
 .loading-message {
-  color: #2563eb;
+  color: var(--primary-color);
   font-weight: 500;
   font-size: .99rem;
   letter-spacing: .01em;
@@ -209,12 +209,12 @@
 
 /* Цвета */
 .edit-button {
-  background: #4361ee;
+  background: var(--primary-color);
   color: #fff;
   margin-right: 8px;
 }
 .edit-button:hover {
-  background: #314ed1;
+  background: #1300be;
 }
 
 .cancel-button {
@@ -254,6 +254,6 @@
 }
 .user-details input:focus {
   outline: none;
-  border-color: #4361ee;
+  border-color: var(--primary-color);
   background: #fff;
 }

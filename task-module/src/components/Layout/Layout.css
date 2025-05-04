@@ -1,5 +1,5 @@
 :root {
-  --stm-primary-color: #4361ee;
+  --stm-primary-color: var(--primary-color);
   --stm-primary-light: #e9eeff;
   --stm-secondary-color: #3a0ca3;
   --stm-accent-color: #7209b7;
