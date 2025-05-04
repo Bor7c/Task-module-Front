@@ -33,6 +33,15 @@ const App: React.FC = () => {
     return <LoadingScreen fullScreen />;
   }
 
+  // if (loading) {
+  //   return (
+  //     <Layout>
+  //       <div className="content-loading">
+  //         <LoadingScreen />
+  //       </div>
+  //     </Layout>
+  //   );
+  // }
 
   return (
     <Layout>

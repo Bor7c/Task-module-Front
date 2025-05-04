@@ -15,6 +15,7 @@ import {
   FaSort, 
   FaExclamationCircle, 
   FaBell,
+  FaUser
 } from 'react-icons/fa';
 
 const TaskList: React.FC = () => {
@@ -39,10 +40,8 @@ const TaskList: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!tasks.length) { // Проверяем, загружены ли уже задачи
-      dispatch(loadTasks());
-    }
-  }, [dispatch, tasks.length]);
+    dispatch(loadTasks());
+  }, [dispatch]);
 
   const handleTaskClick = (taskId: number) => {
     navigate(`/tasks/${taskId}`);
@@ -108,14 +107,14 @@ const TaskList: React.FC = () => {
     ).length;
   };
 
-  // if (loading && !tasks.length) {
-  //   return (
-  //     <div className="task-list__loading">
-  //       <div className="task-list__spinner"></div>
-  //       <p>Загрузка задач...</p>
-  //     </div>
-  //   );
-  // }
+  if (loading && !tasks.length) {
+    return (
+      <div className="task-list__loading">
+        <div className="task-list__spinner"></div>
+        <p>Загрузка задач...</p>
+      </div>
+    );
+  }
 
   if (error) {
     return <div className="task-list__error">{error}</div>;
