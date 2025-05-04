@@ -23,11 +23,13 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     e.stopPropagation();
 
+    // Валидация
     if (!username.trim() || !password.trim()) {
       setError('Имя пользователя и пароль обязательны');
       return;
     }
 
+    // Сброс куки сессии
     document.cookie = 'session_token=; Max-Age=0; path=/;';
 
     setError('');
@@ -35,12 +37,11 @@ const LoginPage: React.FC = () => {
 
     try {
       const resultAction = await dispatch(loginUser({ username, password }));
-      
+
       if (loginUser.fulfilled.match(resultAction)) {
         const redirectTo = (location.state as any)?.from || '/';
         navigate(redirectTo, { replace: true });
       } else if (loginUser.rejected.match(resultAction)) {
-        // Безопасное извлечение сообщения об ошибке
         const payload = resultAction.payload as ErrorPayload | undefined;
         const errorMessage = 
           payload?.message || 
@@ -56,7 +57,7 @@ const LoginPage: React.FC = () => {
       setIsSubmitting(false);
     }
   }, [username, password, dispatch, navigate, location.state]);
-  
+
   return (
     <div className="auth-wrapper">
       <div className="auth-container login-container">
