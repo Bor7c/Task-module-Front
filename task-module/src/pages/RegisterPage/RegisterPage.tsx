@@ -33,58 +33,68 @@ const RegisterPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+  
     const { username, email, password, confirmPassword } = formData;
-
+  
     if (!username.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
       setError('Пожалуйста, заполните все поля');
       return;
     }
-
+  
     if (username.length < 4) {
       setError('Имя пользователя должно содержать минимум 4 символа');
       return;
     }
-
+  
     if (!isValidEmail(email)) {
       setError('Введите корректный email адрес');
       return;
     }
-
+  
     if (password.length < 8) {
       setError('Пароль должен содержать минимум 8 символов');
       return;
     }
-
+  
     if (password !== confirmPassword) {
       setError('Пароли не совпадают');
       return;
     }
-
+  
     setIsSubmitting(true);
     setError('');
-
+  
     try {
       await dispatch(registerUser({ username, email, password })).unwrap();
       navigate('/');
     } catch (err: any) {
-      const serverMessage = err?.data?.message || '';
-    
-      if (err?.status === 409 || serverMessage.includes('Username already exists') || serverMessage.includes('Email already exists')) {
+      console.error('Ошибка регистрации:', err);  // Логируем ошибку для диагностики
+  
+      const serverMessage = err?.data?.error || err?.data?.message || '';
+  
+      console.log('Сообщение с сервера:', serverMessage);  // Логируем сообщение с сервера
+  
+      // Переводим ошибки на русский
+      if (serverMessage.includes('Username already exists')) {
+        setError('Пользователь с таким именем уже существует');
+      } else if (serverMessage.includes('Email already exists')) {
+        setError('Пользователь с таким email уже существует');
+      } else if (serverMessage.includes('Password is too weak')) {
+        setError('Пароль слишком слабый');
+      } else if (serverMessage.toLowerCase().includes('already exists')) {
         setError('Пользователь с таким именем или email уже существует');
-      } else if (typeof err === 'string') {
-        setError(err);
-      } else if (err instanceof Error) {
-        setError(err.message);
+      } else if (serverMessage) {
+        setError(serverMessage);  // Для всех других ошибок
       } else {
-        setError('Произошла ошибка регистрации. Попробуйте позже.');
+        setError('Произошла ошибка регистрации');
       }
-    
-      console.error('Ошибка регистрации:', err);
     } finally {
       setIsSubmitting(false);
     }
   };
+  
+  
+  
 
   return (
     <div className="auth-wrapper">
