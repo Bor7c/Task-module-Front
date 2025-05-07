@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit';
 import * as taskAPI from '../api/taskDetailsAPI';
 import * as commentsAPI from '../api/commentsApi';
 import { Task, User, Comment } from '../types/Types';
@@ -20,7 +20,6 @@ const initialState: TaskDetailsState = {
 };
 
 // Асинхронные экшены для загрузки данных
-
 export const loadTaskById = createAsyncThunk<Task, number>(
   'taskDetails/loadTaskById',
   async (id) => {
@@ -108,8 +107,7 @@ export const updateTaskDescription = createAsyncThunk<Task, { id: number, descri
   }
 );
 
-// Новые методы для работы с комментариями
-
+// Методы для работы с комментариями
 export const addComment = createAsyncThunk<Comment, { taskId: number, text: string }>(
   'taskDetails/addComment',
   async ({ taskId, text }) => {
@@ -134,21 +132,17 @@ export const loadComments = createAsyncThunk<Comment[], number>(
   }
 );
 
-// Новая асинхронная операция для удаления комментария
-
 export const removeComment = createAsyncThunk<number, number>(
   'taskDetails/removeComment',
   async (commentId) => {
     try {
       await commentsAPI.deleteComment(commentId);
-      return commentId; // Возвращаем ID удаленного комментария для удаления его из состояния
+      return commentId;
     } catch (error) {
       throw new Error('Не удалось удалить комментарий');
     }
   }
 );
-
-// Новая асинхронная операция для обновления комментария
 
 export const updateComment = createAsyncThunk<Comment, { id: number, text: string }>(
   'taskDetails/updateComment',
@@ -174,6 +168,9 @@ export const loadUsers = createAsyncThunk<User[]>(
   }
 );
 
+// Экшен для сброса данных задачи (для очистки при переходах)
+export const resetTaskDetails = createAction('taskDetails/resetTaskDetails');
+
 const taskDetailsSlice = createSlice({
   name: 'taskDetails',
   initialState,
@@ -183,6 +180,9 @@ const taskDetailsSlice = createSlice({
       .addCase(loadTaskById.pending, (state) => {
         state.loading = true;
         state.error = null;
+        // Не чистим задачу, чтобы не мигало, но можно обнулить стейт если нужно визуально обнулить
+        // state.task = null;
+        // state.comments = [];
       })
       .addCase(loadTaskById.fulfilled, (state, action) => {
         state.loading = false;
@@ -191,6 +191,8 @@ const taskDetailsSlice = createSlice({
       .addCase(loadTaskById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Произошла ошибка';
+        state.task = null;
+        state.comments = [];
       })
       .addCase(updateTaskStatus.pending, (state) => {
         state.loading = true;
@@ -320,10 +322,9 @@ const taskDetailsSlice = createSlice({
       })
       .addCase(updateComment.fulfilled, (state, action) => {
         state.loading = false;
-        const updatedComments = state.comments.map(comment =>
+        state.comments = state.comments.map(comment =>
           comment.id === action.payload.id ? action.payload : comment
         );
-        state.comments = updatedComments;
       })
       .addCase(updateComment.rejected, (state, action) => {
         state.loading = false;
@@ -340,6 +341,13 @@ const taskDetailsSlice = createSlice({
       .addCase(loadUsers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Произошла ошибка';
+      })
+      .addCase(resetTaskDetails, (state) => {
+        state.task = null;
+        state.comments = [];
+        state.loading = false;
+        state.error = null;
+        // не сбрасываем пользователей — перелистывание задач не должно их терять
       });
   },
 });

@@ -12,7 +12,8 @@ import {
   addComment,
   loadComments,
   updateComment,
-  removeComment
+  removeComment,
+  resetTaskDetails
 } from '../../redux/taskDetailsSlice';
 import { setUsers, setLoading, setError } from '../../redux/usersSlice';
 import { fetchUsers } from '../../api/users';
@@ -46,6 +47,48 @@ const TaskDetail: React.FC = () => {
   const awaitingMenuRef = useRef<HTMLDivElement>(null);
   const closeConfirmationRef = useRef<HTMLDivElement>(null);
 
+  // Очищаем данные задачи и комментарии при размонтировании или смене id
+  useEffect(() => {
+    if (!currentUser) {
+      navigate('/login');
+      return;
+    }
+    if (id) {
+      dispatch(loadTaskById(Number(id)));
+      dispatch(loadComments(Number(id)));
+    }
+    return () => {
+      dispatch(resetTaskDetails());
+    };
+  }, [dispatch, id, currentUser, navigate]);
+
+  // Пользователи (оставим как раньше)
+  useEffect(() => {
+    if (users.length === 0) {
+      dispatch(setLoading(true));
+      fetchUsers()
+        .then(data => {
+          dispatch(setUsers(data));
+          dispatch(setLoading(false));
+        })
+        .catch(() => {
+          dispatch(setError('Ошибка загрузки пользователей'));
+          dispatch(setLoading(false));
+        });
+    }
+  }, [dispatch, users.length]);
+
+  // Для управления "локальным" состоянием (заголовок, описание и т.п.)
+  useEffect(() => {
+    if (task) {
+      setEditedTitle(task.title);
+      setEditedDescription(task.description || '');
+      setLocalStatus(task.status);
+      setLocalPriority(task.priority);
+    }
+  }, [task]);
+
+  // Ожидание и закрытие (меню)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (awaitingMenuRef.current && !awaitingMenuRef.current.contains(event.target as Node)) {

@@ -18,22 +18,27 @@ interface TaskAttachmentsProps {
 
 const TaskAttachments: React.FC<TaskAttachmentsProps> = ({ taskId, taskStatus }) => {
     const dispatch = useAppDispatch();
-    const { 
-        attachments, 
-        loading, 
-        error, 
-        uploadProgress 
-    } = useAppSelector((state) => state.attachments);
+    const { attachments, loading, error, uploadProgress } = useAppSelector((state) => state.attachments);
     const currentUser = useAppSelector((state) => state.auth.user);
-
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [loadedForTask, setLoadedForTask] = useState<number | null>(null); // контролируем id
 
     const isReadOnly = taskStatus === 'closed';
 
     useEffect(() => {
-        dispatch(fetchAttachments(taskId));
+        // Сначала ОЧИЩАЕМ вложения, а только потом грузим новые!
+        dispatch(clearAttachments());
+        setLoadedForTask(null);
+
+        // Затем грузим вложения для нового taskId
+        if (taskId) {
+            dispatch(fetchAttachments(taskId)).then(() => setLoadedForTask(taskId));
+        }
+
+        // Лучше сбрасывать при размонтировании, на всякий случай:
         return () => {
             dispatch(clearAttachments());
+            setLoadedForTask(null);
         };
     }, [taskId, dispatch]);
 
@@ -71,56 +76,60 @@ const TaskAttachments: React.FC<TaskAttachmentsProps> = ({ taskId, taskStatus })
         }
     };
 
+    // ПОКАЗЫВАЕМ вложения только если загрузили для актуальной задачи и не грузим/ошибку
+    const showRealAttachments = taskId === loadedForTask && !loading && !error;
+
     return (
         <div className="task-attachments">
-            <h3>Вложения ({attachments.length})</h3>
-            
+            <h3>Вложения ({showRealAttachments ? attachments.length : '...'})</h3>
             {error && <div className="error-message">{error}</div>}
-
             <div className="attachments-list">
-                {attachments.map(attachment => (
-                    <div key={attachment.id} className="attachment-item">
-                        <div className="attachment-info">
-                            <FaPaperclip className="attachment-icon" />
-                            <a 
-                                href={attachment.file_url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="attachment-link"
-                            >
-                                {attachment.filename}
-                            </a>
-                            <span className="attachment-meta">
-                                {new Date(attachment.uploaded_at).toLocaleDateString()}
-                                {attachment.uploaded_by && (
-                                    <span className="uploaded-by">
-                                        {attachment.uploaded_by.username}
-                                    </span>
-                                )}
-                            </span>
+                {!showRealAttachments ? (
+                    <div className="attachments-loading">Загрузка вложений...</div>
+                ) : (
+                    attachments.map(attachment => (
+                        <div key={attachment.id} className="attachment-item">
+                            <div className="attachment-info">
+                                <FaPaperclip className="attachment-icon" />
+                                <a
+                                    href={attachment.file_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="attachment-link"
+                                >
+                                    {attachment.filename}
+                                </a>
+                                <span className="attachment-meta">
+                                    {new Date(attachment.uploaded_at).toLocaleDateString()}
+                                    {attachment.uploaded_by && (
+                                        <span className="uploaded-by">
+                                            {attachment.uploaded_by.username}
+                                        </span>
+                                    )}
+                                </span>
+                            </div>
+                            {canDeleteAttachment(attachment) && (
+                                <button
+                                    onClick={() => handleDelete(attachment.id)}
+                                    className="attachment-delete-btn"
+                                    title="Удалить вложение"
+                                    disabled={loading}
+                                >
+                                    <FaTrash />
+                                </button>
+                            )}
                         </div>
-                        {canDeleteAttachment(attachment) && (
-                            <button 
-                                onClick={() => handleDelete(attachment.id)}
-                                className="attachment-delete-btn"
-                                title="Удалить вложение"
-                                disabled={loading}
-                            >
-                                <FaTrash />
-                            </button>
-                        )}
-                    </div>
-                ))}
+                    ))
+                )}
             </div>
-
             {!isReadOnly && (
                 <div className="file-upload-section">
                     <div className="file-input-container">
                         <label className="file-input-label">
                             <FaPaperclip />
                             <span>Добавить файлы</span>
-                            <input 
-                                type="file" 
+                            <input
+                                type="file"
                                 multiple
                                 onChange={handleFileChange}
                                 className="file-input"
@@ -128,7 +137,6 @@ const TaskAttachments: React.FC<TaskAttachmentsProps> = ({ taskId, taskStatus })
                             />
                         </label>
                     </div>
-
                     {selectedFiles.length > 0 && (
                         <div className="selected-files">
                             <h4>Выбранные файлы:</h4>
@@ -136,7 +144,7 @@ const TaskAttachments: React.FC<TaskAttachmentsProps> = ({ taskId, taskStatus })
                                 {selectedFiles.map((file, index) => (
                                     <li key={index} className="selected-file-item">
                                         <span>{file.name}</span>
-                                        <button 
+                                        <button
                                             onClick={() => removeSelectedFile(index)}
                                             className="remove-file-btn"
                                             disabled={loading}
@@ -146,7 +154,7 @@ const TaskAttachments: React.FC<TaskAttachmentsProps> = ({ taskId, taskStatus })
                                     </li>
                                 ))}
                             </ul>
-                            <button 
+                            <button
                                 onClick={handleUpload}
                                 disabled={loading || selectedFiles.length === 0}
                                 className="upload-button"
