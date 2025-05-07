@@ -126,9 +126,10 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = adaptUser(action.payload.user);
+        state.user = adaptUser(action.payload.user); // Убедитесь что payload содержит user
         state.isAuthenticated = true;
         state.sessionChecked = true;
+        state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;

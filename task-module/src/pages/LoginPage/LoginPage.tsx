@@ -5,11 +5,6 @@ import { loginUser } from '../../redux/authSlice';
 import './LoginPage.css';
 import { authAPI } from '../../api/auth';
 
-interface ErrorPayload {
-  message?: string;
-  error?: string;
-}
-
 const LoginPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -20,13 +15,20 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Предотвращаем обновление страницы
+  const translateError = (message: string): string => {
+    const lower = message.toLowerCase();
+    if (lower.includes('invalid credentials')) return 'Неверное имя пользователя или пароль';
+    if (lower.includes('user is inactive')) return 'Учетная запись не активна';
+    if (lower.includes('login failed')) return 'Ошибка входа. Проверьте введенные данные';
+    return message;
+  };
 
-    // Валидация
+  const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     if (!username.trim() || !password.trim()) {
-        setError('Имя пользователя и пароль обязательны');
-        return;
+      setError('Имя пользователя и пароль обязательны');
+      return;
     }
 
     setError('');
@@ -34,17 +36,21 @@ const LoginPage: React.FC = () => {
 
     try {
       const result = await authAPI.login({ username, password });
-      const redirectTo = (location.state as any)?.from || '/';
+
+      dispatch(loginUser.fulfilled(result, '', { username, password }));
+
+      const redirectTo = location.state?.from?.pathname || '/';
       navigate(redirectTo, { replace: true });
-  } catch (err) {
-      const errorMessage = (err as Error).message || 'Неизвестная ошибка'; // Утверждение типа
-      setError(errorMessage); // Устанавливаем сообщение об ошибке
-      console.error('Ошибка входа:', err);
-  } finally {
+    } catch (err) {
+      let errorMessage = 'Произошла ошибка при входе. Попробуйте позже.';
+      if (err instanceof Error) {
+        errorMessage = translateError(err.message);
+      }
+      setError(errorMessage);
+    } finally {
       setIsSubmitting(false);
-  }
-  
-}, [username, password, dispatch, navigate, location.state]);
+    }
+  }, [username, password, dispatch, navigate, location.state]);
 
   return (
     <div className="auth-wrapper">
@@ -55,13 +61,13 @@ const LoginPage: React.FC = () => {
         </div>
 
         {error && (
-          <div className="auth-error">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" viewBox="0 0 24 24">
+          <div className="auth-error" role="alert">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" stroke="red" strokeWidth="2" fill="none" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
-            <span>{error}</span>
+            <span style={{ marginLeft: '8px' }}>{error}</span>
           </div>
         )}
 
@@ -82,6 +88,7 @@ const LoginPage: React.FC = () => {
                 autoComplete="username"
                 placeholder="Введите имя пользователя"
                 disabled={isSubmitting}
+                onFocus={() => setError('')}
               />
             </div>
           </div>
@@ -102,11 +109,17 @@ const LoginPage: React.FC = () => {
                 autoComplete="current-password"
                 placeholder="Введите пароль"
                 disabled={isSubmitting}
+                onFocus={() => setError('')}
               />
             </div>
           </div>
 
-          <button type="submit" className="auth-button" disabled={isSubmitting}>
+          <button 
+            type="submit" 
+            className="auth-button" 
+            disabled={isSubmitting}
+            aria-busy={isSubmitting}
+          >
             {isSubmitting ? (
               <>
                 <svg className="spinner" viewBox="0 0 24 24">

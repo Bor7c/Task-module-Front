@@ -27,7 +27,7 @@ const App: React.FC = () => {
     } else {
       dispatch({ type: 'auth/checkSession/rejected' });
     }
-  }, [dispatch, location.pathname]);
+  }, [dispatch]); // Убрали location.pathname
 
   if (!sessionChecked) {
     return <LoadingScreen fullScreen />;
@@ -44,73 +44,66 @@ const App: React.FC = () => {
   // }
 
   return (
-    <Layout>
-      <Routes>
-        <Route
-          path="/login"
-          element={isAuthenticated ? (
-            <Navigate to="/" replace />
-          ) : (
-            <LoginPage />
-          )}
-        />
-        <Route
-          path="/register"
-          element={isAuthenticated ? (
-            <Navigate to="/" replace />
-          ) : (
-            <RegisterPage />
-          )}
-        />
+    <Routes>
+      {/* Роуты без Layout */}
+      <Route
+        path="/login"
+        element={isAuthenticated ? (
+          <Navigate to="/" replace />
+        ) : (
+          <LoginPage />
+        )}
+      />
+      <Route
+        path="/register"
+        element={isAuthenticated ? (
+          <Navigate to="/" replace />
+        ) : (
+          <RegisterPage />
+        )}
+      />
+      
+      {/* Роуты с Layout */}
+      <Route element={<Layout />}>
         <Route
           path="/"
-          element={isAuthenticated ? (
-            <HomePage />
-          ) : (
-            <Navigate 
-              to="/login" 
-              replace 
-              state={{ from: location }} 
-            />
-          )}
+          element={
+            isAuthenticated ? (
+              <HomePage />
+            ) : (
+              <Navigate to="/login" replace state={{ from: location }} />
+            )
+          }
         />
         <Route
           path="/tasks/:id"
-          element={isAuthenticated ? (
-            <TaskDetail />
-          ) : (
-            <Navigate 
-              to="/login" 
-              replace 
-              state={{ from: location }} 
-            />
-          )}
+          element={
+            isAuthenticated ? (
+              <TaskDetail />
+            ) : (
+              <Navigate to="/login" replace state={{ from: location }} />
+            )
+          }
         />
-        {/* Новый роут для создания задачи */}
         <Route
           path="/create-task"
-          element={isAuthenticated ? (
-            <CreateTaskPage />
-          ) : (
-            <Navigate 
-              to="/login" 
-              replace 
-              state={{ from: location }} 
-            />
-          )}
+          element={
+            isAuthenticated ? (
+              <CreateTaskPage />
+            ) : (
+              <Navigate to="/login" replace state={{ from: location }} />
+            )
+          }
         />
-        {/* Новый роут для профиля пользователя */}
         <Route
           path="/user-profile"
-          element={isAuthenticated ? (
-            <UserProfile />
-          ) : (
-            <Navigate 
-              to="/login" 
-              replace 
-              state={{ from: location }} 
-            />
-          )}
+          element={
+            isAuthenticated ? (
+              <UserProfile />
+            ) : (
+              <Navigate to="/login" replace state={{ from: location }} />
+            )
+          }
         />
         <Route 
           path="*" 
@@ -122,8 +115,8 @@ const App: React.FC = () => {
             />
           } 
         />
-      </Routes>
-    </Layout>
+      </Route>
+    </Routes>
   );
 };
 

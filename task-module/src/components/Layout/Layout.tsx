@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { checkUserSession, logoutUser } from '../../redux/authSlice';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { authAPI } from '../../api/auth';
 import './Layout.css';
 import { 
@@ -14,7 +14,7 @@ import {
   FaSignOutAlt 
 } from 'react-icons/fa';
 
-const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const Layout: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
@@ -28,8 +28,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     : null;
 
   useEffect(() => {
-    dispatch(checkUserSession());
-    
     const interval = setInterval(() => {
       dispatch(checkUserSession());
     }, 300000); 
@@ -58,9 +56,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     setUserMenuOpen(false);
   };
 
-  const isActive = (path: string) => {
-    return location.pathname === path;
-  };
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <div className="stm-layout">
@@ -159,7 +155,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         )}
         
         <main className="stm-main">
-          {children}
+          <Outlet />
         </main>
       </div>
       

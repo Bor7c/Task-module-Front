@@ -32,15 +32,11 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-// Интерцептор ответа
+// Интерцептор ответа — редирект удалён
 api.interceptors.response.use(
   response => response,
   error => {
-    if (error.response?.status === 403 || error.response?.status === 401) {
-      localStorage.removeItem('session_id');
-      window.location.href = '/login?next=' + encodeURIComponent(window.location.pathname);
-    }
-    return Promise.reject(error);
+    return Promise.reject(error); // Просто пробрасываем ошибку
   }
 );
 
