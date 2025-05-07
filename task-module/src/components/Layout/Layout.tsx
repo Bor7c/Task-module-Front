@@ -43,13 +43,16 @@ const Layout: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      await authAPI.logout();
-      dispatch(logoutUser());
-      navigate('/login');
+      await authAPI.logout(); // удаляет сессии / куки на сервере
     } catch (err) {
       console.error('Ошибка выхода:', err);
+      // даже если серверная ошибка — всё равно удалим локальные данные
+    } finally {
+      dispatch(logoutUser()); // очищает Redux
+      window.location.reload(); // перезагружает страницу, сбрасывает состояние
     }
   };
+  
 
   const handleProfileClick = () => {
     navigate('/user-profile');
