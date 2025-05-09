@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaPaperclip, FaTimes, FaTrash } from 'react-icons/fa';
-import { useAppDispatch, useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { 
     fetchAttachments, 
     uploadAttachments, 

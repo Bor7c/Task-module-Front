@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { registerUser } from '../../redux/authSlice';
 import './RegisterPage.css';
 
@@ -106,10 +106,10 @@ const RegisterPage: React.FC = () => {
 
         {error && (
           <div className="auth-error">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
-              <line x1="12" y1="16" x2="12.01" y2="16" />
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
             </svg>
             <span>{error}</span>
           </div>
@@ -119,9 +119,9 @@ const RegisterPage: React.FC = () => {
           <div className="form-group">
             <label htmlFor="username">Имя пользователя</label>
             <div className="input-wrapper">
-              <svg className="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" viewBox="0 0 24 24">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
+              <svg className="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
               </svg>
               <input
                 id="username"
@@ -130,19 +130,20 @@ const RegisterPage: React.FC = () => {
                 value={formData.username}
                 onChange={handleChange}
                 required
+                minLength={4}
                 autoComplete="username"
-                placeholder="Введите имя пользователя"
-                disabled={isSubmitting}
+                placeholder="Минимум 4 символа"
               />
             </div>
+            <small>Минимум 4 символа, только буквы и цифры</small>
           </div>
 
           <div className="form-group">
             <label htmlFor="email">Email</label>
             <div className="input-wrapper">
-              <svg className="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" viewBox="0 0 24 24">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                <polyline points="22,6 12,13 2,6" />
+              <svg className="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
               </svg>
               <input
                 id="email"
@@ -152,18 +153,18 @@ const RegisterPage: React.FC = () => {
                 onChange={handleChange}
                 required
                 autoComplete="email"
-                placeholder="Введите email"
-                disabled={isSubmitting}
+                placeholder="your@email.com"
               />
             </div>
+            <small>Введите действительный email адрес</small>
           </div>
 
           <div className="form-group">
             <label htmlFor="password">Пароль</label>
             <div className="input-wrapper">
-              <svg className="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" viewBox="0 0 24 24">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              <svg className="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
               <input
                 id="password"
@@ -172,19 +173,20 @@ const RegisterPage: React.FC = () => {
                 value={formData.password}
                 onChange={handleChange}
                 required
+                minLength={8}
                 autoComplete="new-password"
-                placeholder="Введите пароль"
-                disabled={isSubmitting}
+                placeholder="Минимум 8 символов"
               />
             </div>
+            <small>Минимум 8 символов, используйте комбинацию цифр и букв</small>
           </div>
 
           <div className="form-group">
             <label htmlFor="confirmPassword">Подтверждение пароля</label>
             <div className="input-wrapper">
-              <svg className="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" viewBox="0 0 24 24">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              <svg className="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
               <input
                 id="confirmPassword"
@@ -193,23 +195,23 @@ const RegisterPage: React.FC = () => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
+                minLength={8}
                 autoComplete="new-password"
                 placeholder="Повторите пароль"
-                disabled={isSubmitting}
               />
             </div>
+            <small>Пароли должны совпадать</small>
           </div>
 
           <button
             type="submit"
             className="auth-button"
             disabled={isSubmitting}
-            aria-busy={isSubmitting}
           >
             {isSubmitting ? (
               <>
-                <svg className="spinner" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="10" fill="none" strokeWidth="4" />
+                <svg className="spinner" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" fill="none" strokeWidth="4" stroke="currentColor" strokeLinecap="round" strokeDasharray="60" />
                 </svg>
                 Создание аккаунта...
               </>

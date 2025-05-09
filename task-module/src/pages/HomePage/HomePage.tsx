@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAppDispatch } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { authAPI } from '../../api/auth';
 import { logoutUser } from '../../redux/authSlice';
 import TaskList from '../TaskList/TaskList';

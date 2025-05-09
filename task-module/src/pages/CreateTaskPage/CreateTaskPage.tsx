@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { setTitle, setDescription, setPriority, setDeadline, resetForm } from '../../redux/createTaskFormSlice';
 import { createTask } from '../../api/tasksAddAPI';
 import { useNavigate } from 'react-router-dom';

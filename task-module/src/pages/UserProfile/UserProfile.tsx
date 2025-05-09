@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { useAppSelector, useAppDispatch } from '../../redux/store';
-import { updateUserProfilePicture, deleteUserProfilePicture, updateUserInfo } from '../../api/users';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { updateUserProfilePicture, deleteUserProfilePicture, updateUserInfo } from '../../api/usersApi';
 import { checkUserSession } from '../../redux/authSlice';
 import { updateUser } from '../../redux/usersSlice';
 import './UserProfile.css';

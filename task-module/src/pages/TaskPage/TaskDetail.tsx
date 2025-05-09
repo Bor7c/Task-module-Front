@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import {
   loadTaskById,
   updateTaskStatus,
@@ -16,7 +16,7 @@ import {
   resetTaskDetails
 } from '../../redux/taskDetailsSlice';
 import { setUsers, setLoading, setError } from '../../redux/usersSlice';
-import { fetchUsers } from '../../api/users';
+import { fetchUsers } from '../../api/usersApi';
 import { FaEdit, FaTrash, FaSave, FaUserPlus, FaArrowLeft, FaRegClock, FaSync, FaExclamationCircle } from 'react-icons/fa';
 import LoadingScreen from '../../components/common/LoadingScreen';
 import { Task, User, Comment } from '../../types/Types';

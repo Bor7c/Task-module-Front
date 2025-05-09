@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { checkUserSession, logoutUser } from '../../redux/authSlice';
 import { Link, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { authAPI } from '../../api/auth';
+import { FaUsers } from 'react-icons/fa';
 import './Layout.css';
 import { 
   FaUser, 
@@ -152,6 +153,15 @@ const Layout: React.FC = () => {
                   <FaCog className="stm-nav-icon" />
                   <span className="stm-nav-text">Настройки</span>
                 </Link>
+                {(user?.role === 'admin' || user?.role === 'manager') && (
+                  <Link 
+                    to="/teams" 
+                    className={`stm-nav-item ${isActive('/teams') ? 'stm-nav-item-active' : ''}`}
+                  >
+                    <FaUsers className="stm-nav-icon" />
+                    <span className="stm-nav-text">Команды</span>
+                  </Link>
+                )}
               </div>
             </div>
           </nav>

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from './redux/store';
+import { useAppDispatch, useAppSelector } from './redux/hooks';
 import { checkUserSession } from './redux/authSlice';
 import HomePage from './pages/HomePage/HomePage';
 import LoginPage from './pages/LoginPage/LoginPage';
@@ -10,6 +10,9 @@ import CreateTaskPage from './pages/CreateTaskPage/CreateTaskPage'; // Новы�
 import UserProfile from './pages/UserProfile/UserProfile'; // Новый импорт
 import Layout from './components/Layout/Layout';
 import LoadingScreen from './components/common/LoadingScreen';
+import TeamListPage from './pages/TeamListPage/TeamListPage';
+import TeamDetailPage from './pages/TeamDetailPage/TeamDetailPage';
+
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -33,15 +36,6 @@ const App: React.FC = () => {
     return <LoadingScreen fullScreen />;
   }
 
-  // if (loading) {
-  //   return (
-  //     <Layout>
-  //       <div className="content-loading">
-  //         <LoadingScreen />
-  //       </div>
-  //     </Layout>
-  //   );
-  // }
 
   return (
     <Routes>
@@ -115,6 +109,26 @@ const App: React.FC = () => {
             />
           } 
         />
+              <Route
+        path="/teams"
+        element={
+          isAuthenticated ? (
+            <TeamListPage />
+          ) : (
+            <Navigate to="/login" replace state={{ from: location }} />
+          )
+        }
+      />
+      <Route
+        path="/teams/:id"
+        element={
+          isAuthenticated ? (
+            <TeamDetailPage />
+          ) : (
+            <Navigate to="/login" replace state={{ from: location }} />
+          )
+        }
+      />
       </Route>
     </Routes>
   );

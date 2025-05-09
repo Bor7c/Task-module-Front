@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { loadTasks } from '../../redux/tasksSlice';
 import { useNavigate } from 'react-router-dom';
 import { Task } from '../../types/Types';

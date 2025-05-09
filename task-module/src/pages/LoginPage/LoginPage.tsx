@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAppDispatch } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { loginUser } from '../../redux/authSlice';
 import './LoginPage.css';
 import { authAPI } from '../../api/auth';

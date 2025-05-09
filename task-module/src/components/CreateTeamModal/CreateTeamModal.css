@@ -1,0 +1,124 @@
+.create-team-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .create-team-container {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    max-width: 500px;
+    width: 100%;
+    position: relative;
+    font-family: 'Segoe UI', 'Roboto', sans-serif;
+    animation: fadeInUp 0.4s ease-out;
+    overflow: hidden;
+  }
+  
+  .create-team-container h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a2a6c;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .create-team-container input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    font-size: 14px;
+    transition: all 0.3s ease;
+  }
+  
+  .create-team-container input[type="text"]:focus {
+    border-color: #1a2a6c;
+    box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.1);
+    background-color: white;
+    outline: none;
+  }
+  
+  .user-list {
+    max-height: 160px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: #fafafa;
+  }
+  
+  .user-list label {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    gap: 8px;
+    margin-bottom: 6px;
+    color: #333;
+  }
+  
+  .button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
+  .button-group button {
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .button-cancel {
+    background-color: #f1f1f1;
+    color: #555;
+  }
+  
+  .button-cancel:hover {
+    background-color: #e2e2e2;
+  }
+  
+  .button-create {
+    background-color: #1a2a6c;
+    color: white;
+    box-shadow: 0 4px 10px rgba(26, 42, 108, 0.2);
+  }
+  
+  .button-create:hover:not(:disabled) {
+    background-color: #152253;
+    box-shadow: 0 6px 15px rgba(26, 42, 108, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  .button-create:disabled {
+    background-color: #9aa2bc;
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(15px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
