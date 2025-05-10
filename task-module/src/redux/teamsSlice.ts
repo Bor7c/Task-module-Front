@@ -17,49 +17,55 @@ const initialState: TeamsState = {
 
 // --- Thunks ---
 
+// --- Thunks ---
+
 export const getTeams = createAsyncThunk('teams/getTeams', async () => {
-  const response = await teamsApi.fetchTeams();
-  return response.data;
-});
-
-export const getTeamDetail = createAsyncThunk('teams/getTeamDetail', async (id: number) => {
-  const response = await teamsApi.fetchTeamDetail(id);
-  return response.data;
-});
-
-export const createTeam = createAsyncThunk('teams/createTeam', async (data: { name: string }) => {
-  const response = await teamsApi.createTeam(data);
-  return response.data;
-});
-
-export const updateTeam = createAsyncThunk(
-  'teams/updateTeam',
-  async ({ id, data }: { id: number; data: { name: string } }) => {
-    const response = await teamsApi.updateTeam(id, data);
-    return response.data;
-  }
-);
-
-export const deleteTeam = createAsyncThunk('teams/deleteTeam', async (id: number) => {
-  await teamsApi.deleteTeam(id);
-  return id;
-});
-
-export const addTeamMember = createAsyncThunk(
-  'teams/addTeamMember',
-  async ({ teamId, userId }: { teamId: number; userId: number }) => {
-    const response = await teamsApi.addTeamMember(teamId, userId);
-    return response.data;
-  }
-);
-
-export const removeTeamMember = createAsyncThunk(
-  'teams/removeTeamMember',
-  async ({ teamId, userId }: { teamId: number; userId: number }) => {
-    const response = await teamsApi.removeTeamMember(teamId, userId);
-    return response.data;
-  }
-);
+    const data = await teamsApi.fetchTeams();
+    return data;
+  });
+  
+  export const getTeamDetail = createAsyncThunk('teams/getTeamDetail', async (id: number) => {
+    const data = await teamsApi.fetchTeamDetail(id);
+    return data;
+  });
+  
+  export const createTeam = createAsyncThunk(
+    'teams/createTeam',
+    async (data: { name: string; description?: string; members_ids?: number[] }) => {
+      const team = await teamsApi.createTeam(data);
+      return team;
+    }
+  );
+  
+  
+  export const updateTeam = createAsyncThunk(
+    'teams/updateTeam',
+    async ({ id, data }: { id: number; data: { name: string } }) => {
+      const updated = await teamsApi.updateTeam(id, data);
+      return updated;
+    }
+  );
+  
+  export const deleteTeam = createAsyncThunk('teams/deleteTeam', async (id: number) => {
+    await teamsApi.deleteTeam(id);
+    return id;
+  });
+  
+  export const addTeamMember = createAsyncThunk(
+    'teams/addTeamMember',
+    async ({ teamId, userId }: { teamId: number; userId: number }) => {
+      const updatedTeam = await teamsApi.addTeamMember(teamId, userId);
+      return updatedTeam;
+    }
+  );
+  
+  export const removeTeamMember = createAsyncThunk(
+    'teams/removeTeamMember',
+    async ({ teamId, userId }: { teamId: number; userId: number }) => {
+      const updatedTeam = await teamsApi.removeTeamMember(teamId, userId);
+      return updatedTeam;
+    }
+  );
 
 // --- Slice ---
 

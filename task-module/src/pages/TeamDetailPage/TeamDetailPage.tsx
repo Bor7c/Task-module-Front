@@ -10,6 +10,7 @@ import {
 } from '../../redux/teamsSlice';
 import { getAllUsers } from '../../redux/usersSlice';
 import './TeamDetail.css';
+import LoadingScreen from '../../components/common/LoadingScreen';
 
 const TeamDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -70,7 +71,7 @@ const TeamDetailPage = () => {
     );
   });
 
-  if (loading || !selectedTeam) return <div>Загрузка...</div>;
+  if (loading || !selectedTeam) return <div><LoadingScreen /></div>;
 
   return (
     <div className="team-detail">

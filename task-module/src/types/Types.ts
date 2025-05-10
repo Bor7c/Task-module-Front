@@ -14,6 +14,13 @@ export interface User {
   profile_picture_url?: string;
 }
 
+export interface Team {
+  id: number;
+  name: string;
+  description?: string;
+  members: User[]; // или User[], если ты хранишь полных пользователей
+}
+
 
 // Тип для задачи
 export interface Task {
