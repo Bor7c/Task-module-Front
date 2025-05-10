@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { setTitle, setDescription, setPriority, setDeadline, resetForm } from '../../redux/createTaskFormSlice';
 import { createTask } from '../../api/tasksAddAPI';
+import { getAllTeams } from '../../redux/teamsSlice'; // Импортируйте метод для получения всех команд
 import { useNavigate } from 'react-router-dom';
 import './CreateTaskPage.css';
 
@@ -9,29 +10,45 @@ const CreateTaskPage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { title, description, priority, deadline } = useAppSelector(state => state.createTaskForm);
+
+  // Извлекаем состояние команд из Redux
+  const { list: teams, loading: teamsLoading, error: teamsError } = useAppSelector(state => state.teams);
+  const [selectedTeam, setSelectedTeam] = useState<number | null>(null);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    // Загрузка команд через Redux
+    dispatch(getAllTeams());
+  }, [dispatch]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!title.trim()) {
       setError('Название задачи не может быть пустым');
       return;
     }
-    
+
+    if (!selectedTeam) {
+      setError('Пожалуйста, выберите команду');
+      return;
+    }
+
     setLoading(true);
     setError(null);
-    
+
     try {
       await createTask({
         title,
         description,
         priority,
-        deadline: deadline || undefined, // Если deadline пустой, не отправляем его
+        deadline: deadline || undefined,
+        team_id: selectedTeam,
       });
       dispatch(resetForm());
-      navigate('/'); // Редирект на главную после успешного создания
+      navigate('/');
     } catch (err: any) {
       console.error('Ошибка при создании задачи:', err);
       setError(err.response?.data?.detail || 'Ошибка при создании задачи. Попробуйте позже.');
@@ -41,12 +58,11 @@ const CreateTaskPage = () => {
   };
 
   const handleGoBack = () => {
-    navigate(-1); // Возвращаемся назад на одну страницу
+    navigate(-1);
   };
 
-  // Определяем класс индикатора приоритета
   const getPriorityClass = () => {
-    switch(priority) {
+    switch (priority) {
       case 'low': return 'priority-low';
       case 'medium': return 'priority-medium';
       case 'high': return 'priority-high';
@@ -55,21 +71,30 @@ const CreateTaskPage = () => {
     }
   };
 
-  // Форматируем дату для поля ввода
   const formatDateForInput = (dateString: string | null) => {
     if (!dateString) return '';
     try {
       const date = new Date(dateString);
-      return date.toISOString().slice(0, 16); // Формат "YYYY-MM-DDThh:mm"
-    } catch(e) {
+      return date.toISOString().slice(0, 16);
+    } catch (e) {
       return '';
     }
   };
 
+  // Обработка ошибок при загрузке команд
+  if (teamsError) {
+    return <div>Ошибка при загрузке команд: {teamsError}</div>;
+  }
+
+  // Показ загрузки команд
+  if (teamsLoading) {
+    return <div>Загрузка команд...</div>;
+  }
+
   return (
     <div className="create-task-container">
       <h2 className="create-task-title">Создать новую задачу</h2>
-      
+
       <form onSubmit={handleSubmit} className="create-task-form">
         <div className="form-group">
           <label htmlFor="title" className="form-label">Название задачи</label>
@@ -83,7 +108,7 @@ const CreateTaskPage = () => {
             required
           />
         </div>
-        
+
         <div className="form-group">
           <label htmlFor="description" className="form-label">Описание задачи</label>
           <textarea
@@ -94,7 +119,7 @@ const CreateTaskPage = () => {
             onChange={(e) => dispatch(setDescription(e.target.value))}
           />
         </div>
-        
+
         <div className="form-group">
           <label htmlFor="priority" className="form-label">
             Приоритет
@@ -112,7 +137,7 @@ const CreateTaskPage = () => {
             <option value="critical">Критический</option>
           </select>
         </div>
-        
+
         <div className="form-group">
           <label htmlFor="deadline" className="form-label">
             Срок выполнения
@@ -124,22 +149,40 @@ const CreateTaskPage = () => {
             type="datetime-local"
             value={formatDateForInput(deadline)}
             onChange={(e) => dispatch(setDeadline(e.target.value ? new Date(e.target.value).toISOString() : null))}
-            min={new Date().toISOString().slice(0, 16)} // Минимальная дата - сегодня
+            min={new Date().toISOString().slice(0, 16)}
           />
           <small className="field-hint">Выберите дату и время завершения задачи</small>
         </div>
-        
+
+        <div className="form-group">
+          <label htmlFor="team" className="form-label">Команда</label>
+          <select
+            id="team"
+            className="input-field"
+            value={selectedTeam ?? ''}
+            onChange={(e) => setSelectedTeam(Number(e.target.value))}
+            required
+          >
+            <option value="" disabled>Выберите команду</option>
+            {teams.map((team) => (
+              <option key={team.id} value={team.id}>
+                {team.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {error && <div className="error-message">{error}</div>}
-        
+
         <div className="action-buttons">
           <button type="submit" className="create-button" disabled={loading}>
             {loading && <span className="loading-spinner"></span>}
             {loading ? 'Создание...' : 'Создать задачу'}
           </button>
-          <button 
-            type="button" 
-            className="back-button" 
-            onClick={handleGoBack} 
+          <button
+            type="button"
+            className="back-button"
+            onClick={handleGoBack}
             disabled={loading}
           >
             Назад

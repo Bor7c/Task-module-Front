@@ -1,5 +1,8 @@
 // Тип для пользователя
 export type UserRole = 'admin' | 'manager' | 'developer';
+// Типы для приоритета и статуса
+export type TaskPriority = 'low' | 'medium' | 'high' | 'critical';
+export type TaskStatus = 'in_progress' | 'solved' | 'closed' | 'awaiting_response' | 'awaiting_action';
 
 export interface User {
   id: number;
@@ -21,11 +24,18 @@ export interface Team {
   members: User[]; // или User[], если ты хранишь полных пользователей
 }
 
+export interface TeamTask {
+  id: number;
+  name: string;
+  description?: string;
+  members_count: number; // или User[], если ты хранишь полных пользователей
+}
 
 // Тип для задачи
 export interface Task {
   id: number;
   title: string;
+  team: TeamTask;
   description: string | null;
   status: TaskStatus;
   priority: TaskPriority;
@@ -45,9 +55,6 @@ export interface Task {
   is_overdue: boolean; // Новое свойство
 }
 
-// Типы для приоритета и статуса
-export type TaskPriority = 'low' | 'medium' | 'high' | 'critical';
-export type TaskStatus = 'in_progress' | 'solved' | 'closed' | 'awaiting_response' | 'awaiting_action';
 
 // Тип для комментария
 export interface Comment {

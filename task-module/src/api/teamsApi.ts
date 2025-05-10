@@ -7,6 +7,12 @@ export const fetchTeams = async (): Promise<Team[]> => {
   return response.data;
 };
 
+// Получение списка всех команд в сокращённом формате
+export const fetchAllTeams = async (): Promise<Team[]> => {
+  const response = await api.get('/teams/all/');
+  return response.data;
+};
+
 // Получение подробной информации о команде
 export const fetchTeamDetail = async (id: number): Promise<Team> => {
   const response = await api.get(`/teams/${id}/`);

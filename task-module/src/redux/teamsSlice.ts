@@ -17,56 +17,57 @@ const initialState: TeamsState = {
 
 // --- Thunks ---
 
-// --- Thunks ---
-
 export const getTeams = createAsyncThunk('teams/getTeams', async () => {
-    const data = await teamsApi.fetchTeams();
-    return data;
-  });
-  
-  export const getTeamDetail = createAsyncThunk('teams/getTeamDetail', async (id: number) => {
-    const data = await teamsApi.fetchTeamDetail(id);
-    return data;
-  });
-  
-  export const createTeam = createAsyncThunk(
-    'teams/createTeam',
-    async (data: { name: string; description?: string; members_ids?: number[] }) => {
-      const team = await teamsApi.createTeam(data);
-      return team;
-    }
-  );
-  
-  
-  export const updateTeam = createAsyncThunk(
-    'teams/updateTeam',
-    async ({ id, data }: { id: number; data: { name: string; description?: string } }) => {
-      const updated = await teamsApi.updateTeam(id, data);
-      return updated;
-    }
-  );
-  
-  
-  export const deleteTeam = createAsyncThunk('teams/deleteTeam', async (id: number) => {
-    await teamsApi.deleteTeam(id);
-    return id;
-  });
-  
-  export const addTeamMember = createAsyncThunk(
-    'teams/addTeamMember',
-    async ({ teamId, userId }: { teamId: number; userId: number }) => {
-      const updatedTeam = await teamsApi.addTeamMember(teamId, userId);
-      return updatedTeam;
-    }
-  );
-  
-  export const removeTeamMember = createAsyncThunk(
-    'teams/removeTeamMember',
-    async ({ teamId, userId }: { teamId: number; userId: number }) => {
-      const updatedTeam = await teamsApi.removeTeamMember(teamId, userId);
-      return updatedTeam;
-    }
-  );
+  const data = await teamsApi.fetchTeams();
+  return data;
+});
+
+export const getTeamDetail = createAsyncThunk('teams/getTeamDetail', async (id: number) => {
+  const data = await teamsApi.fetchTeamDetail(id);
+  return data;
+});
+
+export const getAllTeams = createAsyncThunk('teams/getAllTeams', async () => {
+  const data = await teamsApi.fetchAllTeams();
+  return data;
+});
+
+export const createTeam = createAsyncThunk(
+  'teams/createTeam',
+  async (data: { name: string; description?: string; members_ids?: number[] }) => {
+    const team = await teamsApi.createTeam(data);
+    return team;
+  }
+);
+
+export const updateTeam = createAsyncThunk(
+  'teams/updateTeam',
+  async ({ id, data }: { id: number; data: { name: string; description?: string } }) => {
+    const updated = await teamsApi.updateTeam(id, data);
+    return updated;
+  }
+);
+
+export const deleteTeam = createAsyncThunk('teams/deleteTeam', async (id: number) => {
+  await teamsApi.deleteTeam(id);
+  return id;
+});
+
+export const addTeamMember = createAsyncThunk(
+  'teams/addTeamMember',
+  async ({ teamId, userId }: { teamId: number; userId: number }) => {
+    const updatedTeam = await teamsApi.addTeamMember(teamId, userId);
+    return updatedTeam;
+  }
+);
+
+export const removeTeamMember = createAsyncThunk(
+  'teams/removeTeamMember',
+  async ({ teamId, userId }: { teamId: number; userId: number }) => {
+    const updatedTeam = await teamsApi.removeTeamMember(teamId, userId);
+    return updatedTeam;
+  }
+);
 
 // --- Slice ---
 
@@ -100,6 +101,20 @@ const teamsSlice = createSlice({
       .addCase(getTeams.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message ?? 'Ошибка при загрузке списка команд';
+      })
+
+      // getAllTeams (новый метод)
+      .addCase(getAllTeams.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAllTeams.fulfilled, (state, action: PayloadAction<any[]>) => {
+        state.loading = false;
+        state.list = action.payload;
+      })
+      .addCase(getAllTeams.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message ?? 'Ошибка при загрузке всех команд';
       })
 
       // getTeamDetail
@@ -154,9 +169,6 @@ const teamsSlice = createSlice({
           state.selectedTeam.members = action.payload.members;
         }
       });
-
-      
-      
   },
 });
 

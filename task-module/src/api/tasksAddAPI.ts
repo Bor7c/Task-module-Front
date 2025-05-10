@@ -1,10 +1,12 @@
 import api from './axiosConfig';
+import { TaskPriority } from '../types/Types';
 
-interface TaskCreatePayload {
+export interface TaskCreatePayload {
   title: string;
-  description: string;
-  priority: 'low' | 'medium' | 'high'  | 'critical';
-  deadline?: string; // Опциональное поле для срока
+  description?: string;
+  priority: TaskPriority;
+  deadline?: string;
+  team_id: number;
 }
 
 export const createTask = async (taskData: TaskCreatePayload) => {
