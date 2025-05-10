@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { createTeam } from '../../redux/teamsSlice';
 import { getAllUsers } from '../../redux/usersSlice';
+import Avatar from '../Avatar/Avatar';
 import './CreateTeamModal.css';
 
 interface CreateTeamModalProps {
@@ -73,6 +74,12 @@ const CreateTeamModal: React.FC<CreateTeamModalProps> = ({ open, onClose, onTeam
     );
   };
 
+  // Логика для получения URL аватарки с проверкой на null или undefined
+  const getAvatarUrl = (profilePictureUrl: string | undefined): string | null => {
+    // Преобразуем undefined в null, если URL не существует
+    return profilePictureUrl || null;
+  };
+
   if (!open) return null;
 
   return (
@@ -109,9 +116,9 @@ const CreateTeamModal: React.FC<CreateTeamModalProps> = ({ open, onClose, onTeam
             <div className="user-scroll-box">
               {filteredAvailable.map((user) => (
                 <div key={user.id} className="user-item" onClick={() => toggleUser(user.id)}>
-                  <img
-                    src={user.profile_picture_url || '/default-avatar.png'}
-                    alt="avatar"
+                  <Avatar
+                    src={getAvatarUrl(user.profile_picture_url)}
+                    fallbackText={user.username}
                     className="avatar"
                   />
                   <span>{user.username} ({user.first_name} {user.last_name})</span>
@@ -125,9 +132,9 @@ const CreateTeamModal: React.FC<CreateTeamModalProps> = ({ open, onClose, onTeam
             <div className="user-scroll-box">
               {selectedUserObjects.map((user) => (
                 <div key={user.id} className="user-item selected" onClick={() => toggleUser(user.id)}>
-                  <img
-                    src={user.profile_picture_url || '/default-avatar.png'}
-                    alt="avatar"
+                  <Avatar
+                    src={getAvatarUrl(user.profile_picture_url)}
+                    fallbackText={user.username}
                     className="avatar"
                   />
                   <span>{user.username} ({user.first_name} {user.last_name})</span>
