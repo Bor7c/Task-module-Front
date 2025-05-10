@@ -634,3 +634,38 @@
   align-items: center;
   justify-content: center;
 }
+
+.task-list__card-team {
+  font-size: 13px;
+  color: #1a2a6c;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.task-list__card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+.task-list__card-dates {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12px;
+}
+.task-list__updated-at {
+  color: #496896;
+}
+
+.task-list__comments {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #2196f3;
+}
+.task-list__card--old {
+  background: linear-gradient(90deg, #ffe5e5 0%, #fff 100%);
+}
