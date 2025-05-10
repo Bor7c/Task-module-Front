@@ -6,11 +6,14 @@ import {
   removeTeamMember,
   addTeamMember,
   clearSelectedTeam,
-  updateMembers, // ⬅️ новое действие
+  updateMembers,
+  updateTeam,
+  setSelectedTeam,
 } from '../../redux/teamsSlice';
 import { getAllUsers } from '../../redux/usersSlice';
 import './TeamDetail.css';
 import LoadingScreen from '../../components/common/LoadingScreen';
+import Avatar from '../../components/Avatar/Avatar';
 
 const TeamDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -22,12 +25,18 @@ const TeamDetailPage = () => {
   const allUsers = useAppSelector((state) => state.users.users);
 
   const [search, setSearch] = useState('');
+  const [searchMembers, setSearchMembers] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [newTeamName, setNewTeamName] = useState(selectedTeam?.name || '');
+  const [newTeamDescription, setNewTeamDescription] = useState(selectedTeam?.description || '');
 
   useEffect(() => {
     if (id) {
       dispatch(getTeamDetail(Number(id)));
-      if (userRole === 'admin') {
+      // Менеджеры тоже могут добавлять пользователей, поэтому запрашиваем список пользователей для них
+      if (userRole === 'admin' || userRole === 'manager') {
         dispatch(getAllUsers());
       }
     }
@@ -37,13 +46,20 @@ const TeamDetailPage = () => {
     };
   }, [dispatch, id, userRole]);
 
+  useEffect(() => {
+    if (selectedTeam) {
+      setNewTeamName(selectedTeam.name || '');
+      setNewTeamDescription(selectedTeam.description || '');
+    }
+  }, [selectedTeam]);
+
   const handleRemove = async (userId: number) => {
     if (!selectedTeam) return;
     if (window.confirm('Удалить пользователя из команды?')) {
       setIsUpdating(true);
       const result = await dispatch(removeTeamMember({ teamId: Number(id), userId }));
       if (removeTeamMember.fulfilled.match(result)) {
-        dispatch(updateMembers(result.payload.members)); // ⚡ обновляем только участников
+        dispatch(updateMembers(result.payload.members));
       }
       setIsUpdating(false);
     }
@@ -54,7 +70,7 @@ const TeamDetailPage = () => {
     setIsUpdating(true);
     const result = await dispatch(addTeamMember({ teamId: Number(id), userId }));
     if (addTeamMember.fulfilled.match(result)) {
-      dispatch(updateMembers(result.payload.members)); // ⚡ обновляем только участников
+      dispatch(updateMembers(result.payload.members));
     }
     setIsUpdating(false);
   };
@@ -71,6 +87,36 @@ const TeamDetailPage = () => {
     );
   });
 
+  const filteredMembers = selectedTeam?.members?.filter((member: any) => {
+    const query = searchMembers.toLowerCase();
+    return (
+      member.username.toLowerCase().includes(query) ||
+      member.first_name.toLowerCase().includes(query) ||
+      member.last_name.toLowerCase().includes(query)
+    );
+  });
+
+  const handleUpdateTeam = async () => {
+    if (selectedTeam && newTeamName && newTeamDescription !== undefined) {
+      setIsUpdating(true);
+      const result = await dispatch(
+        updateTeam({
+          id: selectedTeam.id,
+          data: { name: newTeamName, description: newTeamDescription }
+        })
+      );
+      if (updateTeam.fulfilled.match(result)) {
+        dispatch(setSelectedTeam({
+          ...selectedTeam,
+          name: newTeamName,
+          description: newTeamDescription
+        }));
+        setIsEditing(false);
+      }
+      setIsUpdating(false);
+    }
+  };
+
   if (loading || !selectedTeam) return <div><LoadingScreen /></div>;
 
   return (
@@ -79,21 +125,63 @@ const TeamDetailPage = () => {
         Назад
       </button>
 
-      <h2>{selectedTeam.name}</h2>
-      <p className="team-description">
-        {selectedTeam.description || 'Нет описания'}
-      </p>
+      <div className="team-detail__header">
+        {isEditing && userRole === 'admin' ? (
+          <>
+            <input
+              type="text"
+              value={newTeamName}
+              onChange={(e) => setNewTeamName(e.target.value)}
+              className="team-name-input"
+            />
+            <textarea
+              value={newTeamDescription}
+              onChange={(e) => setNewTeamDescription(e.target.value)}
+              className="team-description-input"
+            />
+            <div className="edit-buttons">
+              <button onClick={handleUpdateTeam} className="save-btn" disabled={isUpdating}>
+                Сохранить
+              </button>
+              <button onClick={() => setIsEditing(false)} className="cancel-btn">
+                Отменить
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h2 className="team-name">
+              {selectedTeam.name}
+              {userRole === 'admin' && (
+                <button className="edit-icon-btn" onClick={() => setIsEditing(true)}>
+                  ✏️
+                </button>
+              )}
+            </h2>
+            <div className="team-description">
+              <p>{selectedTeam.description || 'Нет описания'}</p>
+            </div>
+          </>
+        )}
+      </div>
 
       <div className="team-detail__columns">
         {/* LEFT: TEAM MEMBERS */}
         <div className="team-column">
           <h3>Участники</h3>
+          <input
+            type="text"
+            className="search-input"
+            value={searchMembers}
+            onChange={(e) => setSearchMembers(e.target.value)}
+            placeholder="Поиск по участникам"
+          />
           <div className="team-members">
-            {selectedTeam.members?.map((member: any) => (
+            {filteredMembers?.map((member: any) => (
               <div className="member-row" key={member.id}>
-                <img
-                  src={member.profile_picture_url || '/default-avatar.png'}
-                  alt="avatar"
+                <Avatar
+                  src={member.profile_picture_url || null}
+                  fallbackText={member.username}
                   className="avatar"
                 />
                 <div className="member-info">
@@ -119,7 +207,7 @@ const TeamDetailPage = () => {
         </div>
 
         {/* RIGHT: USERS TO ADD */}
-        {userRole === 'admin' && (
+        {(userRole === 'admin' || userRole === 'manager') && (
           <div className="team-column">
             <h3>Добавить участника</h3>
             <input
@@ -132,9 +220,9 @@ const TeamDetailPage = () => {
             <div className="team-members">
               {filteredUsers.map((user: any) => (
                 <div className="member-row" key={user.id}>
-                  <img
-                    src={user.profile_picture_url || '/default-avatar.png'}
-                    alt="avatar"
+                  <Avatar
+                    src={user.profile_picture_url || null}
+                    fallbackText={user.username}
                     className="avatar"
                   />
                   <div className="member-info">

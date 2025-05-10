@@ -162,6 +162,15 @@ const Layout: React.FC = () => {
                     <span className="stm-nav-text">Команды</span>
                   </Link>
                 )}
+                {user?.role === 'developer' && (
+                  <Link 
+                    to="/teams" 
+                    className={`stm-nav-item ${isActive('/my-teams') ? 'stm-nav-item-active' : ''}`}
+                  >
+                    <FaUsers className="stm-nav-icon" />
+                    <span className="stm-nav-text">Мои команды</span>
+                  </Link>
+                )}
               </div>
             </div>
           </nav>

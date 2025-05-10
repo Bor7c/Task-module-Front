@@ -40,11 +40,12 @@ export const getTeams = createAsyncThunk('teams/getTeams', async () => {
   
   export const updateTeam = createAsyncThunk(
     'teams/updateTeam',
-    async ({ id, data }: { id: number; data: { name: string } }) => {
+    async ({ id, data }: { id: number; data: { name: string; description?: string } }) => {
       const updated = await teamsApi.updateTeam(id, data);
       return updated;
     }
   );
+  
   
   export const deleteTeam = createAsyncThunk('teams/deleteTeam', async (id: number) => {
     await teamsApi.deleteTeam(id);
@@ -77,9 +78,12 @@ const teamsSlice = createSlice({
       state.selectedTeam = null;
     },
     updateMembers: (state, action: PayloadAction<any[]>) => {
-        if (state.selectedTeam) {
-            state.selectedTeam.members = action.payload;
-        }
+      if (state.selectedTeam) {
+        state.selectedTeam.members = action.payload;
+      }
+    },
+    setSelectedTeam: (state, action: PayloadAction<any>) => {
+      state.selectedTeam = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -156,5 +160,5 @@ const teamsSlice = createSlice({
   },
 });
 
-export const { clearSelectedTeam, updateMembers } = teamsSlice.actions;
+export const { clearSelectedTeam, updateMembers, setSelectedTeam } = teamsSlice.actions;
 export default teamsSlice.reducer;

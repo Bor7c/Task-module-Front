@@ -21,7 +21,7 @@ export const createTeam = async (data: { name: string; description?: string; mem
 
 // Обновление информации о команде
 export const updateTeam = async (id: number, data: { name: string; description?: string }): Promise<Team> => {
-  const response = await api.put(`/teams/${id}/`, data);
+  const response = await api.patch(`/teams/${id}/`, data);
   return response.data;
 };
 
