@@ -195,10 +195,10 @@ const UserProfile: React.FC = () => {
                 Отчество:
                 <input name="middle_name" value={form.middle_name} onChange={handleInputChange} />
               </label>
-              <label>
+              {/* <label>
                 Логин:
                 <input name="username" value={form.username} onChange={handleInputChange} />
-              </label>
+              </label> */}
               <label>
                 Email:
                 <input name="email" type="email" value={form.email} onChange={handleInputChange} />

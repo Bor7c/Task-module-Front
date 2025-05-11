@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaFilter, FaSort, FaBell, FaExclamationCircle, FaSearch } from 'react-icons/fa';
+import { FaSort, FaSearch } from 'react-icons/fa';
 
 interface Props {
   filterType: 'all' | 'today' | 'overdue';
@@ -23,6 +23,9 @@ interface Props {
   setFilterEndDate: (value: string) => void;
   filterByDateType: 'created_at' | 'updated_at' | 'deadline';
   setFilterByDateType: (v: 'created_at' | 'updated_at' | 'deadline') => void;
+  taskScope: 'all' | 'responsible' | 'allTasks';
+  setTaskScope: (x: 'all' | 'responsible' | 'allTasks') => void;
+  userRole: 'admin' | 'manager' | 'developer'; // Добавляем роль пользователя
 }
 
 const TaskListFilters: React.FC<Props> = ({
@@ -35,26 +38,35 @@ const TaskListFilters: React.FC<Props> = ({
   filterStartDate, setFilterStartDate,
   filterEndDate, setFilterEndDate,
   filterByDateType, setFilterByDateType,
+  taskScope, setTaskScope,
+  userRole, // Роль пользователя
 }) => (
   <div className="task-list__filters">
     <div className="task-list__filter-section">
       <div className="task-list__filter-group">
-        <label className="task-list__filter-label">
-          <FaFilter /> Фильтры:
-        </label>
+        <label className="task-list__filter-label">Задачи:</label>
         <div className="task-list__filter-buttons">
           <button
-            className={`task-list__filter-btn ${filterType === 'all' ? 'task-list__filter-btn--active' : ''}`}
-            onClick={() => setFilterType('all')}
-          >Все задачи</button>
+            className={`task-list__filter-btn ${taskScope === 'all' ? 'task-list__filter-btn--active' : ''}`}
+            onClick={() => setTaskScope('all')}
+          >
+            Моих команд
+          </button>
           <button
-            className={`task-list__filter-btn ${filterType === 'today' ? 'task-list__filter-btn--active' : ''}`}
-            onClick={() => setFilterType('today')}
-          ><FaBell /> Последний день ({tasksToday})</button>
-          <button
-            className={`task-list__filter-btn ${filterType === 'overdue' ? 'task-list__filter-btn--active' : ''}`}
-            onClick={() => setFilterType('overdue')}
-          ><FaExclamationCircle /> Просрочено ({overdueTasksCount})</button>
+            className={`task-list__filter-btn ${taskScope === 'responsible' ? 'task-list__filter-btn--active' : ''}`}
+            onClick={() => setTaskScope('responsible')}
+          >
+            В ответственности
+          </button>
+          {/* Третья кнопка доступна только для админа и менеджера */}
+          {(userRole === 'admin' || userRole === 'manager') && (
+            <button
+              className={`task-list__filter-btn ${taskScope === 'allTasks' ? 'task-list__filter-btn--active' : ''}`}
+              onClick={() => setTaskScope('allTasks')} // Задаем действие для третьей кнопки
+            >
+              Все в системе
+            </button>
+          )}
         </div>
       </div>
       <div className="task-list__filter-group">
@@ -108,7 +120,7 @@ const TaskListFilters: React.FC<Props> = ({
         >
           <option value="">Все</option>
           {teams.map((team: any) =>
-            <option key={team.id} value={team.id}>{team.name} ({team.members_count})</option>
+            <option key={team.id} value={team.id}>{team.name}</option>
           )}
         </select>
       </div>
@@ -121,7 +133,7 @@ const TaskListFilters: React.FC<Props> = ({
         >
           <option value="created_at">Создания</option>
           <option value="updated_at">Обновления</option>
-          <option value="deadline">Дедлайна</option>
+          <option value="deadline">Срока</option>
         </select>
         <input
           className="task-list__filter-input"

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { loadTasks } from '../../redux/tasksSlice';
+import { loadResponsibleTasks, loadTasks, loadTeamTasks } from '../../redux/tasksSlice';
 import { useNavigate } from 'react-router-dom';
 import { Task } from '../../types/Types';
 import './TaskList.css';
@@ -44,13 +44,22 @@ const TaskList: React.FC = () => {
   const [filterStartDate, setFilterStartDate] = useState<string>('');
   const [filterEndDate, setFilterEndDate] = useState<string>('');
   const [filterByDateType, setFilterByDateType] = useState<'created_at' | 'updated_at' | 'deadline'>('created_at');
+  const [taskScope, setTaskScope] = useState<'all' | 'responsible' | 'allTasks'>(
+    () => localStorage.getItem('taskScope') as 'all' | 'responsible' | 'allTasks' || 'all'
+  );
 
+  // Обработчик для загрузки задач в зависимости от роли
   const handleRefresh = () => {
     setIsRefreshing(true);
-    dispatch(loadTasks()).finally(() => setTimeout(() => setIsRefreshing(false), 500));
+    if (taskScope === 'responsible') {
+      dispatch(loadResponsibleTasks()).finally(() => setIsRefreshing(false));
+    } else if (taskScope === 'allTasks' && (user?.role === 'admin' || user?.role === 'manager')) {
+      dispatch(loadTasks()).finally(() => setIsRefreshing(false));
+    } else {
+      dispatch(loadTeamTasks()).finally(() => setIsRefreshing(false));
+    }
   };
 
-  useEffect(() => { dispatch(loadTasks()); }, [dispatch]);
   const handleTaskClick = (taskId: number) => navigate(`/tasks/${taskId}`);
   const handleCreateTask = () => navigate('/create-task');
   const formatDate = (dateString: string) => {
@@ -58,6 +67,18 @@ const TaskList: React.FC = () => {
     const date = new Date(dateString);
     return date.toLocaleDateString('ru-RU', {day: '2-digit', month: '2-digit', year: 'numeric'});
   };
+
+  useEffect(() => {
+    localStorage.setItem('taskScope', taskScope);
+    if (taskScope === 'responsible') {
+      dispatch(loadResponsibleTasks());
+    } else if (taskScope === 'allTasks' && (user?.role === 'admin' || user?.role === 'manager')) {
+      dispatch(loadTasks());
+    } else {
+      dispatch(loadTeamTasks());
+    }
+  }, [dispatch, taskScope, user?.role]);
+  
   const isToday = (dateString: string) => {
     if (!dateString) return false;
     const date = new Date(dateString);
@@ -219,6 +240,9 @@ const TaskList: React.FC = () => {
         setFilterEndDate={setFilterEndDate}
         filterByDateType={filterByDateType}
         setFilterByDateType={setFilterByDateType}
+        taskScope={taskScope}
+        setTaskScope={setTaskScope}
+        userRole={user ? user.role : 'developer'} // Если user == null, используем роль по умолчанию
       />
       <TaskListTabs
         showCompleted={showCompleted}

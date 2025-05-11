@@ -17,7 +17,7 @@ const TaskListHeader: React.FC<Props> = ({
   <div className="task-list__header">
     <div className="task-list__title">
       <h1>
-        Задачи 
+        Задачи моих команд
         <span className="task-list__counts-inline">
           (всего: {totalTasks}, активных: {activeCount})
           {completedOverdueTasks > 0 && (

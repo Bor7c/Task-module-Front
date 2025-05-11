@@ -146,13 +146,16 @@ const Layout: React.FC = () => {
                   <FaClipboardList className="stm-nav-icon" />
                   <span className="stm-nav-text">Задачи</span>
                 </Link>
+
+                {/* Новый пункт "Мои задачи" */}
                 <Link 
-                  to="/settings" 
-                  className={`stm-nav-item ${isActive('/settings') ? 'stm-nav-item-active' : ''}`}
+                  to="/creator-task-list" 
+                  className={`stm-nav-item ${isActive('/creator-task-list') ? 'stm-nav-item-active' : ''}`}
                 >
-                  <FaCog className="stm-nav-icon" />
-                  <span className="stm-nav-text">Настройки</span>
+                  <FaClipboardList className="stm-nav-icon" />
+                  <span className="stm-nav-text">Мои задачи</span> {/* Новый текст пункта меню */}
                 </Link>
+
                 {(user?.role === 'admin' || user?.role === 'manager') && (
                   <Link 
                     to="/teams" 

@@ -6,13 +6,13 @@ import HomePage from './pages/HomePage/HomePage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
 import TaskDetail from './pages/TaskPage/TaskDetail';
-import CreateTaskPage from './pages/CreateTaskPage/CreateTaskPage'; // Новый импорт
-import UserProfile from './pages/UserProfile/UserProfile'; // Новый импорт
+import CreateTaskPage from './pages/CreateTaskPage/CreateTaskPage';
+import UserProfile from './pages/UserProfile/UserProfile';
 import Layout from './components/Layout/Layout';
 import LoadingScreen from './components/common/LoadingScreen';
 import TeamListPage from './pages/TeamListPage/TeamListPage';
 import TeamDetailPage from './pages/TeamDetailPage/TeamDetailPage';
-
+import CreatorTaskList from './pages/CreatorTaskList/CreatorTaskList'; // Новый импорт
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -30,12 +30,11 @@ const App: React.FC = () => {
     } else {
       dispatch({ type: 'auth/checkSession/rejected' });
     }
-  }, [dispatch]); // Убрали location.pathname
+  }, [dispatch]);
 
   if (!sessionChecked) {
     return <LoadingScreen fullScreen />;
   }
-
 
   return (
     <Routes>
@@ -99,6 +98,16 @@ const App: React.FC = () => {
             )
           }
         />
+        <Route
+          path="/creator-task-list"  // Новый маршрут для страницы задач, созданных пользователем
+          element={
+            isAuthenticated ? (
+              <CreatorTaskList />
+            ) : (
+              <Navigate to="/login" replace state={{ from: location }} />
+            )
+          }
+        />
         <Route 
           path="*" 
           element={
@@ -109,26 +118,26 @@ const App: React.FC = () => {
             />
           } 
         />
-              <Route
-        path="/teams"
-        element={
-          isAuthenticated ? (
-            <TeamListPage />
-          ) : (
-            <Navigate to="/login" replace state={{ from: location }} />
-          )
-        }
-      />
-      <Route
-        path="/teams/:id"
-        element={
-          isAuthenticated ? (
-            <TeamDetailPage />
-          ) : (
-            <Navigate to="/login" replace state={{ from: location }} />
-          )
-        }
-      />
+        <Route
+          path="/teams"
+          element={
+            isAuthenticated ? (
+              <TeamListPage />
+            ) : (
+              <Navigate to="/login" replace state={{ from: location }} />
+            )
+          }
+        />
+        <Route
+          path="/teams/:id"
+          element={
+            isAuthenticated ? (
+              <TeamDetailPage />
+            ) : (
+              <Navigate to="/login" replace state={{ from: location }} />
+            )
+          }
+        />
       </Route>
     </Routes>
   );
