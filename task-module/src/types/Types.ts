@@ -19,7 +19,15 @@ export interface User {
 
 export interface UserForTask {
   id: number;
+  first_name: string;
+  last_name: string;
+  middle_name: string;
   username: string;
+  email: string;
+  role: UserRole;
+  role_display: string;
+  is_active: boolean;
+  profile_picture_url?: string;
 }
 
 export interface Team {

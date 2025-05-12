@@ -15,11 +15,24 @@ interface TaskInfoBlockProps {
   handleRemoveResponsible: () => void;
   currentUser: User | null;
   isReadOnly: boolean;
+  isUpdatingResponsible: boolean;
+  localResponsible: User | null;
 }
 
 const TaskInfoBlock: React.FC<TaskInfoBlockProps> = ({
-  task, localStatus, formatDate, getStatusClass, localPriority, handlePriorityChange, getPriorityClass,
-  handleAssignResponsible, handleRemoveResponsible, currentUser, isReadOnly,
+  task,
+  localStatus,
+  formatDate,
+  getStatusClass,
+  localPriority,
+  handlePriorityChange,
+  getPriorityClass,
+  handleAssignResponsible,
+  handleRemoveResponsible,
+  currentUser,
+  isReadOnly,
+  isUpdatingResponsible,
+  localResponsible,
 }) => (
   <div className="task-detail__info-card">
     {/* Статус */}
@@ -53,51 +66,63 @@ const TaskInfoBlock: React.FC<TaskInfoBlockProps> = ({
     <div className="task-detail__info-section">
       <h3>Ответственный</h3>
       <div className="task-detail__responsible-info">
-        {task.responsible ? (
-          <div className="task-detail__user-display">
-            <Avatar
-              src={task.responsible.profile_picture_url}
-              alt={task.responsible.username}
-              fallbackText={task.responsible.username}
-              className="task-detail__avatar"
-            />
-            <div className="task-detail__user-info">
-              <span className="task-detail__user-name">{task.responsible.username}</span>
-              <span className="task-detail__user-role">{task.responsible.role_display}</span>
-            </div>
-          </div>
-        ) : <p>Не назначен</p>}
+        <div
+          className={`task-detail__user-display ${isUpdatingResponsible ? 'loading' : ''}`}
+          style={{ opacity: isUpdatingResponsible ? 0.6 : 1 }}
+        >
+          {localResponsible ? (
+            <>
+              <Avatar
+                src={localResponsible.profile_picture_url}
+                alt={localResponsible.username}
+                fallbackText={localResponsible.username}
+                className="task-detail__avatar"
+              />
+              <div className="task-detail__user-info">
+                <span className="task-detail__user-name">{localResponsible.username}</span>
+                <span className="task-detail__user-role">{localResponsible.role_display}</span>
+              </div>
+            </>
+          ) : <p>Не назначен</p>}
+        </div>
 
         <div className="task-detail__responsible-controls">
-          {task.responsible && (
+          {localResponsible && (
             <button
               onClick={handleRemoveResponsible}
               className="task-detail__remove-responsible-btn"
               title="Снять ответственного"
-              disabled={isReadOnly}
+              disabled={isReadOnly || isUpdatingResponsible}
             >Снять</button>
           )}
           <select
             onChange={e => handleAssignResponsible(Number(e.target.value))}
-            value={task.responsible?.id || ''}
+            value={localResponsible?.id || ''}
             className="task-detail__user-select"
-            disabled={isReadOnly}
+            disabled={isReadOnly || isUpdatingResponsible}
           >
-            <option value="">{task.responsible ? task.responsible.username : 'Выбрать пользователя'}</option>
-            {task.team.members.map(member => (
-              member.id !== task.responsible?.id && (
+            <option value="">
+              {localResponsible ? localResponsible.username : 'Выбрать пользователя'}
+            </option>
+            {task.team.members.map(member =>
+              member.id !== localResponsible?.id && (
                 <option key={member.id} value={member.id}>{member.username}</option>
               )
-            ))}
+            )}
           </select>
         </div>
+
         <button
           onClick={() => handleAssignResponsible(currentUser?.id || 0)}
           className="task-detail__assign-btn"
-          disabled={currentUser?.id === task.responsible?.id || isReadOnly}
+          disabled={currentUser?.id === localResponsible?.id || isReadOnly || isUpdatingResponsible}
         >
           <FaUserPlus /> Назначить на меня
         </button>
+
+        {isUpdatingResponsible && (
+          <div className="task-detail__loader">Обновление...</div>
+        )}
       </div>
     </div>
 

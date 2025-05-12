@@ -65,21 +65,6 @@ const TaskDetail: React.FC = () => {
     };
   }, [dispatch, id, currentUser, navigate]);
 
-  useEffect(() => {
-    if (users.length === 0) {
-      dispatch(setLoading(true));
-      fetchUsers()
-        .then(data => {
-          dispatch(setUsers(data));
-          dispatch(setLoading(false));
-        })
-        .catch(() => {
-          dispatch(setError('Ошибка загрузки пользователей'));
-          dispatch(setLoading(false));
-        });
-    }
-  }, [dispatch, users.length]);
-
   // --- Обновляем локальные поля при загрузке задачи
   useEffect(() => {
     if (task) {
@@ -143,18 +128,41 @@ const TaskDetail: React.FC = () => {
   };
 
   // --- Ответственный
+
+  const [isUpdatingResponsible, setIsUpdatingResponsible] = useState(false);
+
+  const [localResponsible, setLocalResponsible] = useState<User | null>(null);
+
+  // при загрузке задачи
+  useEffect(() => {
+    if (task) {
+      setLocalResponsible(task.responsible || null);
+    }
+  }, [task]);
+  
+  // при назначении
   const handleAssignResponsible = (userId: number) => {
     if (task) {
+      setIsUpdatingResponsible(true);
+      const user = task.team.members.find(m => m.id === userId);
+      setLocalResponsible(user || null);
       dispatch(assignTaskResponsible({ id: task.id, responsible_id: userId }))
-        .then(() => dispatch(loadTaskById(task.id)));
+        .then(() => dispatch(loadTaskById(task.id)))
+        .finally(() => setIsUpdatingResponsible(false));
     }
   };
+  
+  // при удалении
   const handleRemoveResponsible = () => {
     if (task) {
+      setIsUpdatingResponsible(true);
+      setLocalResponsible(null);
       dispatch(removeResponsible(task.id))
-        .then(() => dispatch(loadTaskById(task.id)));
+        .then(() => dispatch(loadTaskById(task.id)))
+        .finally(() => setIsUpdatingResponsible(false));
     }
   };
+  
 
   // --- Комментарии
   const handleAddComment = async () => {
@@ -306,6 +314,8 @@ const TaskDetail: React.FC = () => {
             handleRemoveResponsible={handleRemoveResponsible}
             currentUser={currentUser}
             isReadOnly={isReadOnly}
+            isUpdatingResponsible={isUpdatingResponsible}
+            localResponsible={localResponsible}
           />
         </div>
       </div>

@@ -19,335 +19,209 @@ const initialState: TaskDetailsState = {
   error: null,
 };
 
-// Асинхронные экшены для загрузки данных
+// Вспомогательные редьюсеры
+const setLoading = (state: TaskDetailsState) => {
+  state.loading = true;
+  state.error = null;
+};
+
+const setError = (state: TaskDetailsState, action: any) => {
+  state.loading = false;
+  state.error = action.error.message || 'Произошла ошибка';
+};
+
+// Асинхронные экшены
 export const loadTaskById = createAsyncThunk<Task, number>(
   'taskDetails/loadTaskById',
   async (id) => {
-    try {
-      const task = await taskAPI.fetchTaskById(id);
-      return task;
-    } catch (error) {
-      throw new Error('Не удалось загрузить задачу');
-    }
+    const task = await taskAPI.fetchTaskById(id);
+    return task;
   }
 );
 
 export const updateTaskStatus = createAsyncThunk<Task, { id: number, status: string }>(
   'taskDetails/updateTaskStatus',
   async ({ id, status }) => {
-    try {
-      const updatedTask = await taskAPI.updateTaskStatus(id, status);
-      return updatedTask;
-    } catch (error) {
-      throw new Error('Не удалось обновить статус задачи');
-    }
+    return await taskAPI.updateTaskStatus(id, status);
   }
 );
 
 export const updateTaskPriority = createAsyncThunk<Task, { id: number, priority: string }>(
   'taskDetails/updateTaskPriority',
   async ({ id, priority }) => {
-    try {
-      const updatedTask = await taskAPI.updateTaskPriority(id, priority);
-      return updatedTask;
-    } catch (error) {
-      throw new Error('Не удалось обновить приоритет задачи');
-    }
+    return await taskAPI.updateTaskPriority(id, priority);
   }
 );
 
-export const assignTaskResponsible = createAsyncThunk<Task, { id: number, responsible_id: number | null }>(
+export const assignTaskResponsible = createAsyncThunk<Task, { id: number, responsible_id: number }>(
   'taskDetails/assignTaskResponsible',
   async ({ id, responsible_id }) => {
-    try {
-      if (responsible_id) {
-        return await taskAPI.updateTaskResponsible(id, responsible_id);
-      } else {
-        return await taskAPI.removeResponsible(id);
-      }
-    } catch (error) {
-      throw new Error('Не удалось назначить ответственного');
-    }
+    return await taskAPI.updateTaskResponsible(id, responsible_id);
   }
 );
 
 export const removeResponsible = createAsyncThunk<Task, number>(
   'taskDetails/removeResponsible',
   async (id) => {
-    try {
-      const updatedTask = await taskAPI.removeResponsible(id);
-      return updatedTask;
-    } catch (error) {
-      throw new Error('Не удалось удалить ответственного');
-    }
+    return await taskAPI.removeResponsible(id);
   }
 );
 
 export const updateTaskTitle = createAsyncThunk<Task, { id: number, title: string }>(
   'taskDetails/updateTaskTitle',
   async ({ id, title }) => {
-    try {
-      const updatedTask = await taskAPI.updateTaskTitle(id, title);
-      return updatedTask;
-    } catch (error) {
-      throw new Error('Не удалось обновить заголовок задачи');
-    }
+    return await taskAPI.updateTaskTitle(id, title);
   }
 );
 
 export const updateTaskDescription = createAsyncThunk<Task, { id: number, description: string }>(
   'taskDetails/updateTaskDescription',
   async ({ id, description }) => {
-    try {
-      const updatedTask = await taskAPI.updateTaskDescription(id, description);
-      return updatedTask;
-    } catch (error) {
-      throw new Error('Не удалось обновить описание задачи');
-    }
+    return await taskAPI.updateTaskDescription(id, description);
   }
 );
 
-// Методы для работы с комментариями
+// Комментарии
 export const addComment = createAsyncThunk<Comment, { taskId: number, text: string }>(
   'taskDetails/addComment',
   async ({ taskId, text }) => {
-    try {
-      const newComment = await commentsAPI.addComment(taskId, text);
-      return newComment;
-    } catch (error) {
-      throw new Error('Не удалось добавить комментарий');
-    }
+    return await commentsAPI.addComment(taskId, text);
   }
 );
 
 export const loadComments = createAsyncThunk<Comment[], number>(
   'taskDetails/loadComments',
   async (taskId) => {
-    try {
-      const comments = await commentsAPI.fetchComments(taskId);
-      return comments;
-    } catch (error) {
-      throw new Error('Не удалось загрузить комментарии');
-    }
+    return await commentsAPI.fetchComments(taskId);
   }
 );
 
 export const removeComment = createAsyncThunk<number, number>(
   'taskDetails/removeComment',
   async (commentId) => {
-    try {
-      await commentsAPI.deleteComment(commentId);
-      return commentId;
-    } catch (error) {
-      throw new Error('Не удалось удалить комментарий');
-    }
+    await commentsAPI.deleteComment(commentId);
+    return commentId;
   }
 );
 
 export const updateComment = createAsyncThunk<Comment, { id: number, text: string }>(
   'taskDetails/updateComment',
   async ({ id, text }) => {
-    try {
-      const updatedComment = await commentsAPI.updateComment(id, text);
-      return updatedComment;
-    } catch (error) {
-      throw new Error('Не удалось обновить комментарий');
-    }
+    return await commentsAPI.updateComment(id, text);
   }
 );
 
 export const loadUsers = createAsyncThunk<User[]>(
   'taskDetails/loadUsers',
   async () => {
-    try {
-      const users = await taskAPI.fetchUsers();
-      return users;
-    } catch (error) {
-      throw new Error('Не удалось загрузить пользователей');
-    }
+    return await taskAPI.fetchUsers();
   }
 );
 
-// Экшен для сброса данных задачи (для очистки при переходах)
 export const resetTaskDetails = createAction('taskDetails/resetTaskDetails');
 
+// Slice
 const taskDetailsSlice = createSlice({
   name: 'taskDetails',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(loadTaskById.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        // Не чистим задачу, чтобы не мигало, но можно обнулить стейт если нужно визуально обнулить
-        // state.task = null;
-        // state.comments = [];
-      })
+      .addCase(loadTaskById.pending, setLoading)
       .addCase(loadTaskById.fulfilled, (state, action) => {
         state.loading = false;
         state.task = action.payload;
       })
       .addCase(loadTaskById.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Произошла ошибка';
+        setError(state, action);
         state.task = null;
         state.comments = [];
       })
-      .addCase(updateTaskStatus.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+
+      .addCase(updateTaskStatus.pending, setLoading)
       .addCase(updateTaskStatus.fulfilled, (state, action) => {
         state.loading = false;
-        if (state.task?.id === action.payload.id) {
-          state.task = action.payload;
-        }
+        if (state.task?.id === action.payload.id) state.task = action.payload;
       })
-      .addCase(updateTaskStatus.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Произошла ошибка';
-      })
-      .addCase(updateTaskPriority.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(updateTaskStatus.rejected, setError)
+
+      .addCase(updateTaskPriority.pending, setLoading)
       .addCase(updateTaskPriority.fulfilled, (state, action) => {
         state.loading = false;
-        if (state.task?.id === action.payload.id) {
-          state.task = action.payload;
-        }
+        if (state.task?.id === action.payload.id) state.task = action.payload;
       })
-      .addCase(updateTaskPriority.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Произошла ошибка';
-      })
-      .addCase(assignTaskResponsible.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(updateTaskPriority.rejected, setError)
+
+      .addCase(assignTaskResponsible.pending, setLoading)
       .addCase(assignTaskResponsible.fulfilled, (state, action) => {
         state.loading = false;
-        if (state.task?.id === action.payload.id) {
-          state.task = action.payload;
-        }
+        if (state.task?.id === action.payload.id) state.task = action.payload;
       })
-      .addCase(assignTaskResponsible.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Произошла ошибка';
-      })
-      .addCase(removeResponsible.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(assignTaskResponsible.rejected, setError)
+
+      .addCase(removeResponsible.pending, setLoading)
       .addCase(removeResponsible.fulfilled, (state, action) => {
         state.loading = false;
-        if (state.task?.id === action.payload.id) {
-          state.task = action.payload;
-        }
+        if (state.task?.id === action.payload.id) state.task = action.payload;
       })
-      .addCase(removeResponsible.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Произошла ошибка';
-      })
-      .addCase(updateTaskTitle.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(removeResponsible.rejected, setError)
+
+      .addCase(updateTaskTitle.pending, setLoading)
       .addCase(updateTaskTitle.fulfilled, (state, action) => {
         state.loading = false;
-        if (state.task?.id === action.payload.id) {
-          state.task = action.payload;
-        }
+        if (state.task?.id === action.payload.id) state.task = action.payload;
       })
-      .addCase(updateTaskTitle.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Произошла ошибка';
-      })
-      .addCase(updateTaskDescription.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(updateTaskTitle.rejected, setError)
+
+      .addCase(updateTaskDescription.pending, setLoading)
       .addCase(updateTaskDescription.fulfilled, (state, action) => {
         state.loading = false;
-        if (state.task?.id === action.payload.id) {
-          state.task = action.payload;
-        }
+        if (state.task?.id === action.payload.id) state.task = action.payload;
       })
-      .addCase(updateTaskDescription.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Произошла ошибка';
-      })
-      .addCase(addComment.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(updateTaskDescription.rejected, setError)
+
+      .addCase(addComment.pending, setLoading)
       .addCase(addComment.fulfilled, (state, action) => {
         state.loading = false;
-        if (state.task?.id === action.payload.task.id) {
-          state.comments.push(action.payload);
-        }
+        state.comments.push(action.payload);
       })
-      .addCase(addComment.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Произошла ошибка';
-      })
-      .addCase(loadComments.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(addComment.rejected, setError)
+
+      .addCase(loadComments.pending, setLoading)
       .addCase(loadComments.fulfilled, (state, action) => {
         state.loading = false;
         state.comments = action.payload;
       })
-      .addCase(loadComments.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Произошла ошибка';
-      })
-      .addCase(removeComment.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(loadComments.rejected, setError)
+
+      .addCase(removeComment.pending, setLoading)
       .addCase(removeComment.fulfilled, (state, action) => {
         state.loading = false;
         state.comments = state.comments.filter(comment => comment.id !== action.payload);
       })
-      .addCase(removeComment.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Произошла ошибка';
-      })
-      .addCase(updateComment.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(removeComment.rejected, setError)
+
+      .addCase(updateComment.pending, setLoading)
       .addCase(updateComment.fulfilled, (state, action) => {
         state.loading = false;
         state.comments = state.comments.map(comment =>
           comment.id === action.payload.id ? action.payload : comment
         );
       })
-      .addCase(updateComment.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Произошла ошибка';
-      })
-      .addCase(loadUsers.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(updateComment.rejected, setError)
+
+      .addCase(loadUsers.pending, setLoading)
       .addCase(loadUsers.fulfilled, (state, action) => {
         state.loading = false;
         state.users = action.payload;
       })
-      .addCase(loadUsers.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Произошла ошибка';
-      })
+      .addCase(loadUsers.rejected, setError)
+
       .addCase(resetTaskDetails, (state) => {
         state.task = null;
         state.comments = [];
         state.loading = false;
         state.error = null;
-        // не сбрасываем пользователей — перелистывание задач не должно их терять
       });
   },
 });
