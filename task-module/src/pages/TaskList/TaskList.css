@@ -125,7 +125,7 @@
   background-color: var(--light-gray);
   border-radius: var(--border-radius);
   padding: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .task-list__filter-section {
@@ -668,4 +668,40 @@
 }
 .task-list__card--old {
   background: linear-gradient(90deg, #ffe5e5 0%, #fff 100%);
+}
+
+
+
+
+
+.task-list__reset-filters-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background-color: white;
+  border: 1px solid var(--gray);
+  border-radius: var(--border-radius);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--animation-speed) ease;
+  white-space: nowrap;
+}
+
+.task-list__reset-filters-btn:hover {
+  background-color: var(--gray); /* Добавляем серый фон при наведении */
+  color: var(--primary-color); /* Меняем цвет текста */
+}
+
+.task-list__reset-filters-btn:active {
+  background-color: var(--danger-color); /* Меняем цвет фона на красный при нажатии */
+  color: white; /* Белый текст при нажатии */
+  border-color: var(--danger-color); /* Красная рамка при нажатии */
+}
+
+.task-list__reset-filters-btn--active {
+  background-color: var(--danger-color); /* Красный фон для активной кнопки */
+  color: white;
+  border-color: var(--danger-color);
 }

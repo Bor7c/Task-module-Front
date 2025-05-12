@@ -38,7 +38,6 @@ const TaskList: React.FC = () => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [daysWithoutUpdate, setDaysWithoutUpdate] = useState<number | null>(null);
 
-  // Новые фильтры
   const [searchTitle, setSearchTitle] = useState('');
   const [selectedTeam, setSelectedTeam] = useState<number | null>(null);
   const [filterStartDate, setFilterStartDate] = useState<string>('');
@@ -48,7 +47,49 @@ const TaskList: React.FC = () => {
     () => localStorage.getItem('taskScope') as 'all' | 'responsible' | 'allTasks' || 'all'
   );
 
-  // Обработчик для загрузки задач в зависимости от роли
+  useEffect(() => {
+    const savedFilters = {
+      searchTitle: localStorage.getItem('filter_searchTitle'),
+      selectedTeam: localStorage.getItem('filter_selectedTeam'),
+      startDate: localStorage.getItem('filter_startDate'),
+      endDate: localStorage.getItem('filter_endDate'),
+      dateType: localStorage.getItem('filter_dateType'),
+      filterType: localStorage.getItem('filter_type'),
+      sortBy: localStorage.getItem('filter_sortBy'),
+      sortDirection: localStorage.getItem('filter_sortDirection'),
+      daysWithoutUpdate: localStorage.getItem('filter_daysWithoutUpdate'),
+    };
+
+    if (savedFilters.searchTitle) setSearchTitle(savedFilters.searchTitle);
+    if (savedFilters.selectedTeam) setSelectedTeam(Number(savedFilters.selectedTeam));
+    if (savedFilters.startDate) setFilterStartDate(savedFilters.startDate);
+    if (savedFilters.endDate) setFilterEndDate(savedFilters.endDate);
+    if (savedFilters.dateType) setFilterByDateType(savedFilters.dateType as any);
+    if (savedFilters.filterType) setFilterType(savedFilters.filterType as any);
+    if (savedFilters.sortBy) setSortBy(savedFilters.sortBy as any);
+    if (savedFilters.sortDirection) setSortDirection(savedFilters.sortDirection as any);
+    if (savedFilters.daysWithoutUpdate) setDaysWithoutUpdate(Number(savedFilters.daysWithoutUpdate));
+  }, []);
+
+  const saveToLocalStorage = () => {
+    localStorage.setItem('filter_searchTitle', searchTitle);
+    if (selectedTeam !== null) localStorage.setItem('filter_selectedTeam', String(selectedTeam));
+    else localStorage.removeItem('filter_selectedTeam');
+    
+    localStorage.setItem('filter_startDate', filterStartDate);
+    localStorage.setItem('filter_endDate', filterEndDate);
+    localStorage.setItem('filter_dateType', filterByDateType);
+    localStorage.setItem('filter_type', filterType);
+    localStorage.setItem('filter_sortBy', sortBy);
+    localStorage.setItem('filter_sortDirection', sortDirection);
+    if (daysWithoutUpdate !== null) localStorage.setItem('filter_daysWithoutUpdate', String(daysWithoutUpdate));
+    else localStorage.removeItem('filter_daysWithoutUpdate');
+  };
+
+  useEffect(() => {
+    saveToLocalStorage();
+  }, [searchTitle, selectedTeam, filterStartDate, filterEndDate, filterByDateType, filterType, sortBy, sortDirection, daysWithoutUpdate]);
+
   const handleRefresh = () => {
     setIsRefreshing(true);
     if (taskScope === 'responsible') {
@@ -78,7 +119,20 @@ const TaskList: React.FC = () => {
       dispatch(loadTeamTasks());
     }
   }, [dispatch, taskScope, user?.role]);
-  
+
+  const resetFilters = () => {
+    setSearchTitle('');
+    setSelectedTeam(null);
+    setFilterStartDate('');
+    setFilterEndDate('');
+    setFilterByDateType('created_at');
+    setFilterType('all');
+    setSortBy('created_at');
+    setSortDirection('desc');
+    setDaysWithoutUpdate(null);
+    localStorage.clear(); // очищаем все фильтры в localStorage
+  };
+
   const isToday = (dateString: string) => {
     if (!dateString) return false;
     const date = new Date(dateString);
@@ -110,7 +164,6 @@ const TaskList: React.FC = () => {
   };
   const getOverdueTasks = () => tasks.filter(task => !completedStatuses.includes(task.status) && task.is_overdue).length;
 
-  // Собираем список команд для фильтра
   const teams = useMemo(
     () =>
       Array.from(
@@ -131,11 +184,8 @@ const TaskList: React.FC = () => {
   if (error)
     return <div className="task-list__error">{error}</div>;
 
-  // ====== Фильтрация ======
-
   let filteredTasks = [...tasks];
 
-  // Фильтр по названию
   if (searchTitle.trim())
     filteredTasks = filteredTasks.filter(
       task =>
@@ -143,20 +193,17 @@ const TaskList: React.FC = () => {
         task.title.toLowerCase().includes(searchTitle.trim().toLowerCase())
     );
 
-  // Фильтр по команде
   if (selectedTeam !== null)
     filteredTasks = filteredTasks.filter(
       task => task.team && task.team.id === selectedTeam
     );
 
-  // Фильтр по диапазону дат
   if (filterStartDate || filterEndDate) {
     filteredTasks = filteredTasks.filter(task =>
       isDateInRange(task[filterByDateType], filterStartDate, filterEndDate)
     );
   }
 
-  // Остальные фильтры
   if (filterType === 'today') {
     filteredTasks = filteredTasks.filter(
       task =>
@@ -187,7 +234,6 @@ const TaskList: React.FC = () => {
     return sortDirection === 'desc' ? dateB - dateA : dateA - dateB;
   });
 
-  // Группировка по статусу (но можно добавить по команде — для примера, оставим как есть)
   const groupedActiveTasks = {
     'В работе': tasksToDisplay.filter(task => task.status === 'in_progress'),
     'Ожидает ответа': tasksToDisplay.filter(task => task.status === 'awaiting_response'),
@@ -199,7 +245,6 @@ const TaskList: React.FC = () => {
   };
   const displayGroups = showCompleted ? groupedCompletedTasks : groupedActiveTasks;
 
-  // Счётчики
   const totalTasks = tasks.length;
   const tasksToday = getTodaysTasks();
   const overdueTasksCount = getOverdueTasks();
@@ -242,8 +287,11 @@ const TaskList: React.FC = () => {
         setFilterByDateType={setFilterByDateType}
         taskScope={taskScope}
         setTaskScope={setTaskScope}
-        userRole={user ? user.role : 'developer'} // Если user == null, используем роль по умолчанию
+        userRole={user ? user.role : 'developer'}
       />
+      <button className="task-list__reset-filters-btn" onClick={resetFilters}>
+        Сбросить фильтры
+      </button>
       <TaskListTabs
         showCompleted={showCompleted}
         setShowCompleted={setShowCompleted}

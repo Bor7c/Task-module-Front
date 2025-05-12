@@ -99,11 +99,11 @@ const TaskCard: React.FC<Props> = ({
             </div>
           )}
         </div>
-        {task.comments_count > 0 && (
+        {/* {task.comments_count > 0 && (
           <div className="task-list__comments">
             <FaComments /> {task.comments_count}
           </div>
-        )}
+        )} */}
         {task.responsible && (
           <div className="task-list__responsible">
             <div className="task-list__avatar" title={task.responsible.username}>
