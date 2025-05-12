@@ -1,263 +1,375 @@
-.creator-tasks {
-    padding: 20px;
-    max-width: 1400px;
-    margin: 0 auto;
-    font-family: 'Segoe UI', sans-serif;
-    color: #2c2c2c;
+:root {
+    --primary-color: #1a2a6c;
+    --secondary-color: #0066cc;
+    --success-color: #4CAF50;
+    --warning-color: #FFC107;
+    --danger-color: #F44336;
+    --info-color: #2196F3;
+    --light-gray: #f5f5f5;
+    --gray: #e0e0e0;
+    --dark-gray: #757575;
+    --border-radius: 8px;
+    --card-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    --animation-speed: 0.3s;
   }
   
-  /* ===== ФИЛЬТРЫ ===== */
+  /* =================== ОСНОВНОЙ КОНТЕЙНЕР =================== */
+  .creator-tasks {
+    padding: 24px;
+    max-width: 1800px;
+    margin: 0 auto;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--primary-color);
+    background: #f9fafc;
+  }
+  
+  /* =================== ФИЛЬТРЫ =================== */
   .creator-tasks__header {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
   }
   .creator-tasks__filters-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px 24px;
-    padding: 16px;
-    background: #f5f5f5;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    gap: 20px 32px;
+    padding: 18px 22px;
+    background: var(--light-gray);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    align-items: flex-start;
   }
   .creator-tasks__filter-group {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    background: transparent;
+  }
+  .creator-tasks__filter-group > :is(input, select, button, svg) {
+    margin: 0 !important;
   }
   .creator-tasks__filter-input {
-    padding: 6px 12px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    font-size: 14px;
+    display: block;
+    height: 38px;
+    min-width: 125px;
+    max-width: 220px;
+    border-radius: var(--border-radius);
+    border: 1.5px solid #d1d5db;
     background: #fff;
-    min-width: 120px;
-    transition: border 0.2s, box-shadow 0.2s;
+    padding: 0 13px;
+    font-size: 15px;
+    line-height: 1.35;
+    color: var(--primary-color);
+    appearance: none;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.18s, box-shadow 0.18s;
   }
   .creator-tasks__filter-input:focus {
-    border-color: #1a73e8;
-    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 2.5px #cee6fe;
+  }
+  .creator-tasks__filter-group svg {
+    color: var(--secondary-color);
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin-right: 4px;
+    margin-left: 0;
+    vertical-align: middle;
   }
   .creator-tasks__filter-sortdir {
-    background: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 7px;
     border: none;
-    font-size: 18px;
+    color: var(--secondary-color);
+    background: transparent;
+    font-size: 20px;
     cursor: pointer;
-    padding: 0 6px;
-    color: #1a73e8;
-    height: 34px;
-    transition: background 0.2s;
-  }
-  .creator-tasks__filter-sortdir:hover {
-    background: #e6e6e6;
-    border-radius: 6px;
-  }
-  
-  /* ===== ТАБЛИЦА ===== */
-  .creator-tasks__table {
-    width: 100%;
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  .creator-tasks__row {
+    margin-left: 2px;
     display: flex;
     align-items: center;
-    font-size: 14.5px;
-    min-height: 44px;
-    padding: 2px 0;
-    background: #fff;
-    border-bottom: 1px solid #eee;
+    justify-content: center;
     transition: background 0.15s;
   }
-  .creator-tasks__row:last-child {
-    border-bottom: none;
+  .creator-tasks__filter-sortdir:hover {
+    background: #e3f2fd;
   }
-  .creator-tasks__row:hover:not(.creator-tasks__row--head) {
-    background: #f9f9f9;
+  .creator-tasks__filter-input[type="date"] {
+    padding-left: 10px;
+    padding-right: 10px;
+    min-width: 105px;
+    max-width: 140px;
+    appearance: none;
   }
-  .creator-tasks__row--head {
-    font-weight: bold;
-    background: #f0f3f8;
-    color: #1a2a6c;
-    border-bottom: 2px solid #ddd;
-    cursor: default;
+  .creator-tasks__filter-group input[type="date"]::-webkit-input-placeholder { color: #bbb;}
+  .creator-tasks__filter-group input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: grayscale(0.6);
   }
-  .creator-tasks__row--overdue {
-    background: #ffe6e6 !important;
+  .creator-tasks__filter-group span {
+    padding: 0 2px;
+    color: #b1b4be;
+    align-self: center;
   }
-  .creator-tasks__row--today:not(.creator-tasks__row--overdue) {
-    background: #fffbe6 !important;
+  @media (max-width: 900px) {
+    .creator-tasks__filters-row {
+      flex-direction: column;
+      gap: 16px 0;
+    }
+    .creator-tasks__filter-group {
+      width: 100%;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+    }
+    .creator-tasks__filter-input {
+      width: 100%;
+      min-width: 0;
+      max-width: none;
+    }
   }
-  .creator-tasks__row--old {
-    font-style: italic;
-    color: #999;
-  }
-  
-  /* ===== ЯЧЕЙКИ ===== */
-  .creator-tasks__cell {
-    padding: 10px 12px;
-    min-width: 72px;
-    flex: 1;
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .creator-tasks__cell--name {
-    flex: 3;
-  }
-  .creator-tasks__cell--priority,
-  .creator-tasks__cell--status {
-    justify-content: center;
-    min-width: 90px;
-  }
-  .creator-tasks__cell--comments,
-  .creator-tasks__cell--responsible {
-    justify-content: center;
-    min-width: 50px;
-    max-width: 60px;
-  }
-  .creator-tasks__priority-critical {
-    background: #f44336;
-    color: white;
-    padding: 2px 8px;
-    border-radius: 6px;
-  }
-  .creator-tasks__priority-high {
-    background: #ff9800;
-    color: white;
-    padding: 2px 8px;
-    border-radius: 6px;
-  }
-  .creator-tasks__priority-medium {
-    background: #ffc107;
-    color: white;
-    padding: 2px 8px;
-    border-radius: 6px;
-  }
-  .creator-tasks__priority-low {
-    background: #e0f2f1;
-    color: #333;
-    padding: 2px 8px;
-    border-radius: 6px;
-  }
-  .creator-tasks__deadline--overdue {
-    color: #f44336;
-    font-weight: bold;
-  }
-  .creator-tasks__deadline--today {
-    color: #ff9800;
-    font-weight: 600;
-  }
-  
-  /* ===== АВАТАР ===== */
-  .creator-tasks__avatar-img {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1.5px solid #eaeaea;
-    background: white;
-  }
-  
 
+
+  /* =================== ТАБЛИЦА =================== */
+  .creator-tasks__table-container {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(10, 20, 40, 0.06);
+    background: #fff;
+  }
+  .creator-tasks__table {
+    width: 100%;
+    min-width: 1200px;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .creator-tasks__row,
   .task-row {
     display: flex;
     align-items: center;
-    font-size: 14px;
-    padding: 8px 12px;
+    font-size: 15px;
+    min-height: 56px;
     background: #fff;
-    border-bottom: 1px solid #eef1f5;
-    transition: background 0.2s ease;
-    cursor: pointer;
+    border-bottom: 1px solid #f0f2f7;
+    transition: background 0.15s;
   }
+  .creator-tasks__row:last-child,
+  .task-row:last-child {
+    border-bottom: none;
+  }
+  .creator-tasks__row:hover:not(.creator-tasks__row--head),
   .task-row:hover {
-    background: #f9f9f9;
+    background: #f8fafd;
   }
-  
-  .task-row--overdue {
-    background-color: #ffeae9 !important;
+  .creator-tasks__row--head {
+    font-weight: 600;
+    background: #f5f8ff;
+    color: var(--primary-color);
+    border-bottom: 2px solid #e0e6f0;
   }
-  .task-row--today:not(.task-row--overdue) {
-    background-color: #fffce8 !important;
-  }
-  .task-row--old {
-    font-style: italic;
-    color: #9c9c9c;
-  }
-  
+  /* =================== ЯЧЕЙКИ =================== */
+  .creator-tasks__cell,
   .task-row__cell {
-    flex: 1;
-    padding: 4px 8px;
+    flex:auto;
+    padding: 14px 16px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     display: flex;
     align-items: center;
+    box-sizing: border-box;
   }
-  
+  .creator-tasks__cell--priority,
   .task-row__priority {
+    width: 130px;
+    min-width: 130px;
     justify-content: center;
-    font-weight: bold;
-    min-width: 90px;
   }
-  .task-row__priority--critical {
-    background-color: #f44336;
-    color: white;
-    padding: 2px 8px;
-    border-radius: 4px;
-  }
-  .task-row__priority--high {
-    background-color: #ff9800;
-    color: white;
-    padding: 2px 8px;
-    border-radius: 4px;
-  }
-  .task-row__priority--medium {
-    background-color: #ffc107;
-    color: white;
-    padding: 2px 8px;
-    border-radius: 4px;
-  }
-  .task-row__priority--low {
-    background-color: #e0f7fa;
-    color: #111;
-    padding: 2px 8px;
-    border-radius: 4px;
-  }
-  
+  .creator-tasks__cell--status,
   .task-row__status {
+    width: 150px;
+    min-width: 150px;
     justify-content: center;
-    min-width: 100px;
   }
+  .creator-tasks__cell--name,
   .task-row__title {
-    flex: 2;
-    min-width: 200px;
+    width: 400px;
+    min-width: 250px;
+    flex-grow: 1;
   }
-  
-  .task-row__deadline--overdue {
-    color: #f44336;
-    font-weight: 600;
+  .creator-tasks__table > .creator-tasks__row > .creator-tasks__cell:nth-child(4),
+  .task-row__cell:nth-child(4) {
+    width: 200px;
+    min-width: 150px;
   }
-  .task-row__deadline--today {
-    color: #ffc107;
-    font-weight: 600;
-  }
-  
-  .task-row__comments {
+  .creator-tasks__table > .creator-tasks__row > .creator-tasks__cell:nth-child(5),
+  .task-row__cell:nth-child(5) {
+    width: 140px;
+    min-width: 120px;
     justify-content: center;
-    min-width: 60px;
   }
+  .creator-tasks__table > .creator-tasks__row > .creator-tasks__cell:nth-child(6),
+  .task-row__cell:nth-child(6) {
+    width: 150px;
+    min-width: 130px;
+  }
+  .creator-tasks__table > .creator-tasks__row > .creator-tasks__cell:nth-child(7),
+  .task-row__cell:nth-child(7) {
+    width: 140px;
+    min-width: 120px;
+    justify-content: center;
+  }
+  .creator-tasks__cell--responsible,
   .task-row__responsible {
+    width: 120px;
+    min-width: 100px;
     justify-content: center;
-    min-width: 60px;
   }
-  .task-row__avatar {
-    width: 26px;
-    height: 26px;
+  
+  /* =================== STATUS ROWS =================== */
+  .creator-tasks__row--overdue,
+  .task-row--overdue {
+    background: rgba(244, 67, 54, 0.05) !important;
+  }
+  .creator-tasks__row--today:not(.creator-tasks__row--overdue),
+  .task-row--today:not(.task-row--overdue) {
+    background: rgba(255, 193, 7, 0.09) !important;
+  }
+  .creator-tasks__row--old,
+  .task-row--old {
+    color: var(--dark-gray) !important;
+    font-style: italic;
+  }
+  
+  /* =================== ПРИОРИТЕТЫ =================== */
+  .creator-tasks__priority-critical,
+  .task-row__priority--critical {
+    background-color: rgba(244, 67, 54, 0.1);
+    color: var(--danger-color);
+    padding: 5px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .creator-tasks__priority-high,
+  .task-row__priority--high {
+    background-color: rgba(255, 152, 0, 0.1);
+    color: #FF9800;
+    padding: 5px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .creator-tasks__priority-medium,
+  .task-row__priority--medium {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: var(--warning-color);
+    padding: 5px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .creator-tasks__priority-low,
+  .task-row__priority--low {
+    background-color: rgba(76, 175, 80, 0.1);
+    color: var(--success-color);
+    padding: 5px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  
+  /* =================== DEADLINE =================== */
+  .task-row__deadline--overdue,
+  .creator-tasks__deadline--overdue {
+    color: var(--danger-color);
+    font-weight: 600;
+  }
+  .task-row__deadline--today,
+  .creator-tasks__deadline--today {
+    color: var(--warning-color);
+    font-weight: 600;
+  }
+  
+  /* =================== AVATAR =================== */
+  .task-row__avatar,
+  .creator-tasks__avatar-img {
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     object-fit: cover;
-    border: 1.5px solid #ddd;
-    background: #fff;
+    border: 2px solid #f0f2f7;
+    background: white;
   }
   
+  /* =================== LOADING & ERROR =================== */
+  .creator-tasks__spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid rgba(25, 118, 210, 0.2);
+    border-top-color: var(--secondary-color);
+    border-radius: 50%;
+    margin-right: 12px;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .creator-tasks__error {
+    color: var(--danger-color);
+    font-weight: 500;
+    padding: 16px;
+  }
+  
+  /* =================== SCROLLBARS =================== */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f1f3f7;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #c1c7d0;
+    border-radius: 5px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #a8b0bb;
+  }
+  
+  /* =================== PAGINATION =================== */
+  .creator-tasks__pagination {
+    display: flex;
+    justify-content: flex-end;
+    gap: 2px;
+    margin: 20px 0 0 0;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .creator-tasks__pagination-btn {
+    min-width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    border: none;
+    background: var(--light-gray);
+    font-size: 16px;
+    color: var(--primary-color);
+    font-weight: 500;
+    margin: 0 2px;
+    cursor: pointer;
+    transition: background 0.16s, color 0.18s;
+  }
+  .creator-tasks__pagination-btn--active,
+  .creator-tasks__pagination-btn:active {
+    background: var(--secondary-color);
+    color: #fff;
+  }
+  .creator-tasks__pagination-btn:disabled {
+    color: #bbb;
+    cursor: not-allowed;
+    background: #f1f3f6;
+  }
+  .creator-tasks__pagination-ellipsis {
+    padding: 0 8px;
+    color: #7a8196;
+    font-size: 18px;
+  }
