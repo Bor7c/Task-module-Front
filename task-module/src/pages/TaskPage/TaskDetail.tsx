@@ -148,17 +148,18 @@ const TaskDetail: React.FC = () => {
       setLocalResponsible(user || null);
       dispatch(assignTaskResponsible({ id: task.id, responsible_id: userId }))
         .then(() => dispatch(loadTaskById(task.id)))
+        .catch(() => dispatch(setError('Ошибка назначения ответственного')))
         .finally(() => setIsUpdatingResponsible(false));
     }
   };
   
-  // при удалении
   const handleRemoveResponsible = () => {
     if (task) {
       setIsUpdatingResponsible(true);
       setLocalResponsible(null);
       dispatch(removeResponsible(task.id))
         .then(() => dispatch(loadTaskById(task.id)))
+        .catch(() => dispatch(setError('Ошибка удаления ответственного')))
         .finally(() => setIsUpdatingResponsible(false));
     }
   };
