@@ -302,7 +302,6 @@ const TaskDetail: React.FC = () => {
             localPriority={localPriority}
             handlePriorityChange={handlePriorityChange}
             getPriorityClass={getPriorityClass}
-            users={users}
             handleAssignResponsible={handleAssignResponsible}
             handleRemoveResponsible={handleRemoveResponsible}
             currentUser={currentUser}

@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaSearch, FaSort, FaUsers, FaExclamationCircle, FaBell, FaRegCalendarAlt } from 'react-icons/fa';
 import './CreatorTaskList.css';
 import { DropMultiSelect } from './DropMultiselect';
+import CreatorTaskListHeader from './CreatorTaskListHeader';
 
 // ==== TaskRow ====
 function timeAgo(dateStr: string): string {
@@ -223,47 +224,6 @@ const saveFiltersToStorage = (filters: MultiFilterState) => {
   } catch { /* ignore */ }
 };
 
-// ==== Мультиселекты ====
-function MultiSelect<T extends { value: string; label: string }>({
-  options,
-  value,
-  onChange,
-  placeholder,
-  className = '',
-}: {
-  options: T[];
-  value: string[];
-  onChange: (v: string[]) => void;
-  placeholder?: string;
-  className?: string;
-}) {
-  return (
-    <select
-      multiple
-      className={className}
-      value={value}
-      onChange={e => {
-        const selected = Array.from(e.target.selectedOptions).map(opt => opt.value);
-        onChange(selected);
-      }}
-      size={Math.min(4, options.length)}
-      style={{ minWidth: 125, maxWidth: 220 }}
-      title={placeholder}
-    >
-      {placeholder &&
-        <option disabled value="">
-          {placeholder}
-        </option>
-      }
-      {options.map(opt =>
-        <option key={opt.value} value={opt.value}>
-          {opt.label}
-        </option>
-      )}
-    </select>
-  );
-}
-
 // ==== Главный компонент ====
 const CreatorTaskList: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -296,6 +256,14 @@ const CreatorTaskList: React.FC = () => {
   }, [createdTasks]);
   const handleTaskClick = useCallback((id: number) => {
     navigate(`/tasks/${id}`);
+  }, [navigate]);
+
+  const handleRefresh = useCallback(() => {
+    dispatch(loadCreatedTasks());
+  }, [dispatch]);
+
+  const handleCreateTask = useCallback(() => {
+    navigate('/create-task');
   }, [navigate]);
 
   const filtered = useMemo(() => {
@@ -339,9 +307,24 @@ const CreatorTaskList: React.FC = () => {
     [sorted, page]
   );
 
+  const totalTasks = createdTasks.length;
+  const activeCount = createdTasks.filter(task => task.status !== 'closed' && task.status !== 'solved').length;
+  const completedOverdueTasks = createdTasks.filter(task => task.status === 'solved' && new Date(task.updated_at) < new Date()).length;
+
+
   return (
     <div className="creator-tasks">
+        
       <div className="creator-tasks__header">
+      <CreatorTaskListHeader
+        totalTasks={totalTasks}
+        activeCount={activeCount}
+        completedOverdueTasks={completedOverdueTasks}
+        isRefreshing={loading}
+        onRefresh={handleRefresh}
+        user={{}}  // Здесь передавайте информацию о пользователе (если есть)
+        onCreateTask={handleCreateTask}
+      />
         <div className="creator-tasks__filters-row">
           <div className="creator-tasks__filter-group">
             <FaSearch />
@@ -402,7 +385,7 @@ const CreatorTaskList: React.FC = () => {
               <option value="created_at">Создана</option>
               <option value="updated_at">Обновлена</option>
               <option value="deadline">Дедлайн</option>
-              <option value="priority">Критичность</option>
+              <option value="priority">Приоритет</option>
               <option value="status">Статус</option>
             </select>
             <button

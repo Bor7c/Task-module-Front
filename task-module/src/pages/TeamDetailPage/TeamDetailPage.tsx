@@ -14,6 +14,7 @@ import { getAllUsers } from '../../redux/usersSlice';
 import './TeamDetail.css';
 import LoadingScreen from '../../components/common/LoadingScreen';
 import Avatar from '../../components/Avatar/Avatar';
+import { FaArrowLeft, FaEdit } from 'react-icons/fa';
 
 const TeamDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -122,7 +123,7 @@ const TeamDetailPage = () => {
   return (
     <div className="team-detail">
       <button className="team-detail__back-btn" onClick={() => navigate(-1)}>
-        Назад
+        <FaArrowLeft /> Назад
       </button>
 
       <div className="team-detail__header">
@@ -154,7 +155,7 @@ const TeamDetailPage = () => {
               {selectedTeam.name}
               {userRole === 'admin' && (
                 <button className="edit-icon-btn" onClick={() => setIsEditing(true)}>
-                  ✏️
+                  <FaEdit/>
                 </button>
               )}
             </h2>

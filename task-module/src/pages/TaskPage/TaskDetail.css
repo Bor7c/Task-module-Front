@@ -836,3 +836,44 @@
     color: #bdc3c7;
     cursor: not-allowed;
   }
+
+  .task-detail__avatar {
+    width: 28px;
+    height: 28px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .task-detail__user-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .task-detail__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .task-detail__user-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .task-detail__user-name {
+    font-weight: 600;
+  }
+  
+  .task-detail__user-role {
+    font-size: 0.9em;
+    color: #666;
+  }
+  

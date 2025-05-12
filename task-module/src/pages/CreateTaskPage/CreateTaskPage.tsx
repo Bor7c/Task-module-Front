@@ -25,20 +25,20 @@ const CreateTaskPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     if (!title.trim()) {
       setError('Название задачи не может быть пустым');
       return;
     }
-
+  
     if (!selectedTeam) {
       setError('Пожалуйста, выберите команду');
       return;
     }
-
+  
     setLoading(true);
     setError(null);
-
+  
     try {
       await createTask({
         title,
@@ -48,7 +48,7 @@ const CreateTaskPage = () => {
         team_id: selectedTeam,
       });
       dispatch(resetForm());
-      navigate('/');
+      navigate(-1); // Редирект на предыдущую страницу
     } catch (err: any) {
       console.error('Ошибка при создании задачи:', err);
       setError(err.response?.data?.detail || 'Ошибка при создании задачи. Попробуйте позже.');
@@ -56,6 +56,7 @@ const CreateTaskPage = () => {
       setLoading(false);
     }
   };
+  
 
   const handleGoBack = () => {
     navigate(-1);

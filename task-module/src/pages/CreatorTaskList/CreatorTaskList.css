@@ -68,7 +68,7 @@
     box-shadow: 0 0 0 2.5px #cee6fe;
   }
   .creator-tasks__filter-group svg {
-    color: var(--secondary-color);
+    color: var(--primary-color);
     width: 18px;
     height: 18px;
     flex-shrink: 0;
@@ -81,7 +81,7 @@
     height: 36px;
     border-radius: 7px;
     border: none;
-    color: var(--secondary-color);
+    color: var(--primary-color);
     background: transparent;
     font-size: 20px;
     cursor: pointer;
@@ -346,8 +346,8 @@
     align-items: center;
   }
   .creator-tasks__pagination-btn {
-    min-width: 36px;
-    height: 36px;
+    min-width: 26px;
+    height: 26px;
     border-radius: 6px;
     border: none;
     background: var(--light-gray);
@@ -360,7 +360,7 @@
   }
   .creator-tasks__pagination-btn--active,
   .creator-tasks__pagination-btn:active {
-    background: var(--secondary-color);
+    background: var(--primary-color);
     color: #fff;
   }
   .creator-tasks__pagination-btn:disabled {

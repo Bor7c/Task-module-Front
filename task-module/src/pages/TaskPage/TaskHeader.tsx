@@ -15,13 +15,15 @@ interface HeaderProps {
   closeConfirmationRef: React.RefObject<HTMLDivElement | null>;
   navigate: ReturnType<typeof useNavigate>;
 }
+
 const TaskHeader: React.FC<HeaderProps> = ({
   isReadOnly, localStatus, handleStatusChange, isAwaitingMenuOpen, setIsAwaitingMenuOpen, awaitingMenuRef,
   showCloseConfirmation, cancelCloseTask, confirmCloseTask, closeConfirmationRef, navigate
 }) => (
   <>
     <div className="task-detail__header">
-      <button onClick={() => navigate('/tasks')} className="task-detail__back-btn">
+      {/* Кнопка "Назад", которая возвращает на предыдущую страницу */}
+      <button onClick={() => navigate(-1)} className="task-detail__back-btn">
         <FaArrowLeft /> Назад
       </button>
       <div className="task-detail__action-buttons">
@@ -69,4 +71,5 @@ const TaskHeader: React.FC<HeaderProps> = ({
     )}
   </>
 );
+
 export default TaskHeader;

@@ -17,6 +17,11 @@ export interface User {
   profile_picture_url?: string;
 }
 
+export interface UserForTask {
+  id: number;
+  username: string;
+}
+
 export interface Team {
   id: number;
   name: string;
@@ -27,8 +32,8 @@ export interface Team {
 export interface TeamTask {
   id: number;
   name: string;
-  description?: string;
-  members_count: number; // или User[], если ты хранишь полных пользователей
+  description: string;
+  members: UserForTask[];
 }
 
 // Тип для задачи
