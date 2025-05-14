@@ -163,7 +163,7 @@ const Pagination: React.FC<PaginationProps> = ({ page, pageCount, setPage }) => 
   );
 };
 // ======= /Pagination =======
-const ROWS_PER_PAGE = 10;
+const ROWS_PER_PAGE = 8;
 
 // ==== Сохранение/чтение фильтров (мульти значения!) ====
 const LS_KEY = 'creatorTasksFiltersV2';
@@ -383,7 +383,7 @@ const CreatorTaskList: React.FC = () => {
               onChange={e => setSort(e.target.value)}
             >
               <option value="created_at">Создана</option>
-              <option value="updated_at">Обновлена</option>
+              {/* <option value="updated_at">Обновлена</option> */}
               <option value="deadline">Дедлайн</option>
               <option value="priority">Приоритет</option>
               <option value="status">Статус</option>

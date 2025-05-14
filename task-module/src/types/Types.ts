@@ -4,6 +4,15 @@ export type UserRole = 'admin' | 'manager' | 'developer';
 export type TaskPriority = 'low' | 'medium' | 'high' | 'critical';
 export type TaskStatus = 'in_progress' | 'solved' | 'closed' | 'awaiting_response' | 'awaiting_action';
 
+
+export interface TeamSummary {
+  id: number;
+  name: string;
+  description?: string;
+  members_count: number;
+  is_default: boolean;
+}
+
 export interface User {
   id: number;
   first_name: string;
@@ -15,6 +24,7 @@ export interface User {
   role_display: string;
   is_active: boolean;
   profile_picture_url?: string;
+  teams?: TeamSummary[];
 }
 
 export interface UserForTask {

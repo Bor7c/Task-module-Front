@@ -13,6 +13,9 @@ import LoadingScreen from './components/common/LoadingScreen';
 import TeamListPage from './pages/TeamListPage/TeamListPage';
 import TeamDetailPage from './pages/TeamDetailPage/TeamDetailPage';
 import CreatorTaskList from './pages/CreatorTaskList/CreatorTaskList'; // Новый импорт
+import AdminUsersPage from './pages/AdminUsersPage/AdminUsersPage';
+
+
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -133,6 +136,16 @@ const App: React.FC = () => {
           element={
             isAuthenticated ? (
               <TeamDetailPage />
+            ) : (
+              <Navigate to="/login" replace state={{ from: location }} />
+            )
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            isAuthenticated ? (
+              <AdminUsersPage />
             ) : (
               <Navigate to="/login" replace state={{ from: location }} />
             )

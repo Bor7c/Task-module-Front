@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { checkUserSession, logoutUser } from '../../redux/authSlice';
 import { Link, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { authAPI } from '../../api/auth';
-import { FaUsers } from 'react-icons/fa';
+import { FaList, FaListUl, FaProjectDiagram, FaRegListAlt, FaStream, FaThList, FaUserCircle, FaUsers } from 'react-icons/fa';
 import './Layout.css';
 import { 
   FaUser, 
@@ -152,7 +152,7 @@ const Layout: React.FC = () => {
                   to="/creator-task-list" 
                   className={`stm-nav-item ${isActive('/creator-task-list') ? 'stm-nav-item-active' : ''}`}
                 >
-                  <FaClipboardList className="stm-nav-icon" />
+                  <FaStream className="stm-nav-icon" />
                   <span className="stm-nav-text">Мои задачи</span> {/* Новый текст пункта меню */}
                 </Link>
 
@@ -172,6 +172,15 @@ const Layout: React.FC = () => {
                   >
                     <FaUsers className="stm-nav-icon" />
                     <span className="stm-nav-text">Мои команды</span>
+                  </Link>
+                )}
+                {user?.role === 'admin' && (
+                  <Link 
+                    to="/admin/users"
+                    className={`stm-nav-item ${isActive('/admin/users') ? 'stm-nav-item-active' : ''}`}
+                  >
+                    <FaUserCircle className="stm-nav-icon" />
+                    <span className="stm-nav-text">Пользователи</span>
                   </Link>
                 )}
               </div>
