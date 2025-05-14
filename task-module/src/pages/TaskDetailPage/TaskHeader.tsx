@@ -14,11 +14,13 @@ interface HeaderProps {
   confirmCloseTask: () => void;
   closeConfirmationRef: React.RefObject<HTMLDivElement | null>;
   navigate: ReturnType<typeof useNavigate>;
+  isAdmin: boolean;
+  handleDeleteTask: () => void;
 }
 
 const TaskHeader: React.FC<HeaderProps> = ({
   isReadOnly, localStatus, handleStatusChange, isAwaitingMenuOpen, setIsAwaitingMenuOpen, awaitingMenuRef,
-  showCloseConfirmation, cancelCloseTask, confirmCloseTask, closeConfirmationRef, navigate
+  showCloseConfirmation, cancelCloseTask, confirmCloseTask, closeConfirmationRef, navigate, isAdmin, handleDeleteTask
 }) => (
   <>
     <div className="task-detail__header">
@@ -54,6 +56,12 @@ const TaskHeader: React.FC<HeaderProps> = ({
         {!isReadOnly && localStatus === 'solved' && (
           <button onClick={() => handleStatusChange('closed')}
             className="task-detail__status-btn task-detail__closed-btn">Закрыть</button>
+        )}
+        {/* Кнопка удаления — только для админа */}
+        {isAdmin && (
+          <button onClick={handleDeleteTask} className="task-detail__delete-btn">
+            Удалить задачу
+          </button>
         )}
       </div>
     </div>

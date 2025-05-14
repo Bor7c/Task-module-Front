@@ -54,3 +54,9 @@ export const fetchUsers = async (): Promise<any[]> => {
   const response = await api.get('/users/');
   return response.data;
 };
+
+// Функция для удаления задачи
+export const deleteTask = async (id: number): Promise<void> => {
+  await api.delete(`/tasks/${id}/`);
+};
+

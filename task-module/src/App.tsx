@@ -5,7 +5,7 @@ import { checkUserSession } from './redux/authSlice';
 import HomePage from './pages/HomePage/HomePage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
-import TaskDetail from './pages/TaskPage/TaskDetail';
+import TaskDetail from './pages/TaskDetailPage/TaskDetail';
 import CreateTaskPage from './pages/CreateTaskPage/CreateTaskPage';
 import UserProfile from './pages/UserProfile/UserProfile';
 import Layout from './components/Layout/Layout';

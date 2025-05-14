@@ -118,6 +118,18 @@ export const loadUsers = createAsyncThunk<User[]>(
   }
 );
 
+export const deleteTask = createAsyncThunk(
+  'taskDetails/deleteTask',
+  async (taskId: number, { rejectWithValue }) => {
+    try {
+      await taskAPI.deleteTask(taskId);
+      return taskId; // можно вернуть, если нужно фильтровать потом
+    } catch (error) {
+      return rejectWithValue('Ошибка при удалении задачи');
+    }
+  }
+);
+
 export const resetTaskDetails = createAction('taskDetails/resetTaskDetails');
 
 // Slice
@@ -216,6 +228,15 @@ const taskDetailsSlice = createSlice({
         state.users = action.payload;
       })
       .addCase(loadUsers.rejected, setError)
+
+
+      .addCase(deleteTask.pending, setLoading)
+      .addCase(deleteTask.fulfilled, (state) => {
+        state.loading = false;
+        state.task = null;         // Удалили задачу, очищаем стейт
+        state.comments = [];
+      })
+      .addCase(deleteTask.rejected, setError)
 
       .addCase(resetTaskDetails, (state) => {
         state.task = null;

@@ -13,7 +13,8 @@ import {
   loadComments,
   updateComment,
   removeComment,
-  resetTaskDetails
+  resetTaskDetails,
+  deleteTask
 } from '../../redux/taskDetailsSlice';
 import { setUsers, setLoading, setError } from '../../redux/usersSlice';
 import { fetchUsers } from '../../api/usersApi';
@@ -35,6 +36,8 @@ const TaskDetail: React.FC = () => {
   const { task, loading, error, comments } = useAppSelector(state => state.taskDetails);
   const { users } = useAppSelector(state => state.users);
   const currentUser = useAppSelector(state => state.auth.user);
+  const isAdmin = currentUser?.role === 'admin';
+
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
@@ -101,6 +104,16 @@ const TaskDetail: React.FC = () => {
             dispatch(loadTaskById(task.id));
           });
         setIsAwaitingMenuOpen(false);
+      }
+    }
+  };
+
+  const handleDeleteTask = () => {
+    if (window.confirm('Вы уверены, что хотите удалить задачу? Это действие необратимо.')) {
+      if (task) {
+        dispatch(deleteTask(task.id))
+          .then(() => navigate('/tasks')) // перенаправление на список задач
+          .catch(() => dispatch(setError('Ошибка удаления задачи')));
       }
     }
   };
@@ -270,6 +283,8 @@ const TaskDetail: React.FC = () => {
         confirmCloseTask={confirmCloseTask}
         closeConfirmationRef={closeConfirmationRef}
         navigate={navigate}
+        isAdmin={isAdmin}
+        handleDeleteTask={handleDeleteTask}
       />
       <div className="task-detail__content">
         <div className="task-detail__left-column">
