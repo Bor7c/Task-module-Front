@@ -364,7 +364,7 @@
   }
   
   .admin-users-page-btn {
-    padding: 9px 20px;
+    padding: 7px 10px;
     border: none;
     border-radius: var(--border-radius-sm);
     font-size: 14px;
@@ -530,3 +530,24 @@
       justify-content: center;
     }
   }
+
+  .avatar-image-1 {
+    width: 64px !important;
+    height: 64px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+  }
+  
+  .avatar-fallback-1 {
+    width: 100px !important;
+    height: 100px !important;
+    border-radius: 50% !important;
+    background-color: #dbe1f1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: bold !important;
+    color: #1a2a6c !important;
+    font-size: 14px !important;
+  }
+  

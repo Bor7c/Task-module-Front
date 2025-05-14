@@ -76,7 +76,7 @@ const Layout: React.FC = () => {
             </button>
             
             <Link to="/" className="stm-logo">
-              <span className="stm-logo-text">Simple Task Manager</span>
+              <span className="stm-logo-text">Координатор задач</span>
             </Link>
           </div>
           
@@ -139,20 +139,20 @@ const Layout: React.FC = () => {
                   <FaHome className="stm-nav-icon" />
                   <span className="stm-nav-text">Главная</span>
                 </Link>
-                <Link 
+                {/* <Link 
                   to="/tasks" 
                   className={`stm-nav-item ${isActive('/tasks') ? 'stm-nav-item-active' : ''}`}
                 >
                   <FaClipboardList className="stm-nav-icon" />
                   <span className="stm-nav-text">Задачи</span>
-                </Link>
+                </Link> */}
 
                 {/* Новый пункт "Мои задачи" */}
                 <Link 
                   to="/creator-task-list" 
                   className={`stm-nav-item ${isActive('/creator-task-list') ? 'stm-nav-item-active' : ''}`}
                 >
-                  <FaStream className="stm-nav-icon" />
+                  <FaClipboardList className="stm-nav-icon" />
                   <span className="stm-nav-text">Мои задачи</span> {/* Новый текст пункта меню */}
                 </Link>
 

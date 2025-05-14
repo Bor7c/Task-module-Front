@@ -56,7 +56,7 @@ const LoginPage: React.FC = () => {
     <div className="auth-wrapper">
       <div className="auth-container login-container">
         <div className="auth-header">
-          <h1>Simple Task Manager</h1>
+          <h1>Координатор задач</h1>
           <h2>Вход в систему</h2>
         </div>
 

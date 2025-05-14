@@ -222,12 +222,12 @@ const AdminUsersPage = () => {
         {selectedUser ? (
           <>
             <div className="admin-users-page-user-card">
-            <div className="admin-users-page-card-photo">
+            <div className="avatar-fallback-1">
                 <Avatar
                     src={selectedUser.profile_picture_url}
                     alt={selectedUser.username}
                     fallbackText={selectedUser.username?.slice(0, 2) || '?'}
-                    className="admin-users-page-card-photo"
+                    className="avatar-fallback-1"
                 />
             </div>
               <div className="admin-users-page-card-info">
