@@ -85,6 +85,15 @@
   .task-detail__closed-btn:hover {
     background-color: #6c7879;
   }
+
+  .task-detail__delete-btn {
+    background-color: #9e0000;
+    color: white;
+  }
+  
+  .task-detail__delete-btn:hover {
+    background-color: #c70000;
+  }
   
   /* Выпадающее меню для статусов ожидания */
   .task-detail__dropdown-container {

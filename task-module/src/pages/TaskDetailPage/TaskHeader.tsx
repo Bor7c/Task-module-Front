@@ -59,7 +59,7 @@ const TaskHeader: React.FC<HeaderProps> = ({
         )}
         {/* Кнопка удаления — только для админа */}
         {isAdmin && (
-          <button onClick={handleDeleteTask} className="task-detail__delete-btn">
+          <button onClick={handleDeleteTask} className="task-detail__status-btn task-detail__delete-btn">
             Удалить задачу
           </button>
         )}
