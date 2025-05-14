@@ -1,44 +1,181 @@
-.admin-users-page {
+.admin-users-page-root {
     display: flex;
-    gap: 2rem;
-    padding: 2rem;
+    gap: 32px;
+    padding: 32px;
+    background: #f9fbfc;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Arial, sans-serif;
   }
   
-  .user-list {
-    width: 30%;
-    border-right: 1px solid #ccc;
-    padding-right: 1rem;
+  .admin-users-page-user-list {
+    width: 300px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(60, 60, 90, 0.10);
+    padding: 20px;
   }
   
-  .user-list ul {
+  .admin-users-page-user-list h2 {
+    margin-top: 0;
+    font-size: 1.25rem;
+    color: #2c3e50;
+  }
+  
+  .admin-users-page-user-list ul {
     list-style: none;
     padding: 0;
+    margin: 0;
   }
   
-  .user-list li {
+  .admin-users-page-user-list li {
+    padding: 8px 12px;
+    border-radius: 6px;
     cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 4px;
+    margin-bottom: 5px;
+    transition: background 0.2s, color 0.2s;
   }
   
-  .user-list li:hover,
-  .user-list li.selected {
-    background-color: #f0f0f0;
-    font-weight: bold;
+  .admin-users-page-user-list li:hover {
+    background: #ecf3fa;
+    color: #205090;
   }
   
-  .user-details {
-    flex-grow: 1;
-    padding-left: 1rem;
+  .admin-users-page-selected {
+    background: #205090;
+    color: #fff !important;
   }
   
-  .profile-picture {
-    max-width: 120px;
+  .admin-users-page-user-details {
+    flex: 1;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(60, 60, 90, 0.10);
+    padding: 24px 32px;
+    min-width: 340px;
+  }
+  
+  .admin-users-page-user-details h2 {
+    margin-top: 0;
+    color: #205090;
+    font-size: 1.2rem;
+  }
+  
+  .admin-users-page-profile-picture {
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
-    margin-bottom: 1rem;
+    object-fit: cover;
+    border: 2px solid #eaeaea;
+    margin-bottom: 20px;
+    background: #f0f0f2;
   }
   
-  .error {
-    color: red;
+  .admin-users-page-user-fields label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: #375071;
   }
   
+  .admin-users-page-user-fields input,
+  .admin-users-page-user-fields select {
+    margin-top: 3px;
+    padding: 6px 8px;
+    border-radius: 5px;
+    border: 1px solid #bcc9df;
+    background: #f7fbff;
+    font-size: 1rem;
+  }
+  
+  .admin-users-page-user-fields span {
+    margin-top: 2px;
+    font-weight: 400;
+    color: #35383b;
+  }
+  
+  .admin-users-page-actions {
+    margin: 18px 0;
+  }
+  
+  .admin-users-page-btn {
+    padding: 8px 18px;
+    margin-right: 14px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    background: #e3eafb;
+    color: #205090;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+  }
+  
+  .admin-users-page-btn:hover {
+    background: #205090;
+    color: #fff;
+  }
+  
+  .admin-users-page-btn-save {
+    background: #30b043;
+    color: #fff;
+  }
+  
+  .admin-users-page-btn-save:hover {
+    background: #15802c;
+  }
+  
+  .admin-users-page-btn-cancel {
+    background: #eee3e3;
+    color: #bd2121;
+  }
+  
+  .admin-users-page-btn-cancel:hover {
+    background: #bd2121;
+    color: #fff;
+  }
+  
+  .admin-users-page-btn-edit {
+    background: #205090;
+    color: #fff;
+  }
+  
+  .admin-users-page-user-teams {
+    margin-top: 30px;
+  }
+  
+  .admin-users-page-user-teams strong {
+    display: block;
+    margin-bottom: 7px;
+    color: #205090;
+  }
+  
+  .admin-users-page-user-teams ul {
+    list-style: disc;
+    margin: 0 0 0 22px;
+    color: #4866ae;
+  }
+  
+  .admin-users-page-user-teams p {
+    color: #a2acc8;
+    margin: 0;
+  }
+  
+  .admin-users-page-error {
+    color: #c12c2c;
+    font-weight: 500;
+    margin-top: 10px;
+  }
+  
+  @media (max-width: 900px) {
+    .admin-users-page-root {
+      flex-direction: column;
+      gap: 24px;
+      padding: 0;
+    }
+    .admin-users-page-user-list, .admin-users-page-user-details {
+      padding: 16px;
+      border-radius: 0;
+      box-shadow: none;
+    }
+  }
