@@ -7,25 +7,30 @@ interface UsersState {
   users: User[];
   loading: boolean;
   error: string | null;
+  selectedUserId: number | null;
 }
 
 const initialState: UsersState = {
   users: [],
   loading: false,
   error: null,
+  selectedUserId: null,
 };
 
-// ✅ Получение всех пользователей
-export const getAllUsers = createAsyncThunk('users/getAll', async (_, { rejectWithValue }) => {
-  try {
-    const data = await fetchUsers();
-    return data;
-  } catch (error: any) {
-    return rejectWithValue(error.message || 'Ошибка при загрузке пользователей');
+// Получение всех пользователей
+export const getAllUsers = createAsyncThunk(
+  'users/getAll',
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await fetchUsers();
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Ошибка при загрузке пользователей');
+    }
   }
-});
+);
 
-// ✅ Получение деталей пользователя
+// Получение деталей пользователя
 export const getUserDetails = createAsyncThunk(
   'users/getDetails',
   async (userId: number, { rejectWithValue }) => {
@@ -38,13 +43,16 @@ export const getUserDetails = createAsyncThunk(
   }
 );
 
-// ✅ Обновление информации пользователя
+// Обновление информации пользователя
 export const patchUserInfo = createAsyncThunk(
   'users/updateInfo',
-  async ({ userId, data }: { userId: number; data: Partial<User> }, { rejectWithValue }) => {
+  async (
+    { userId, data }: { userId: number; data: Partial<User> },
+    { rejectWithValue }
+  ) => {
     try {
       const updated = await updateUserInfo(userId, data);
-      return updated;
+      return updated;  // Возвращаем обновленного пользователя
     } catch (error: any) {
       return rejectWithValue(error.message || 'Ошибка при обновлении пользователя');
     }
@@ -73,6 +81,9 @@ const usersSlice = createSlice({
         };
       }
     },
+    setSelectedUserId: (state, action: PayloadAction<number | null>) => {
+      state.selectedUserId = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -89,7 +100,6 @@ const usersSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
       // getUserDetails
       .addCase(getUserDetails.fulfilled, (state, action: PayloadAction<User>) => {
         const index = state.users.findIndex((user) => user.id === action.payload.id);
@@ -99,16 +109,22 @@ const usersSlice = createSlice({
           state.users[index] = action.payload;
         }
       })
-
       // patchUserInfo
       .addCase(patchUserInfo.fulfilled, (state, action: PayloadAction<User>) => {
-        const index = state.users.findIndex((user) => user.id === action.payload.id);
+        const updatedUser = action.payload;
+        const index = state.users.findIndex((user) => user.id === updatedUser.id);
         if (index !== -1) {
-          state.users[index] = action.payload;
+          // Обновляем состояние, заменяя старые данные на новые
+          state.users[index] = updatedUser;
+        }
+        // Важно, если выбранный пользователь был обновлен, меняем состояние выбранного пользователя
+        if (state.selectedUserId === updatedUser.id) {
+          state.selectedUserId = updatedUser.id;
         }
       });
   },
 });
 
-export const { setUsers, setLoading, setError, updateUser } = usersSlice.actions;
+export const { setUsers, setLoading, setError, updateUser, setSelectedUserId } = usersSlice.actions;
+
 export default usersSlice.reducer;

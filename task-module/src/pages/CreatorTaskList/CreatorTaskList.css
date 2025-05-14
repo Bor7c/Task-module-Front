@@ -48,14 +48,14 @@
   }
   .creator-tasks__filter-input {
     display: block;
-    height: 38px;
-    min-width: 125px;
+    height: 36px; /* чуть меньше, ближе к примеру */
+    min-width: 120px;
     max-width: 220px;
     border-radius: var(--border-radius);
-    border: 1.5px solid #d1d5db;
+    border: 1px solid var(--gray); /* заменили на переменную, как в примере */
     background: #fff;
-    padding: 0 13px;
-    font-size: 15px;
+    padding: 6px 12px; /* как в task-list__filter-input */
+    font-size: 13px; /* уменьшен до размера из примера */
     line-height: 1.35;
     color: var(--primary-color);
     appearance: none;
@@ -64,8 +64,8 @@
     transition: border-color 0.18s, box-shadow 0.18s;
   }
   .creator-tasks__filter-input:focus {
-    border-color: var(--secondary-color);
-    box-shadow: 0 0 0 2.5px #cee6fe;
+    border-color: var(--primary-color); /* как в task-list */
+    box-shadow: 0 0 0 2px rgba(26, 42, 108, 0.1); /* task-list style */
   }
   .creator-tasks__filter-group svg {
     color: var(--primary-color);
