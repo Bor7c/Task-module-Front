@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Avatar.css'; // Создаём простые стили, если надо
 
 interface AvatarProps {
@@ -9,24 +9,27 @@ interface AvatarProps {
 }
 
 const Avatar: React.FC<AvatarProps> = ({ src, alt, fallbackText, className }) => {
-  const [error, setError] = useState(false);
-
-  if (!src || error) {
+    const [error, setError] = useState(false);
+  
+    // Сброс ошибки, если src меняется
+    useEffect(() => {
+      setError(false);
+    }, [src]);
+  
+    if (!src || error) {
+      return (
+        <div className={`avatar-fallback ${className || ''}`}>
+          {fallbackText.charAt(0).toUpperCase()}
+        </div>
+      );
+    }
     return (
-      <div className={`avatar-fallback ${className || ''}`}>
-        {fallbackText.charAt(0).toUpperCase()}
-      </div>
+      <img
+        src={src}
+        alt={alt || 'avatar'}
+        className={`avatar-image ${className || ''}`}
+        onError={() => setError(true)}
+      />
     );
-  }
-
-  return (
-    <img
-      src={src}
-      alt={alt || 'avatar'}
-      className={`avatar-image ${className || ''}`}
-      onError={() => setError(true)}
-    />
-  );
-};
-
-export default Avatar;
+  };
+  export default Avatar;
