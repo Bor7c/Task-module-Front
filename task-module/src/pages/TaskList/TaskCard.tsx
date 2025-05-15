@@ -33,6 +33,19 @@ const TaskCard: React.FC<Props> = ({
   const profilePicture = task.responsible ? getProfilePicture(task.responsible) : null;
   const updatedAgo = timeAgo(task.updated_at);
 
+
+  const isTaskClosedToday = task.closed_at && task.deadline && (() => {
+    const closedDate = new Date(task.closed_at);
+    const deadlineDate = new Date(task.deadline);
+    return (
+      closedDate.getFullYear() === deadlineDate.getFullYear() &&
+      closedDate.getMonth() === deadlineDate.getMonth() &&
+      closedDate.getDate() === deadlineDate.getDate()
+    );
+  })();
+  
+  const isTaskLastDay = completedStatuses.includes(task.status) && isTaskClosedToday;
+
   // Подсветка: давно не обновлялось (>7 дней)
   const highlightOld = (() => {
     if (!task.updated_at) return false;
@@ -65,19 +78,26 @@ const TaskCard: React.FC<Props> = ({
       )}
       {(isTaskToday || isTaskOverdue) && (
         <div className="task-list__card-status">
-          {isTaskOverdue && (
-            <span className="task-list__card-status-badge task-list__card-status-overdue">
-              <FaExclamationCircle />
-              {completedStatuses.includes(task.status)
-                ? 'Завершена с просрочкой'
-                : 'Просрочена'}
-            </span>
-          )}
-          {isTaskToday && !isTaskOverdue && (
-            <span className="task-list__card-status-badge task-list__card-status-today">
-              <FaBell /> Последний день
-            </span>
-          )}
+        {(isTaskToday || isTaskOverdue || isTaskLastDay) && (
+          <div className="task-list__card-status">
+            {isTaskOverdue ? (
+              <span className="task-list__card-status-badge task-list__card-status-overdue">
+                <FaExclamationCircle />
+                {completedStatuses.includes(task.status)
+                  ? 'Завершена с просрочкой'
+                  : 'Просрочена'}
+              </span>
+            ) : isTaskLastDay ? (
+              <span className="task-list__card-status-badge task-list__card-status-today">
+                <FaBell /> Завершена в последний день
+              </span>
+            ) : isTaskToday ? (
+              <span className="task-list__card-status-badge task-list__card-status-today">
+                <FaBell /> Последний день
+              </span>
+            ) : null}
+          </div>
+        )}
         </div>
       )}
       <div className="task-list__card-footer">
