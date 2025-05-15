@@ -193,7 +193,7 @@ const TeamDetailPage = () => {
                     {member.role_display} • {member.email}
                   </div>
                 </div>
-                {userRole === 'admin' && (
+                {(userRole === 'admin' || userRole === 'manager') && (
                   <button
                     onClick={() => handleRemove(member.id)}
                     className="remove-btn"

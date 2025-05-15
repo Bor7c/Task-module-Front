@@ -32,7 +32,7 @@ const TaskHeader: React.FC<HeaderProps> = ({
         {!isReadOnly && localStatus !== 'in_progress' && (
           <button onClick={() => handleStatusChange('in_progress')}
             className="task-detail__status-btn task-detail__in-progress-btn">
-            {localStatus === 'solved' ? 'Возобновить работу' : 'Взять в работу'}
+            {localStatus === 'solved' ? 'Возобновить работу' : 'В работу'}
           </button>
         )}
         {!isReadOnly && (

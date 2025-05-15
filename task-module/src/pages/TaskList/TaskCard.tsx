@@ -126,17 +126,17 @@ const TaskCard: React.FC<Props> = ({
         )} */}
         {task.responsible && (
           <div className="task-list__responsible">
-            <div className="task-list__avatar" title={task.responsible.username}>
+            <div className="task-list__avatar" title={task.responsible.full_name}>
               {profilePicture ? (
                 <img
                   src={profilePicture}
-                  alt={task.responsible.username}
+                  alt={task.responsible.full_name}
                   className="task-list__avatar-img"
                   onError={e => ((e.target as HTMLImageElement).style.display = 'none')}
                 />
               ) : (
                 <div className="task-list__avatar-fallback">
-                  {task.responsible.username.charAt(0).toUpperCase()}
+                  {task.responsible.full_name.charAt(0).toUpperCase()}
                 </div>
               )}
             </div>

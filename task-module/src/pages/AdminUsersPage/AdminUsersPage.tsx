@@ -201,8 +201,8 @@ const AdminUsersPage = () => {
               >
                 <Avatar
                 src={user.profile_picture_url}
-                alt={user.username}
-                fallbackText={user.username?.slice(0, 2) || '?'}
+                alt={user.full_name}
+                fallbackText={user.full_name?.slice(0, 2) || '?'}
                 className="admin-users-page-user-avatar"
                 />
                 <div>
@@ -225,8 +225,8 @@ const AdminUsersPage = () => {
             <div className="avatar-fallback-1">
                 <Avatar
                     src={selectedUser.profile_picture_url}
-                    alt={selectedUser.username}
-                    fallbackText={selectedUser.username?.slice(0, 2) || '?'}
+                    alt={selectedUser.full_name}
+                    fallbackText={selectedUser.full_name?.slice(0, 2) || '?'}
                     className="avatar-fallback-1"
                 />
             </div>
@@ -250,11 +250,11 @@ const AdminUsersPage = () => {
                   <input
                     type="text"
                     name="first_name"
-                    value={editFields.first_name}
+                    value={editFields.last_name}
                     onChange={handleEditChange}
                   />
                 ) : (
-                  <span>{selectedUser.first_name}</span>
+                  <span>{selectedUser.last_name}</span>
                 )}
               </label>
               <label>
@@ -263,11 +263,11 @@ const AdminUsersPage = () => {
                   <input
                     type="text"
                     name="last_name"
-                    value={editFields.last_name}
+                    value={editFields.first_name}
                     onChange={handleEditChange}
                   />
                 ) : (
-                  <span>{selectedUser.last_name}</span>
+                  <span>{selectedUser.first_name}</span>
                 )}
               </label>
               <label>

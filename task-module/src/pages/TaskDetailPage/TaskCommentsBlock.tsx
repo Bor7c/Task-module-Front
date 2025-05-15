@@ -43,7 +43,7 @@ const TaskCommentsBlock: React.FC<TaskCommentsBlockProps> = ({
           <div key={comment.id} className="task-detail__comment-card">
             <div className="task-detail__comment-header">
               <div className="task-detail__comment-author">
-                <p className="task-detail__author-name">{comment.author.username}</p>
+                <p className="task-detail__author-name">{comment.author.full_name}</p>
                 <p className="task-detail__comment-meta">
                   {comment.is_modified && !comment.is_system && (<span className="task-detail__modified-badge">изменен</span>)}
                   <span className="task-detail__comment-date">{new Date(comment.updated_at).toLocaleString("ru-RU")}</span>

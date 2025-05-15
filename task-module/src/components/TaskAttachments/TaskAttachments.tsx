@@ -103,7 +103,7 @@ const TaskAttachments: React.FC<TaskAttachmentsProps> = ({ taskId, taskStatus })
                                     {new Date(attachment.uploaded_at).toLocaleDateString()}
                                     {attachment.uploaded_by && (
                                         <span className="uploaded-by">
-                                            {attachment.uploaded_by.username}
+                                            {attachment.uploaded_by.full_name}
                                         </span>
                                     )}
                                 </span>

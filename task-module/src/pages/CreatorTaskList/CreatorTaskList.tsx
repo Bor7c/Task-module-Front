@@ -81,10 +81,10 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, onClick }) => {
         }
       </div>
       <div className="task-row__cell">{timeAgo(task.updated_at)}</div>
-      <div className="task-row__cell task-row__responsible" title={task.responsible?.username || ''}>
+      <div className="task-row__cell task-row__responsible" title={task.responsible?.full_name || ''}>
         {profilePicture
           ? <img src={profilePicture} alt="" className="task-row__avatar" />
-          : (task.responsible?.username?.[0] || '—').toUpperCase()}
+          : (task.responsible?.full_name?.[0] || '—').toUpperCase()}
       </div>
     </div>
   );

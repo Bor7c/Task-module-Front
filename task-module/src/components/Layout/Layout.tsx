@@ -31,7 +31,7 @@ const Layout: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       dispatch(checkUserSession());
-    }, 300000); 
+    }, 90000000); 
     
     return () => clearInterval(interval);
   }, [dispatch]);
@@ -92,17 +92,17 @@ const Layout: React.FC = () => {
                     {profilePictureUrl && !avatarError ? (
                       <img 
                         src={profilePictureUrl} 
-                        alt={`Аватар ${user?.username}`}
+                        alt={`Аватар ${user?.full_name}`}
                         className="stm-avatar-image"
                         onError={() => setAvatarError(true)}
                       />
                     ) : (
                       <div className="stm-avatar-fallback">
-                        {user?.username?.charAt(0).toUpperCase()}
+                        {user?.full_name?.charAt(0).toUpperCase()}
                       </div>
                     )}
                   </div>
-                  <span className="stm-username">{user?.username}</span>
+                  <span className="stm-username">{user?.full_name}</span>
                 </button>
                 
                 {userMenuOpen && (

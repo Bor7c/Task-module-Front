@@ -19,6 +19,7 @@ export interface User {
   last_name: string;
   middle_name: string;
   username: string;
+  full_name: string;
   email: string;
   role: UserRole;
   role_display: string;
@@ -33,6 +34,7 @@ export interface UserForTask {
   last_name: string;
   middle_name: string;
   username: string;
+  full_name: string;
   email: string;
   role: UserRole;
   role_display: string;
@@ -104,6 +106,7 @@ export interface Attachment {
     first_name?: string;
     last_name?: string;
     middle_name?: string;
+    full_name?: string;
     email?: string;
     role?: UserRole;
     role_display?: string;

@@ -25,6 +25,15 @@ function isDateInRange(
   return true;
 }
 
+const priorityWeight = (priority: string) => {
+  switch(priority) {
+    case 'high': return 3;
+    case 'medium': return 2;
+    case 'low': return 1;
+    default: return 0;
+  }
+};
+
 const TaskList: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -34,15 +43,15 @@ const TaskList: React.FC = () => {
   const [showCompleted, setShowCompleted] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [filterType, setFilterType] = useState<'all' | 'today' | 'overdue'>('all');
-  const [sortBy, setSortBy] = useState<'created_at' | 'updated_at'>('created_at');
+  const [sortBy, setSortBy] = useState<'created_at' | 'updated_at' | 'priority' | 'deadline'>('created_at');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [daysWithoutUpdate, setDaysWithoutUpdate] = useState<number | null>(null);
-
   const [searchTitle, setSearchTitle] = useState('');
   const [selectedTeam, setSelectedTeam] = useState<number | null>(null);
   const [filterStartDate, setFilterStartDate] = useState<string>('');
   const [filterEndDate, setFilterEndDate] = useState<string>('');
   const [filterByDateType, setFilterByDateType] = useState<'created_at' | 'updated_at' | 'deadline'>('created_at');
+  const [filterPriority, setFilterPriority] = useState<'' | 'critical' | 'high' | 'medium' | 'low'>('');
   const [taskScope, setTaskScope] = useState<'all' | 'responsible' | 'allTasks'>(
     () => localStorage.getItem('taskScope') as 'all' | 'responsible' | 'allTasks' || 'all'
   );
@@ -58,8 +67,8 @@ const TaskList: React.FC = () => {
       sortBy: localStorage.getItem('filter_sortBy'),
       sortDirection: localStorage.getItem('filter_sortDirection'),
       daysWithoutUpdate: localStorage.getItem('filter_daysWithoutUpdate'),
+      filterPriority: localStorage.getItem('filter_priority'),
     };
-
     if (savedFilters.searchTitle) setSearchTitle(savedFilters.searchTitle);
     if (savedFilters.selectedTeam) setSelectedTeam(Number(savedFilters.selectedTeam));
     if (savedFilters.startDate) setFilterStartDate(savedFilters.startDate);
@@ -69,13 +78,14 @@ const TaskList: React.FC = () => {
     if (savedFilters.sortBy) setSortBy(savedFilters.sortBy as any);
     if (savedFilters.sortDirection) setSortDirection(savedFilters.sortDirection as any);
     if (savedFilters.daysWithoutUpdate) setDaysWithoutUpdate(Number(savedFilters.daysWithoutUpdate));
+    if (savedFilters.filterPriority) setFilterPriority(savedFilters.filterPriority as any);
   }, []);
 
   const saveToLocalStorage = () => {
     localStorage.setItem('filter_searchTitle', searchTitle);
     if (selectedTeam !== null) localStorage.setItem('filter_selectedTeam', String(selectedTeam));
     else localStorage.removeItem('filter_selectedTeam');
-    
+
     localStorage.setItem('filter_startDate', filterStartDate);
     localStorage.setItem('filter_endDate', filterEndDate);
     localStorage.setItem('filter_dateType', filterByDateType);
@@ -84,11 +94,12 @@ const TaskList: React.FC = () => {
     localStorage.setItem('filter_sortDirection', sortDirection);
     if (daysWithoutUpdate !== null) localStorage.setItem('filter_daysWithoutUpdate', String(daysWithoutUpdate));
     else localStorage.removeItem('filter_daysWithoutUpdate');
+    localStorage.setItem('filter_priority', filterPriority);
   };
 
   useEffect(() => {
     saveToLocalStorage();
-  }, [searchTitle, selectedTeam, filterStartDate, filterEndDate, filterByDateType, filterType, sortBy, sortDirection, daysWithoutUpdate]);
+  }, [searchTitle, selectedTeam, filterStartDate, filterEndDate, filterByDateType, filterType, sortBy, sortDirection, daysWithoutUpdate, filterPriority]);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -103,6 +114,7 @@ const TaskList: React.FC = () => {
 
   const handleTaskClick = (taskId: number) => navigate(`/tasks/${taskId}`);
   const handleCreateTask = () => navigate('/create-task');
+
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -130,7 +142,8 @@ const TaskList: React.FC = () => {
     setSortBy('created_at');
     setSortDirection('desc');
     setDaysWithoutUpdate(null);
-    localStorage.clear(); // очищаем все фильтры в localStorage
+    setFilterPriority('');
+    localStorage.clear();
   };
 
   const isToday = (dateString: string) => {
@@ -139,6 +152,7 @@ const TaskList: React.FC = () => {
     const today = new Date();
     return date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
   };
+
   const getDaysWithoutUpdate = (updatedAt: string) => {
     if (!updatedAt) return 0;
     const updateDate = new Date(updatedAt);
@@ -146,10 +160,12 @@ const TaskList: React.FC = () => {
     const diffTime = Math.abs(today.getTime() - updateDate.getTime());
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
+
   const getProfilePicture = (user: any) => {
     if (!user) return null;
     return user.profile_picture_url || null;
   };
+
   const getTodaysTasks = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -162,6 +178,7 @@ const TaskList: React.FC = () => {
       return false;
     }).length;
   };
+
   const getOverdueTasks = () => tasks.filter(task => !completedStatuses.includes(task.status) && task.is_overdue).length;
 
   const teams = useMemo(
@@ -192,7 +209,6 @@ const TaskList: React.FC = () => {
         task.title &&
         task.title.toLowerCase().includes(searchTitle.trim().toLowerCase())
     );
-
   if (selectedTeam !== null)
     filteredTasks = filteredTasks.filter(
       task => task.team && task.team.id === selectedTeam
@@ -221,14 +237,32 @@ const TaskList: React.FC = () => {
     );
   }
 
+  if (filterPriority) {
+    filteredTasks = filteredTasks.filter(
+      task => task.priority === filterPriority
+    );
+  }
+
   const activeTasks = filteredTasks.filter(task =>
     activeStatuses.includes(task.status)
   );
   const completedTasks = filteredTasks.filter(task =>
     completedStatuses.includes(task.status)
   );
+
   let tasksToDisplay = showCompleted ? completedTasks : activeTasks;
+
   tasksToDisplay = tasksToDisplay.sort((a, b) => {
+    if (sortBy === 'priority') {
+      const wA = priorityWeight(a.priority);
+      const wB = priorityWeight(b.priority);
+      return sortDirection === 'desc' ? wB - wA : wA - wB;
+    }
+    if (sortBy === 'deadline') {
+      const dA = a.deadline ? new Date(a.deadline).getTime() : 0;
+      const dB = b.deadline ? new Date(b.deadline).getTime() : 0;
+      return sortDirection === 'desc' ? dB - dA : dA - dB;
+    }
     const dateA = new Date(a[sortBy]).getTime();
     const dateB = new Date(b[sortBy]).getTime();
     return sortDirection === 'desc' ? dateB - dateA : dateA - dateB;
@@ -239,10 +273,12 @@ const TaskList: React.FC = () => {
     'Ожидает ответа': tasksToDisplay.filter(task => task.status === 'awaiting_response'),
     'Ожидает действия': tasksToDisplay.filter(task => task.status === 'awaiting_action')
   };
+
   const groupedCompletedTasks = {
     'Решено': tasksToDisplay.filter(task => task.status === 'solved'),
     'Закрыто': tasksToDisplay.filter(task => task.status === 'closed')
   };
+
   const displayGroups = showCompleted ? groupedCompletedTasks : groupedActiveTasks;
 
   const totalTasks = tasks.length;
@@ -288,6 +324,8 @@ const TaskList: React.FC = () => {
         taskScope={taskScope}
         setTaskScope={setTaskScope}
         userRole={user ? user.role : 'developer'}
+        filterPriority={filterPriority}
+        setFilterPriority={setFilterPriority}
       />
       <button className="task-list__reset-filters-btn" onClick={resetFilters}>
         Сбросить фильтры

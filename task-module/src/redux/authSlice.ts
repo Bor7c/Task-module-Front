@@ -24,6 +24,7 @@ const adaptUser = (rawUser: any): User => ({
   email: rawUser.email,
   first_name: rawUser.first_name ?? '',
   last_name: rawUser.last_name ?? '',
+  full_name: rawUser.full_name ?? '',
   middle_name: rawUser.middle_name ?? '',
   role: rawUser.role ?? 'developer',
   role_display: rawUser.role_display ?? '',

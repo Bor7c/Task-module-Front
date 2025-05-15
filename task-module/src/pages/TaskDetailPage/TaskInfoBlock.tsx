@@ -79,7 +79,7 @@ const TaskInfoBlock: React.FC<TaskInfoBlockProps> = ({
                 className="task-detail__avatar"
               />
               <div className="task-detail__user-info">
-                <span className="task-detail__user-name">{localResponsible.username}</span>
+                <span className="task-detail__user-name">{localResponsible.full_name}</span>
                 <span className="task-detail__user-role">{localResponsible.role_display}</span>
               </div>
             </>
@@ -102,11 +102,11 @@ const TaskInfoBlock: React.FC<TaskInfoBlockProps> = ({
             disabled={isReadOnly || isUpdatingResponsible}
           >
             <option value="">
-              {localResponsible ? localResponsible.username : 'Выбрать пользователя'}
+              {localResponsible ? localResponsible.full_name : 'Выбрать пользователя'}
             </option>
             {task.team.members.map(member =>
               member.id !== localResponsible?.id && (
-                <option key={member.id} value={member.id}>{member.username}</option>
+                <option key={member.id} value={member.id}>{member.full_name}</option>
               )
             )}
           </select>
@@ -140,7 +140,7 @@ const TaskInfoBlock: React.FC<TaskInfoBlockProps> = ({
             className="task-detail__avatar"
           />
           <div className="task-detail__user-info">
-            <span className="task-detail__user-name">{task.created_by.username}</span>
+            <span className="task-detail__user-name">{task.created_by.full_name}</span>
             <span className="task-detail__user-role">{task.created_by.role_display}</span>
           </div>
         </div>

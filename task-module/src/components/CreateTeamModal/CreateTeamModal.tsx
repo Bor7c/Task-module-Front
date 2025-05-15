@@ -118,7 +118,7 @@ const CreateTeamModal: React.FC<CreateTeamModalProps> = ({ open, onClose, onTeam
                 <div key={user.id} className="user-item" onClick={() => toggleUser(user.id)}>
                   <Avatar
                     src={getAvatarUrl(user.profile_picture_url)}
-                    fallbackText={user.username}
+                    fallbackText={user.full_name}
                     className="avatar"
                   />
                   <span>{user.username} ({user.first_name} {user.last_name})</span>
@@ -134,7 +134,7 @@ const CreateTeamModal: React.FC<CreateTeamModalProps> = ({ open, onClose, onTeam
                 <div key={user.id} className="user-item selected" onClick={() => toggleUser(user.id)}>
                   <Avatar
                     src={getAvatarUrl(user.profile_picture_url)}
-                    fallbackText={user.username}
+                    fallbackText={user.full_name}
                     className="avatar"
                   />
                   <span>{user.username} ({user.first_name} {user.last_name})</span>
