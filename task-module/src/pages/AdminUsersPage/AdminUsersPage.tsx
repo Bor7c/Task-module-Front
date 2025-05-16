@@ -236,9 +236,9 @@ const AdminUsersPage = () => {
                   <span className="admin-users-page-card-username">@{selectedUser.username}</span>
                 </h3>
                 <div className="admin-users-page-card-roles">
-                  <span className={`role-badge role-${selectedUser.role}`}>
+                  {/* <span className={`role-badge role-${selectedUser.role}`}>
                     {selectedUser.role_display}
-                  </span>
+                  </span> */}
                 </div>
                 <div className="admin-users-page-card-email">{selectedUser.email}</div>
               </div>

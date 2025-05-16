@@ -74,8 +74,8 @@ const TaskInfoBlock: React.FC<TaskInfoBlockProps> = ({
             <>
               <Avatar
                 src={localResponsible.profile_picture_url}
-                alt={localResponsible.username}
-                fallbackText={localResponsible.username}
+                alt={localResponsible.full_name}
+                fallbackText={localResponsible.full_name}
                 className="task-detail__avatar"
               />
               <div className="task-detail__user-info">
@@ -135,8 +135,8 @@ const TaskInfoBlock: React.FC<TaskInfoBlockProps> = ({
         <div className="task-detail__user-display">
           <Avatar
             src={task.created_by.profile_picture_url}
-            alt={task.created_by.username}
-            fallbackText={task.created_by.username}
+            alt={task.created_by.full_name}
+            fallbackText={task.created_by.full_name}
             className="task-detail__avatar"
           />
           <div className="task-detail__user-info">
