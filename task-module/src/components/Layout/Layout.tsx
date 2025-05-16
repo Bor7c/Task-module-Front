@@ -31,7 +31,7 @@ const Layout: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       dispatch(checkUserSession());
-    }, 90000000); 
+    }, 300000); 
     
     return () => clearInterval(interval);
   }, [dispatch]);

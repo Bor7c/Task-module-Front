@@ -223,7 +223,7 @@ const TeamDetailPage = () => {
                 <div className="member-row" key={user.id}>
                   <Avatar
                     src={user.profile_picture_url || null}
-                    fallbackText={user.username}
+                    fallbackText={user.full_name}
                     className="avatar"
                   />
                   <div className="member-info">
